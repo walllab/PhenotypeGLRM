@@ -64,8 +64,10 @@ with open(filename + '.csv', 'r') as infile:
 						json_item = json_item['properties'][piece]
 					else:
 						print('Problem!')
-				if 'data-type' in json_item and json_item['data-type'] == 'ordinal' and not pieces[0].startswith('ADOS_'):
+				if 'data-type' in json_item and json_item['data-type'] == 'ordinal' and not pieces[0].startswith('ADOS_') and not pieces[1].endswith('.1'):
 					keep_cols.append(i)
+
+	print('Keeping %d features' % (len(keep_cols)-1))
 
 	with open(filename + '_filtered_labels.csv', 'w+') as label_outfile:
 		with open(filename + '_filtered.csv', 'w+') as outfile:
