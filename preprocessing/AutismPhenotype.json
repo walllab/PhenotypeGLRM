@@ -2941,8 +2941,12 @@
 			"enum": ["Autism", "Control", null]
 		},
 		"clinical_diagnosis": {
-			"description": "Diagnosis given by clinician.",
+			"description": "Diagnosis given by clinician. Coded value.",
 			"enum": ["Autism", "Control", null]
+		},
+		"clinical_diagnosis_raw": {
+			"description": "Original diagnosis given by clinician. Free text.",
+			"type": ["string", "null"]
 		},
 		"cpea_diagnosis": {
 			"description": "CPEA diagnosis - combines ADIR and ADOS.",

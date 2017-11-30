@@ -255,6 +255,24 @@ def assign_diagnosis(sample):
 	else:
 		sample['diagnosis'] = None
 
+def assign_clinical_diagnosis(sample):
+	if sample['clinical_diagnosis_raw'] is not None:
+		cd = sample['clinical_diagnosis_raw'].lower()
+		if cd == '':
+			sample['clinical_diagnosis'] = None
+		elif 'aut' in cd or '299' in cd or cd in ['proband', 'broadspectrum', 'asd', 'affected sibling', 'ad']:
+			sample['clinical_diagnosis'] = 'Autism'
+		elif 'asperger' in cd:
+			sample['clinical_diagnosis'] =  'Asperger'
+		elif cd in ['nqa', 'not met', 'control']:
+			sample['clinical_diagnosis'] =  'Control'
+		elif 'pdd' in cd or 'nos' in cd or 'pervasive developmental disorder' in cd:
+			sample['clinical_diagnosis'] = 'PDD-NOS'
+		elif 'not' in cd:
+			print(sample['dataset'], sample['identifier'], cd)
+		else:
+			print(sample['dataset'], sample['identifier'], cd)
+
 def assign_all_diagnoses(sample):
 	assign_adir_diagnosis(sample)
 
@@ -268,7 +286,9 @@ def assign_all_diagnoses(sample):
 	assign_cpea_adjusted_diagnosis(sample)
 
 	assign_diagnosis(sample)
+	assign_clinical_diagnosis(sample)
 
+from collections import Counter
 if __name__ == '__main__':
 	# Load schema
 	with open("AutismPhenotype.json") as schema_file:    
@@ -279,6 +299,7 @@ if __name__ == '__main__':
 		# Read in samples
 		samples = json.load(infile)
 
+		# Diagnose
 		for sample in samples:
 			# Assign diagnoses
 			assign_all_diagnoses(sample)
@@ -286,36 +307,13 @@ if __name__ == '__main__':
 			# Validate schema
 			#jsonschema.validate(sample, pheno_schema)
 
-		#Check concordance
-		diagnosis_breakdown = defaultdict(int)
-		adir_breakdown = defaultdict(int)
-		ados_breakdown = defaultdict(int)
-		cpea_breakdown = defaultdict(int)
-		cpea_adjusted_breakdown = defaultdict(int)
+		# Print counts
+		diag_keys = ['clinical_diagnosis_raw', 'clinical_diagnosis', 'diagnosis',
+		'cpea_diagnosis', 'cpea_adjusted_diagnosis']
 
-		diag_combinations = defaultdict(int)
-		for sample in samples:
-			diags = (
-				(None if 'ADIR' not in sample else sample['ADIR']['diagnosis']), 
-				(None if 'ADOS' not in sample else sample['ADOS']['diagnosis']),
-				sample['cpea_diagnosis'])
-			diag_combinations[diags] += 1
-
-			diagnosis_breakdown[sample['diagnosis']] += 1
-			if 'ADIR' in sample:
-				adir_breakdown[sample['ADIR']['diagnosis']] += 1
-			if 'ADOS' in sample:
-				ados_breakdown[sample['ADOS']['diagnosis']] += 1
-			cpea_breakdown[sample['cpea_diagnosis']] += 1
-			cpea_adjusted_breakdown[sample['cpea_adjusted_diagnosis']] += 1
-			
-		print(diag_combinations)
-		print('diagnosis', diagnosis_breakdown)
-		print('ADOS', ados_breakdown)
-		print('ADIR', adir_breakdown)
-		print('cpea', cpea_breakdown)
-		print('cpea_adjusted', cpea_adjusted_breakdown)
-
+		for key in diag_keys:
+			print(key)
+			print(Counter([s[key] for s in samples]))
 
 		# Write to file
 		with open(sys.argv[2], 'w+') as outfile:
