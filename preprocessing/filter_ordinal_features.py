@@ -46,6 +46,7 @@ with open(filename + '.csv', 'r') as infile:
 		header.index('identifier'), 
 		header.index('diagnosis'), header.index('ADIR:diagnosis'), header.index('ADIR:diagnosis_num_nulls'), header.index('ADIR:communication'), header.index('ADIR:social_interaction'), header.index('ADIR:restricted_repetitive_behavior'),
 		header.index('ADOS:diagnosis'), header.index('ADOS:diagnosis_num_nulls'), header.index('ADOS:communication'), header.index('ADOS:social_interaction'), header.index('ADOS:restricted_repetitive_behavior'),
+		header.index('SRS:diagnosis'), header.index('SRS:diagnosis_num_nulls'), header.index('SRS:social_awareness'), header.index('SRS:social_cognition'), header.index('SRS:social_communication'), header.index('SRS:social_motivation'), header.index('SRS:autistic_mannerisms'),
 		header.index('cpea_diagnosis'), header.index('cpea_adjusted_diagnosis')
 	]
 
@@ -63,8 +64,8 @@ with open(filename + '.csv', 'r') as infile:
 					elif piece in json_item['properties']:
 						json_item = json_item['properties'][piece]
 					else:
-						print('Problem!')
-				if 'data-type' in json_item and json_item['data-type'] == 'ordinal' and not pieces[0].startswith('ADOS_') and not pieces[1].endswith('.1'):
+						print('Problem!', piece)
+				if 'data-type' in json_item and json_item['data-type'] == 'ordinal' and not pieces[0].startswith('ADOS_'):
 					keep_cols.append(i)
 
 	print('Keeping %d features' % (len(keep_cols)-1))

@@ -24,9 +24,9 @@ This package is structured as a multi-stage pipeline.
 
 Here's an example run:
 python3 aggregate_phenotype.py /Users/kelley/Projects/iHART/Phenotype
-python3 aggregate_ados.py
-python3 adjust_adir.py
+python3 remove_empty.py ../data/all_samples_stage1.json ../data/all_samples_stage2.json
+python3 aggregate_ados.py ../data/all_samples_stage2.json ../data/all_samples_stage3.json
 python3 assign_diagnosis.py ../data/all_samples_stage3.json ../data/all_samples.json
-python3 keep_only_both_instruments.py
-python3 json-to-csv.py ../data/all_samples_both_instruments.json ../data/all_samples_both_instruments.csv
-python3 filter_ordinal_features.py ../data/all_samples_both_instruments
+python3 json-to-csv.py ../data/all_samples.json ../data/all_samples.csv
+python3 filter_ordinal_features.py ../data/all_samples
+

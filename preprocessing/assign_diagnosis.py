@@ -26,7 +26,7 @@ from collections import defaultdict
 # python3 assign_diagnosis.py
 
 def calculate_subscore(score_name, sample, instrument, features, additional_score_entries = [], calculate_score_f = lambda score_entries: sum([2 if x==3 else (0 if x>3 else x) for x in score_entries if x is not None])):
-	score_entries = [sample[instrument][feature] for feature in features]
+	score_entries = [sample[instrument][key] for key in features]
 	score_entries.extend(additional_score_entries)
 	sample[instrument][score_name] = calculate_score_f(score_entries)
 	num_nulls = sum(x is None for x in score_entries)
@@ -186,6 +186,85 @@ def assign_ados_diagnosis(sample):
 		for feature in ('diagnosis', 'diagnosis_num_nulls', 'communication', 'social_interaction', 'restricted_repetitive_behavior'):
 			sample['ADOS'][feature] = sample[module][feature]
 
+srs_male = [34, 34, 35, 35, 36, 36, 37, 37, 38, 38, 
+			39, 39, 40, 40, 41, 41, 42, 42, 42, 43, 
+			43, 44, 44, 45, 45, 46, 46, 47, 47, 48,
+			48, 49, 49, 50, 50, 51, 51, 52, 52, 53,
+			53, 53, 54, 54, 55, 55, 56, 56, 57, 57,
+			58, 58, 59, 59, 60, 60, 61, 61, 62, 62,
+			63, 63, 64, 64, 64, 65, 65, 66, 66, 67,
+			67, 68, 68, 69, 69, 70, 70, 71, 71, 72,
+			72, 73, 73, 74, 74, 75, 75, 76, 76, 76,
+			77, 77, 78, 78, 79, 79, 80, 80, 81, 81, 
+			82, 82, 83, 83, 84, 84, 85, 85, 86, 86, 
+			87, 87, 87, 88, 88, 89, 89, 90, 90, 91,
+			91, 92, 92, 93, 93, 94, 94, 95, 95, 96,
+			96, 97, 97, 98, 98, 98, 99, 99, 100, 100,
+			101, 101, 102, 102, 103, 103, 104, 104, 105, 105, 
+			106, 106, 107, 107, 108, 108, 109, 109, 109, 110,
+			110, 111, 111, 112, 112, 113, 113, 114, 114, 115,
+			115, 116, 116, 117, 117, 118, 118, 119, 119, 120,
+			120, 120, 121, 121, 122, 122, 123, 123, 124, 124, 
+			125, 125, 126, 126, 127, 127]
+
+srs_female = [35, 35, 36, 36, 37, 38, 38, 39, 39, 40, 
+			40, 41, 41, 42, 42, 43, 44, 44, 45, 45, 
+			46, 46, 47, 47, 48, 49, 49, 50, 50, 51, 
+			51, 52, 52, 53, 54, 54, 55, 55, 56, 56, 
+			57, 57, 58, 59, 59, 60, 60, 61, 61, 62, 
+			62, 63, 63, 64, 65, 65, 66, 66, 67, 67,
+			68, 68, 69, 70, 70, 71, 71, 72, 72, 73,
+			73, 74, 75, 75, 76, 76, 77, 77, 78, 78, 
+			79, 80, 80, 81, 81, 82, 82, 83, 83, 84, 
+			84, 85, 86, 86, 87, 87, 88, 88, 89, 89, 
+			90, 91, 91, 92, 92, 93, 93, 94, 94, 95, 
+			96, 96, 97, 97, 98, 98, 99, 99, 100, 100,
+			101, 102, 102, 103, 103, 104, 104, 105, 105, 106, 
+			107, 107, 108, 108, 109, 109, 110, 110, 111, 112,
+			112, 113, 113, 114, 114, 115, 115, 116, 117, 117, 
+			118, 118, 119, 119, 120, 120, 121, 121, 122, 123, 
+			123, 124, 124, 125, 125, 126, 126, 127, 128, 128, 
+			129, 129, 130, 130, 131, 313, 132, 133, 133, 134,
+			134, 135, 135, 136, 136, 137, 138, 138, 139, 139, 
+			140, 140, 141, 141, 142, 142]
+
+def assign_srs_diagnosis(sample):
+	instrument = 'SRS'
+	if instrument in sample:
+
+		awa_num_nulls = calculate_subscore('social_awareness', sample, instrument,  
+			['Q02', 'Q07', 'Q25', 'Q32', 'Q45', 'Q52', 'Q54', 'Q56'])
+
+		cog_num_nulls = calculate_subscore('social_cognition', sample, instrument,  
+			['Q05', 'Q10', 'Q15', 'Q17', 'Q30', 'Q40', 'Q42', 'Q44', 'Q48',
+			'Q58', 'Q59', 'Q62'])
+
+		com_num_nulls = calculate_subscore('social_communication', sample, instrument,
+			['Q12', 'Q13', 'Q16', 'Q18', 'Q19', 'Q21', 'Q22', 'Q26', 'Q33', 
+			'Q35', 'Q36', 'Q37', 'Q38', 'Q41', 'Q46', 'Q47', 'Q51', 'Q53',
+			'Q55', 'Q57', 'Q60', 'Q61'])
+
+		mot_num_nulls = calculate_subscore('social_motivation', sample, instrument,
+			['Q01', 'Q03', 'Q06', 'Q09', 'Q11', 'Q23', 'Q27', 'Q34', 'Q43', 
+			'Q64', 'Q65'])
+
+		man_num_nulls = calculate_subscore('autistic_mannerisms', sample, instrument,
+			['Q04', 'Q08', 'Q14', 'Q20', 'Q24', 'Q28', 'Q29', 'Q31', 'Q39', 
+			'Q49', 'Q50', 'Q63'])
+
+		sample[instrument]['total_raw_score'] = sample[instrument]['social_awareness'] + sample[instrument]['social_cognition']  + \
+		sample[instrument]['social_communication']  + sample[instrument]['social_motivation']  + sample[instrument]['autistic_mannerisms'] 
+		
+		if sample['gender'] is not None:
+			if sample['gender'] == 'Male':
+				sample[instrument]['total_t_score'] = srs_male[sample[instrument]['total_raw_score']]
+			else:
+				sample[instrument]['total_t_score'] = srs_female[sample[instrument]['total_raw_score']]
+
+			sample[instrument]['diagnosis'] = 'Autism' if sample[instrument]['total_t_score'] >= 76 else 'Autism Spectrum' if sample[instrument]['total_t_score'] >= 60 else 'Control'
+
+		sample[instrument]['diagnosis_num_nulls'] = awa_num_nulls + cog_num_nulls + com_num_nulls + mot_num_nulls + man_num_nulls
+
 
 def assign_cpea_diagnosis(sample):
 	if 'ADIR' in sample and 'ADOS' in sample:
@@ -240,36 +319,23 @@ def assign_cpea_adjusted_diagnosis(sample):
 
 
 def assign_diagnosis(sample):
-	diags = (
-		(None if 'ADIR' not in sample else sample['ADIR']['diagnosis']),
-		(None if 'ADOS_Module1' not in sample else sample['ADOS_Module1']['diagnosis']),
-		(None if 'ADOS_Module2' not in sample else sample['ADOS_Module2']['diagnosis']),
-		(None if 'ADOS_Module3' not in sample else sample['ADOS_Module3']['diagnosis']),
-		(None if 'ADOS_Module4' not in sample else sample['ADOS_Module4']['diagnosis']),
-		(None if 'ADOS' not in sample else sample['ADOS']['diagnosis']),
-		sample['cpea_diagnosis'])
-	if 'Autism' in diags or 'Autism Spectrum' in diags or 'Aspergers' in diags:
-		sample['diagnosis'] = 'Autism'
-	elif 'Control' in diags:
-		sample['diagnosis'] = 'Control'
-	else:
-		sample['diagnosis'] = None
+	sample['diagnosis'] = sample['clinical_diagnosis']
 
 def assign_clinical_diagnosis(sample):
 	if sample['clinical_diagnosis_raw'] is not None:
 		cd = sample['clinical_diagnosis_raw'].lower()
 		if cd == '':
 			sample['clinical_diagnosis'] = None
-		elif 'aut' in cd or '299' in cd or cd in ['proband', 'broadspectrum', 'asd', 'affected sibling', 'ad']:
+		elif 'aut' in cd or '299' in cd or cd in ['proband', 'broadspectrum', 'asd', 'affected sibling', 'ad', 'affected']:
 			sample['clinical_diagnosis'] = 'Autism'
 		elif 'asperger' in cd:
 			sample['clinical_diagnosis'] =  'Asperger'
-		elif cd in ['nqa', 'not met', 'control']:
+		elif cd in ['nqa', 'not met', 'unaffected', 'typical', 'unaffected sibling'] or 'control' in cd:
 			sample['clinical_diagnosis'] =  'Control'
 		elif 'pdd' in cd or 'nos' in cd or 'pervasive developmental disorder' in cd:
 			sample['clinical_diagnosis'] = 'PDD-NOS'
-		elif 'not' in cd:
-			print(sample['dataset'], sample['identifier'], cd)
+		elif cd in ['not defined', 'fragile x']:
+			sample['clinical_diagnosis'] = None
 		else:
 			print(sample['dataset'], sample['identifier'], cd)
 
@@ -282,11 +348,13 @@ def assign_all_diagnoses(sample):
 	assign_ados4_diagnosis(sample)
 	assign_ados_diagnosis(sample)
 
+	assign_srs_diagnosis(sample)
+
 	assign_cpea_diagnosis(sample)
 	assign_cpea_adjusted_diagnosis(sample)
 
-	assign_diagnosis(sample)
 	assign_clinical_diagnosis(sample)
+	assign_diagnosis(sample)
 
 from collections import Counter
 if __name__ == '__main__':
@@ -308,12 +376,21 @@ if __name__ == '__main__':
 			#jsonschema.validate(sample, pheno_schema)
 
 		# Print counts
-		diag_keys = ['clinical_diagnosis_raw', 'clinical_diagnosis', 'diagnosis',
+		diag_keys = ['clinical_diagnosis', 'diagnosis',
 		'cpea_diagnosis', 'cpea_adjusted_diagnosis']
 
 		for key in diag_keys:
 			print(key)
 			print(Counter([s[key] for s in samples]))
+
+		print('ADIR')
+		print(Counter([None if 'ADIR' not in s else s['ADIR']['diagnosis'] for s in samples]))
+
+		print('ADOS')
+		print(Counter([None if 'ADOS' not in s else s['ADOS']['diagnosis'] for s in samples]))
+
+		print('SRS')
+		print(Counter([None if 'SRS' not in s else s['SRS']['diagnosis'] for s in samples]))
 
 		# Write to file
 		with open(sys.argv[2], 'w+') as outfile:

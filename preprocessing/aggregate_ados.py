@@ -19,8 +19,8 @@ from preprocessing import create_new_instrument
 # The code can be run with:
 # python3 aggregate_ados.py
 
-with open("../data/all_samples_stage1.json") as f:    
-	samples = json.load(f)
+with open(sys.argv[1], 'r') as infile:
+	samples = json.load(infile)
 
 with open("AutismPhenotype.json") as schema_file:    
 	pheno_schema = json.load(schema_file)
@@ -94,6 +94,6 @@ if __name__ == '__main__':
 		jsonschema.validate(sample, pheno_schema)
 
 	# Write json to file
-	with open('../data/all_samples_stage2.json', 'w+') as outfile:
+	with open(sys.argv[2], 'w+') as outfile:
 		print(len(samples))
 		json.dump(samples, outfile, sort_keys=True, indent=4)
