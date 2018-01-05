@@ -13,4 +13,4 @@
 # Print this sub-job's task ID
 echo "My SLURM_ARRAY_TASK_ID is " $SLURM_ARRAY_TASK_ID
 
-/scratch/PI/dpwall/DATA/iHART/kpaskov/julia-d386e40c17/bin/julia /scratch/PI/dpwall/DATA/iHART/kpaskov/PhenotypeGLRM/data $SLURM_ARRAY_TASK_ID 5
+/scratch/PI/dpwall/DATA/iHART/kpaskov/julia-d386e40c17/bin/julia /scratch/PI/dpwall/DATA/iHART/kpaskov/PhenotypeGLRM/analysis/bvs_entry_param_tuning.jl /scratch/PI/dpwall/DATA/iHART/kpaskov/PhenotypeGLRM/data $SLURM_ARRAY_TASK_ID 5
