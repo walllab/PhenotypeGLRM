@@ -1,10 +1,10 @@
 #!/bin/bash
 #
 #
-#SBATCH --job-name=entry_param_tuning
-#SBATCH --output=entry_param_tuning%A_%a.out
-#SBATCH --error=entry_param_tuning%A_%a.err
-#SBATCH --array=1-15
+#SBATCH --job-name=l1_param_tuning
+#SBATCH --output=l1_param_tuning%A_%a.out
+#SBATCH --error=l1_param_tuning%A_%a.err
+#SBATCH --array=1-4
 #SBATCH -p dpwall
 #SBATCH -D /scratch/PI/dpwall/DATA/iHART/kpaskov/PhenotypeGLRM
 #SBATCH -t 20:00:00
