@@ -4,7 +4,7 @@
 #SBATCH --job-name=wi_param_tuning
 #SBATCH --output=wi_param_tuning%A_%a.out
 #SBATCH --error=wi_param_tuning%A_%a.err
-#SBATCH --array=1-15
+#SBATCH --array=1-10
 #SBATCH -p dpwall
 #SBATCH -D /scratch/PI/dpwall/DATA/iHART/kpaskov/PhenotypeGLRM
 #SBATCH -t 20:00:00

@@ -27,7 +27,7 @@ obs = collect(zip(i, j))
 @show maximum(all_data), minimum(all_data), size(obs, 1)
 
 # construct the model
-rx, ry = SimplexConstraint(), QuadReg(.01)
+rx, ry = NonNegOneReg(1.0), QuadReg(.01)
 
 losses = Array{Loss}(n)
 D = 0
@@ -54,10 +54,6 @@ function getfolds(samples::Array{Int,1}, nfolds)
     return folds
 end
 
-# the loss function evaluates the objective minus the regularization
-# it is the default error metric
-error_fn(args...; kwargs...) = objective(args...; include_regularization=false, kwargs...)
-
 # Features fo each instrument
 adir_indices = 1:139
 ados_indices = 140:185
@@ -78,11 +74,11 @@ train_error = Array{Float64}(nfolds)
 test_error = Array{Float64}(nfolds)
     
 folds = getfolds(Array{Int}(have_all_three), nfolds)
-for j=1:nfolds
-    println("\nforming train and test GLRM for fold $j")
+for ifold=1:nfolds
+    println("\nforming train and test GLRM for fold $ifold")
 
     # Select train/test samples for this fold
-    train_samples, test_samples = folds[j]
+    train_samples, test_samples = folds[ifold]
     ntrain = length(train_samples)
     ntest = length(test_samples)
 
@@ -103,8 +99,8 @@ for j=1:nfolds
     dropzeros!(train_data)
 
     # Mask obs
-    i, j, v = findnz(train_data)
-    obs = collect(zip(i, j))
+    is, js, vs = findnz(train_data)
+    obs = collect(zip(is, js))
 
     test_data = sparse(test_data)
     dropzeros!(test_data)
@@ -125,14 +121,19 @@ for j=1:nfolds
     train_glrm = GLRM(train_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=Xinit, Y=Yord);
     X,Y,ch = LowRankModels.fit!(train_glrm, params=ProxGradParams(max_iter=500), verbose=true);
 
-    train_error[j] = error_fn(train_glrm, train_glrm.X, train_glrm.Y) / size(nonzeros(train_data), 1)
-    println("\ttrain error: $(train_error[j])")
+    train_error[ifold] = objective(train_glrm,
+            X, Y, include_regularization=false) / size(nonzeros(train_data), 1)
+    println("\ttrain error: $(train_error[ifold])")
+
+    test_glrm = GLRM(test_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=Xinit, Y=Yord)
+    test_error[ifold] = objective(test_glrm,
+            X, Y, include_regularization=false) / size(nonzeros(test_data), 1)
+    println("\ttest error:  $(test_error[ifold])")
+    
             
-    test_glrm = GLRM(test_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=randn(k, m), Y=Yord);
-    test_error[j] = error_fn(test_glrm, train_glrm.X, train_glrm.Y) / size(nonzeros(test_data), 1)
-    println("\ttest error:  $(test_error[j])")
+       
 end
     
 # write to file
-writecsv(string(data_directory, "/impute_bvs_simplex_cv_train_error_wholeinst$(k).csv"), train_error)
-writecsv(string(data_directory, "/impute_bvs_simplex_cv_test_error_wholeinst$(k).csv"), test_error)
+writecsv(string(data_directory, "/impute_bvs_l1_cv_train_error_wholeinst$(k).csv"), train_error)
+writecsv(string(data_directory, "/impute_bvs_l1_cv_test_error_wholeinst$(k).csv"), test_error)
