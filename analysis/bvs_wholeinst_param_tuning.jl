@@ -130,10 +130,8 @@ for ifold=1:nfolds
             X, Y, include_regularization=false) / size(nonzeros(test_data), 1)
     println("\ttest error:  $(test_error[ifold])")
     
-            
-       
+    # write to file
+	writecsv(string(data_directory, "/impute_bvs_l1_cv_train_error_wholeinst$(k).csv"), train_error)
+	writecsv(string(data_directory, "/impute_bvs_l1_cv_test_error_wholeinst$(k).csv"), test_error)    
 end
     
-# write to file
-writecsv(string(data_directory, "/impute_bvs_l1_cv_train_error_wholeinst$(k).csv"), train_error)
-writecsv(string(data_directory, "/impute_bvs_l1_cv_test_error_wholeinst$(k).csv"), test_error)
