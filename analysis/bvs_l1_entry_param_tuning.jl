@@ -4,10 +4,9 @@ using LowRankModels
 
 # Pull command line arguments
 data_directory = ARGS[1]
-reg = parse(Int64, ARGS[2])
+k = parse(Int64, ARGS[2])
 nfolds = parse(Int64, ARGS[3])
-k = 7
-@show data_directory, reg, k, nfolds
+@show data_directory, k, nfolds
 
 # Read in training data
 df = readtable(string(data_directory, "/all_samples_filtered_train.csv"), header=false)
@@ -29,7 +28,7 @@ obs = collect(zip(i, j))
 @show maximum(all_data), minimum(all_data), size(obs, 1)
 
 # construct the model
-rx, ry = NonNegOneReg(10.0^(reg-2)), QuadReg(.01)
+rx, ry = NonNegOneReg(1.0), QuadReg(.01)
 
 losses = Array{Loss}(n)
 D = 0
@@ -53,7 +52,7 @@ end
 glrm = GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=Xinit, Y=Yord);
 
 # cross validate
-#train_error, test_error, train_glrms, test_glrms = cross_validate(glrm, nfolds=nfolds, use_folds=1, params=ProxGradParams(max_iter=500), verbose=true)
+train_error, test_error, train_glrms, test_glrms = cross_validate(glrm, nfolds=nfolds, use_folds=1, params=ProxGradParams(max_iter=500), verbose=true)
 
 # write to file
 #writecsv(string(data_directory, "/impute_bvs_simplex_cv_train_error$(k)_$(10.0^(reg-2)).csv"), train_error)
@@ -63,7 +62,7 @@ glrm = GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=X
 @time X,Y,ch = fit!(glrm, ProxGradParams(max_iter=500));
 
 # write to file
-writecsv(string(data_directory, "/impute_bvs_simplex_initk_X$(k)_$(10.0^(reg-2)).csv"), X)
-writecsv(string(data_directory, "/impute_bvs_simplex_initk_Y$(k)_$(10.0^(reg-2)).csv"), Y)
-writecsv(string(data_directory, "/impute_bvs_simplex_initk_Z$(k)_$(10.0^(reg-2)).csv"), impute(glrm))
+writecsv(string(data_directory, "/impute_bvs_simplex_initk_X$(k).csv"), X)
+writecsv(string(data_directory, "/impute_bvs_simplex_initk_Y$(k).csv"), Y)
+writecsv(string(data_directory, "/impute_bvs_simplex_initk_Z$(k).csv"), impute(glrm))
 
