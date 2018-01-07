@@ -28,7 +28,7 @@ obs = collect(zip(i, j))
 @show maximum(all_data), minimum(all_data), size(obs, 1)
 
 # construct the model
-rx, ry = NonNegOneReg(1.0), QuadReg(.01)
+rx, ry = NonNegOneReg(1000.0), QuadReg(.01)
 
 losses = Array{Loss}(n)
 D = 0
@@ -62,7 +62,7 @@ writecsv(string(data_directory, "/impute_bvs_l1_cv_test_error$(k).csv"), test_er
 @time X,Y,ch = fit!(glrm, ProxGradParams(max_iter=500));
 
 # write to file
-writecsv(string(data_directory, "/impute_bvs_l1_initk_X$(k).csv"), X)
-writecsv(string(data_directory, "/impute_bvs_l1_initk_Y$(k).csv"), Y)
-writecsv(string(data_directory, "/impute_bvs_l1_initk_Z$(k).csv"), impute(glrm))
+writecsv(string(data_directory, "/impute_bvs_l1_reg1000_X$(k).csv"), X)
+writecsv(string(data_directory, "/impute_bvs_l1_reg1000_Y$(k).csv"), Y)
+writecsv(string(data_directory, "/impute_bvs_l1_reg1000_Z$(k).csv"), impute(glrm))
 
