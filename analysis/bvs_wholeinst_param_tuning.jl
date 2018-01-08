@@ -27,7 +27,7 @@ obs = collect(zip(i, j))
 @show maximum(all_data), minimum(all_data), size(obs, 1)
 
 # construct the model
-rx, ry = lastentry1(NonNegConstraint()), OrdinalReg(QuadReg(.01))
+rx, ry = lastentry1(QuadReg(.01)), OrdinalReg(QuadReg(.01))
 
 losses = Array{Loss}(n)
 D = 0
@@ -134,7 +134,7 @@ for ifold=1:nfolds
     println("\ttest error:  $(test_error[ifold])")
     
     # write to file
-	writecsv(string(data_directory, "/impute_bvs_nonneg_ordreg_cv_train_error_wholeinst$(k).csv"), train_error)
-	writecsv(string(data_directory, "/impute_bvs_nonneg_ordreg_cv_test_error_wholeinst$(k).csv"), test_error)    
+	writecsv(string(data_directory, "/impute_bvs_quadreg_ordreg_cv_train_error_wholeinst$(k).csv"), train_error)
+	writecsv(string(data_directory, "/impute_bvs_quadreg_ordreg_cv_test_error_wholeinst$(k).csv"), test_error)    
 end
     
