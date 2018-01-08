@@ -28,7 +28,7 @@ obs = collect(zip(i, j))
 @show maximum(all_data), minimum(all_data), size(obs, 1)
 
 # construct the model
-rx, ry = lastentry1(NonNegConstraint()), OrdinalReg(QuadReg(.01))
+rx, ry = lastentry1(QuadReg(.01)), OrdinalReg(QuadReg(.01))
 
 losses = Array{Loss}(n)
 D = 0
@@ -55,15 +55,15 @@ glrm = GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=X
 train_error, test_error, train_glrms, test_glrms = cross_validate(glrm, nfolds=nfolds, use_folds=1, params=ProxGradParams(max_iter=500), verbose=true)
 
 # write to file
-writecsv(string(data_directory, "/impute_bvs_nonneg_ordreg_cv_train_error$(k).csv"), train_error)
-writecsv(string(data_directory, "/impute_bvs_nonneg_ordreg_cv_test_error$(k).csv"), test_error)
+writecsv(string(data_directory, "/impute_bvs_quadreg_ordreg_cv_train_error$(k).csv"), train_error)
+writecsv(string(data_directory, "/impute_bvs_quadreg_ordreg_cv_test_error$(k).csv"), test_error)
 
 # fit full model
 @time X,Y,ch = fit!(glrm, ProxGradParams(max_iter=500));
 
 # write to file
-writecsv(string(data_directory, "/impute_bvs_nonneg_ordreg_X$(k).csv"), X)
-writecsv(string(data_directory, "/impute_bvs_nonneg_ordreg_Y$(k).csv"), Y)
-writecsv(string(data_directory, "/impute_bvs_nonneg_ordreg_Z$(k).csv"), impute(glrm))
+writecsv(string(data_directory, "/impute_bvs_quadreg_ordreg_X$(k).csv"), X)
+writecsv(string(data_directory, "/impute_bvs_quadreg_ordreg_Y$(k).csv"), Y)
+writecsv(string(data_directory, "/impute_bvs_quadreg_ordreg_Z$(k).csv"), impute(glrm))
 
 
