@@ -28,7 +28,7 @@ obs = collect(zip(i, j))
 @show maximum(all_data), minimum(all_data), size(obs, 1)
 
 # construct the model
-rx, ry = NonNegOneReg(1.0), QuadReg(.01)
+rx, ry = lastentry1(NonNegOneReg(1.0)), OrdinalReg(QuadReg(.01))
 
 losses = Array{Loss}(n)
 D = 0
@@ -49,22 +49,22 @@ for j=1:n
     prox!(ry, view(Yord,:,yidxs[j]), 1)
 end
 
-glrm = GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=true, X=Xinit, Y=Yord);
+glrm = GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=Xinit, Y=Yord);
 
 # fit full model
 @time X,Y,ch = fit!(glrm, ProxGradParams(max_iter=500));
 
 # write to file
-writecsv(string(data_directory, "/impute_bvs_l1_offset_X$(k).csv"), X)
-writecsv(string(data_directory, "/impute_bvs_l1_offset_Y$(k).csv"), Y)
-writecsv(string(data_directory, "/impute_bvs_l1_offset_Z$(k).csv"), impute(glrm))
+writecsv(string(data_directory, "/impute_bvs_l1_ordreg_X$(k).csv"), X)
+writecsv(string(data_directory, "/impute_bvs_l1_ordreg_Y$(k).csv"), Y)
+writecsv(string(data_directory, "/impute_bvs_l1_ordreg_Z$(k).csv"), impute(glrm))
 
 # cross validate
 train_error, test_error, train_glrms, test_glrms = cross_validate(glrm, nfolds=nfolds, use_folds=5, params=ProxGradParams(max_iter=500), verbose=true)
 
 # write to file
-writecsv(string(data_directory, "/impute_bvs_l1_offset_cv_train_error$(k).csv"), train_error)
-writecsv(string(data_directory, "/impute_bvs_l1_offset_cv_test_error$(k).csv"), test_error)
+writecsv(string(data_directory, "/impute_bvs_l1_ordreg_cv_train_error$(k).csv"), train_error)
+writecsv(string(data_directory, "/impute_bvs_l1_ordreg_cv_test_error$(k).csv"), test_error)
 
 
 
