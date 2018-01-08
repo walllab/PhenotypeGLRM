@@ -134,7 +134,7 @@ for ifold=1:nfolds
     println("\ttest error:  $(test_error[ifold])")
     
     # write to file
-	writecsv(string(data_directory, "/impute_bvs_l1_ordreg_cv_train_error_wholeinst$(k).csv"), train_error)
-	writecsv(string(data_directory, "/impute_bvs_l1_ordreg_cv_test_error_wholeinst$(k).csv"), test_error)    
+	writecsv(string(data_directory, "/impute_bvs_simplex_ordreg_cv_train_error_wholeinst$(k).csv"), train_error)
+	writecsv(string(data_directory, "/impute_bvs_simplex_ordreg_cv_test_error_wholeinst$(k).csv"), test_error)    
 end
     
