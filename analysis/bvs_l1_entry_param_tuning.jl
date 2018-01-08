@@ -28,7 +28,7 @@ obs = collect(zip(i, j))
 @show maximum(all_data), minimum(all_data), size(obs, 1)
 
 # construct the model
-rx, ry = lastentry1(NonNegOneReg(1.0)), OrdinalReg(QuadReg(.01))
+rx, ry = lastentry1(SimplexConstraint()), OrdinalReg(QuadReg(.01))
 
 losses = Array{Loss}(n)
 D = 0
