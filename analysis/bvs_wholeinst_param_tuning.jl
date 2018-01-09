@@ -27,7 +27,7 @@ obs = collect(zip(i, j))
 @show maximum(all_data), minimum(all_data), size(obs, 1)
 
 # construct the model
-rx, ry = lastentry1(QuadReg(.01)), OrdinalReg(QuadReg(.01))
+rx, ry = SimplexConstraint(), QuadReg(.01)
 
 losses = Array{Loss}(n)
 D = 0
@@ -121,7 +121,7 @@ for ifold=1:nfolds
 	end
 
 	# Fit model
-    train_glrm = GLRM(train_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=Xinit, Y=Yord);
+    train_glrm = GLRM(train_data, losses, rx, ry, k, obs=obs, scale=false, offset=true, X=Xinit, Y=Yord);
     X,Y,ch = LowRankModels.fit!(train_glrm, params=ProxGradParams(max_iter=500), verbose=true);
 
     train_error[ifold] = objective(train_glrm,
@@ -134,7 +134,7 @@ for ifold=1:nfolds
     println("\ttest error:  $(test_error[ifold])")
     
     # write to file
-	writecsv(string(data_directory, "/impute_bvs_quadreg_ordreg_cv_train_error_wholeinst$(k).csv"), train_error)
-	writecsv(string(data_directory, "/impute_bvs_quadreg_ordreg_cv_test_error_wholeinst$(k).csv"), test_error)    
+	writecsv(string(data_directory, "/impute_bvs_simplex_offset_cv_train_error_wholeinst$(k).csv"), train_error)
+	writecsv(string(data_directory, "/impute_bvs_simplex_offset_cv_test_error_wholeinst$(k).csv"), test_error)    
 end
     
