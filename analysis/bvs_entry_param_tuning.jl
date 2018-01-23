@@ -49,20 +49,20 @@ for j=1:n
     prox!(ry, view(Yord,:,yidxs[j]), 1)
 end
 
-glrm = GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=Xinit, Y=Yord);
+glrm = GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=true, X=Xinit, Y=Yord);
 
 # cross validate
 train_error, test_error, train_glrms, test_glrms = cross_validate(glrm, nfolds=nfolds, params=ProxGradParams(max_iter=500), verbose=true)
 
 # write to file
-writecsv(string(data_directory, "/impute_bvs_simplex_cv_train_error$(k).csv"), train_error)
-writecsv(string(data_directory, "/impute_bvs_simplex_cv_test_error$(k).csv"), test_error)
+writecsv(string(data_directory, "/impute_bvs_simplex_offset_cv_train_error$(k).csv"), train_error)
+writecsv(string(data_directory, "/impute_bvs_simplex_offset_cv_test_error$(k).csv"), test_error)
 
 # fit full model
 @time X,Y,ch = fit!(glrm, ProxGradParams(max_iter=500));
 
 # write to file
-writecsv(string(data_directory, "/impute_bvs_simplex_initk_X$(k).csv"), X)
-writecsv(string(data_directory, "/impute_bvs_simplex_initk_Y$(k).csv"), Y)
-writecsv(string(data_directory, "/impute_bvs_simplex_initk_Z$(k).csv"), impute(glrm))
+writecsv(string(data_directory, "/impute_bvs_simplex_offset_X$(k).csv"), X)
+writecsv(string(data_directory, "/impute_bvs_simplex_offset_Y$(k).csv"), Y)
+writecsv(string(data_directory, "/impute_bvs_simplex_offset_Z$(k).csv"), impute(glrm))
 

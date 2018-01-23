@@ -128,7 +128,7 @@ for ifold=1:nfolds
             X, Y, include_regularization=false) / size(nonzeros(train_data), 1)
     println("\ttrain error: $(train_error[ifold])")
 
-    test_glrm = GLRM(test_data, losses, rx, ry, k, obs=test_obs, scale=false, offset=false, X=Xinit, Y=Yord)
+    test_glrm = GLRM(test_data, losses, rx, ry, k, obs=test_obs, scale=false, offset=true, X=Xinit, Y=Yord)
     test_error[ifold] = objective(test_glrm,
             X, Y, include_regularization=false) / size(nonzeros(test_data), 1)
     println("\ttest error:  $(test_error[ifold])")
