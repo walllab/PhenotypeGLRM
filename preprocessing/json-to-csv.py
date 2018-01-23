@@ -21,7 +21,6 @@
 # www.askVinay.com
 
 # Modifications by Kelley Paskov to meet needs of Wall Lab phenotype project
-# Must be run with Python 2
 ##
 
 import sys
