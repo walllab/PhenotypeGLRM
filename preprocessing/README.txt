@@ -8,19 +8,18 @@ for the following instruments:
 	Autism Diagnostic Interview-Revised (ADIR)
 	Autism Diagnostic Observation Schedule 2 (ADOS)*
 
-* As a note, ADOS contains four modules, each of which are administered to individuals in different age brackets. I aggregate these modules by item.
+* As a note, ADOS contains four modules, each of which are administered to individuals in different age brackets. We aggregate these modules by item.
 
 The data from these datasets exists in csv and txt files on sherlock at /scratch/PI/dpwall/DATA/phenotypes. Each dataset uses a different file structure (sometimes multiple structures) to store the data. I used a jsonschema (which can be found in AutismPhenotype.json) to aggregate the data and to be sure that is conforms to the instruments themselves.
 
 This package is structured as a multi-stage pipeline.
 
 1. aggregate_phenotype.py - Pulls data from raw files, aggregates it into json, then validates this json with the jsonschema
-2. aggregate_ados.py - Aggregates ADOS data across all four modules, item by item, to create an ADOS dataset that is comparable across individuals
-3. adjust_adir.py - Imputes questions of the form Q**.1 and Q**.2 from each other. These correspond to "current"/"ever" questions. One is often left blank.
+2. remove_empty.py - Removes subjects that do not have data for any instrument. This occurs because some of our datasets include all study participants, even if they do not have phenotypic data. 
+3. aggregate_ados.py - Aggregates ADOS data across all four modules, item by item, to create an ADOS dataset that is comparable across individuals
 4. assign_diagnosis.py - Assigns diagnoses to each instrument based on item-level data for each instrument. This script uses the diagnostic instructions provided with each instrument.
-5. keep_only_both_instruments.py - Creates a .json file containing only samples with both instruments.
-6. json-to-csv.py - Transforms json into csv form for ease of analysis.
-7. filter_ordinal_features.py - Creates a csv file filtered by column. Only pulls column of interest for analysis (disregards special codes, also discards individual ADOS modules in favor of the aggregated ADOS data).
+5. json-to-csv.py - Transforms json into csv form for ease of analysis.
+6. filter_ordinal_features.py - Pulls columns of interet for analysis. Discards age of onset questions, special codes, and individual ADOS modules (in favor of the aggregated ADOS data).
 
 Here's an example run:
 python3 aggregate_phenotype.py /Users/kelley/Projects/iHART/Phenotype
