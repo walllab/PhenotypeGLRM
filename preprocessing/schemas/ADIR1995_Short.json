@@ -1,0 +1,2495 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "ADIR1995_Short",
+	"id": "resource:/schemas/ADIR1995_Short#",
+	"type": "object",
+	"additionalProperties": false,
+    "properties": {
+        "Q02": {
+            "data-type": "interval",
+            "description": "Age (in Months) When Parents First Noticed Something Not Quite Right",
+            "maximum": 899,
+            "not": {
+                "enum": [
+                    991,
+                    992,
+                    996,
+                    997,
+                    998,
+                    999
+                ]
+            },
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "Q04": {
+            "data-type": "interval",
+            "description": "Walked Unaided (in months)",
+            "maximum": 899,
+            "not": {
+                "enum": [
+                    991,
+                    992,
+                    996,
+                    997,
+                    998,
+                    999
+                ]
+            },
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "Q05": {
+            "data-type": "interval",
+            "description": "Acquisition (in months) of Bowel and Bladder Control: Daytime",
+            "maximum": 899,
+            "not": {
+                "enum": [
+                    991,
+                    992,
+                    996,
+                    997,
+                    998,
+                    999
+                ]
+            },
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "Q06": {
+            "data-type": "interval",
+            "description": "Acquisition (in months) of Bowel and Bladder control: Night",
+            "maximum": 899,
+            "not": {
+                "enum": [
+                    991,
+                    992,
+                    996,
+                    997,
+                    998,
+                    999
+                ]
+            },
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "Q07": {
+            "data-type": "ordinal",
+            "description": "Use of Other's Body to Communicate (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q07E": {
+            "data-type": "ordinal",
+            "description": "Use of Other's Body to Communicate (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q07Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Use of Other's Body to Communicate (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q07a": {
+            "data-type": "categorical",
+            "description": "Coded: Use of Other's Body to Communicate (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q08": {
+            "data-type": "interval",
+            "description": "Age of First Single Words (If Ever Used) (in months)",
+            "maximum": 899,
+            "not": {
+                "enum": [
+                    991,
+                    992,
+                    996,
+                    997,
+                    998,
+                    999
+                ]
+            },
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "Q09": {
+            "data-type": "interval",
+            "description": "Age of First Phrases (If Ever Used) (in months)",
+            "maximum": 899,
+            "not": {
+                "enum": [
+                    991,
+                    992,
+                    996,
+                    997,
+                    998,
+                    999
+                ]
+            },
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "Q10": {
+            "data-type": "ordinal",
+            "description": "Articulation/Pronunciation (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q10E": {
+            "data-type": "ordinal",
+            "description": "Articulation/Pronunciation (at age 5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q10Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Articulation/Pronunciation (at age 5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q10a": {
+            "data-type": "categorical",
+            "description": "Coded: Articulation/Pronunciation (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q11": {
+            "data-type": "ordinal",
+            "description": "Complexity of Non-Echoed Utterances (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q11E": {
+            "data-type": "ordinal",
+            "description": "Complexity of Non-Echoed Utterances (at age 5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q11Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Complexity of Non-Echoed Utterances (at age 5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q11a": {
+            "data-type": "categorical",
+            "description": "Coded: Complexity of Non-Echoed Utterances (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q12": {
+            "data-type": "ordinal",
+            "description": "Immediate Echolalia (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q12E": {
+            "data-type": "ordinal",
+            "description": "Immediate Echolalia (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q12Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Immediate Echolalia (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q12a": {
+            "data-type": "categorical",
+            "description": "Coded: Immediate Echolalia (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q13": {
+            "data-type": "ordinal",
+            "description": "Stereotyped Utterances and Delayed Echolalia (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q13E": {
+            "data-type": "ordinal",
+            "description": "Stereotyped Utterances and Delayed Echolalia (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q13Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Stereotyped Utterances and Delayed Echolalia (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q13a": {
+            "data-type": "categorical",
+            "description": "Coded: Stereotyped Utterances and Delayed Echolalia (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q14": {
+            "data-type": "ordinal",
+            "description": "Overall Level of Language (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q15": {
+            "data-type": "ordinal",
+            "description": "Social Vocalization/Chat (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q15E": {
+            "data-type": "ordinal",
+            "description": "Social Vocalization/Chat (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q15Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Social Vocalization/Chat (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q15a": {
+            "data-type": "categorical",
+            "description": "Coded: Social Vocalization/Chat (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q16": {
+            "data-type": "ordinal",
+            "description": "Reciprocal Conversation (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q16E": {
+            "data-type": "ordinal",
+            "description": "Reciprocal Conversation (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q16Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Reciprocal Conversation (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q16a": {
+            "data-type": "categorical",
+            "description": "Coded: Reciprocal Conversation (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q17": {
+            "data-type": "ordinal",
+            "description": "Inappropriate Questions or Statements (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q17E": {
+            "data-type": "ordinal",
+            "description": "Inappropriate Questions or Statements (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q17Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Inappropriate Questions or Statements (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q17a": {
+            "data-type": "categorical",
+            "description": "Coded: Inappropriate Questions or Statements (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q18": {
+            "data-type": "ordinal",
+            "description": "Pronominal Reversal (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q18E": {
+            "data-type": "ordinal",
+            "description": "Pronominal Reversal (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q18Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Pronominal Reversal (ever)",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q18a": {
+            "data-type": "categorical",
+            "description": "Coded: Pronominal Reversal (current)",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q19": {
+            "data-type": "ordinal",
+            "description": "Neologisms/Idiosyncratic Language (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q19E": {
+            "data-type": "ordinal",
+            "description": "Neologisms/Idiosyncratic Language (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q19Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Neologisms/Idiosyncratic Language (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q19a": {
+            "data-type": "categorical",
+            "description": "Coded: Neologisms/Idiosyncratic Language (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q20": {
+            "data-type": "ordinal",
+            "description": "Verbal Rituals (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q20E": {
+            "data-type": "ordinal",
+            "description": "Verbal Rituals (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q20Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Verbal Rituals (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q20a": {
+            "data-type": "categorical",
+            "description": "Coded: Verbal Rituals (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q21": {
+            "data-type": "ordinal",
+            "description": "Spontaneous Imitation of Actions (current under age 10.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q21E": {
+            "data-type": "ordinal",
+            "description": "Spontaneous Imitation of Actions (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q21Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Spontaneous Imitation of Actions (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q21a": {
+            "data-type": "categorical",
+            "description": "Coded: Spontaneous Imitation of Actions (current under age 10.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q22": {
+            "data-type": "ordinal",
+            "description": "Pointing to Express Interest (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q22E": {
+            "data-type": "ordinal",
+            "description": "Pointing to Express Interest (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q22Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Pointing to Express Interest (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q22a": {
+            "data-type": "categorical",
+            "description": "Coded: Pointing to Express Interest (current)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q23": {
+            "data-type": "ordinal",
+            "description": "Conventional/Instrumental Gestures (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q23E": {
+            "data-type": "ordinal",
+            "description": "Conventional/instrumental Gestures (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q23Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Conventional/instrumental Gestures (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q23a": {
+            "data-type": "categorical",
+            "description": "Coded: Conventional/Instrumental Gestures (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q24": {
+            "data-type": "ordinal",
+            "description": "Nodding (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q24E": {
+            "data-type": "ordinal",
+            "description": "Nodding (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q24Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Nodding (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q24a": {
+            "data-type": "categorical",
+            "description": "Coded: Nodding (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q25": {
+            "data-type": "ordinal",
+            "description": "Head Shaking (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q25E": {
+            "data-type": "ordinal",
+            "description": "Head Shaking (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q25Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Head Shaking (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q25a": {
+            "data-type": "categorical",
+            "description": "Coded: Head Shaking (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q26": {
+            "data-type": "ordinal",
+            "description": "Attention to Voice (current under age 5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q26E": {
+            "data-type": "ordinal",
+            "description": "Attention to Voice (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q26Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Attention to Voice (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q26a": {
+            "data-type": "categorical",
+            "description": "Coded: Attention to Voice (current under age 5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q27E": {
+            "data-type": "ordinal",
+            "description": "Concerns about Hearing (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q27Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Concerns about Hearing (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q28": {
+            "data-type": "ordinal",
+            "description": "Comprehension of Simple Language (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q28E": {
+            "data-type": "ordinal",
+            "description": "Comprehension of Simple Language (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q29": {
+            "data-type": "ordinal",
+            "description": "Direct Gaze (current under age 4.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q29E": {
+            "data-type": "ordinal",
+            "description": "Direct Gaze (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q29Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Direct Gaze (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q29a": {
+            "data-type": "categorical",
+            "description": "Coded: Direct Gaze (current under age 4.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q30": {
+            "data-type": "ordinal",
+            "description": "Social Smiling (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q30E": {
+            "data-type": "ordinal",
+            "description": "Social Smiling (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q30Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Social Smiling (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q30a": {
+            "data-type": "categorical",
+            "description": "Coded: Social Smiling (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q31": {
+            "data-type": "ordinal",
+            "description": "Showing and Directing Attention (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q31E": {
+            "data-type": "ordinal",
+            "description": "Showing and Directing Attention (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q31Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Showing and Directing Attention (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q31a": {
+            "data-type": "categorical",
+            "description": "Coded: Showing and Directing Attention (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q32": {
+            "data-type": "ordinal",
+            "description": "Offering to Share (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q32E": {
+            "data-type": "ordinal",
+            "description": "Offering to Share (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q32Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Offering to Share (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q32a": {
+            "data-type": "categorical",
+            "description": "Coded: Offering to Share (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q33": {
+            "data-type": "ordinal",
+            "description": "Seeking to Share His/Her Enjoyment with Others (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q33E": {
+            "data-type": "ordinal",
+            "description": "Seeking to Share His/Her Enjoyment with Others (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q33Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Seeking to Share His/Her Enjoyment with Others (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q33a": {
+            "data-type": "categorical",
+            "description": "Coded: Seeking to Share His/Her Enjoyment with Others (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q34": {
+            "data-type": "ordinal",
+            "description": "Offers Comfort (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q34E": {
+            "data-type": "ordinal",
+            "description": "Offers Comfort (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q34Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Offers Comfort (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q34a": {
+            "data-type": "categorical",
+            "description": "Coded: Offers Comfort (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q35": {
+            "data-type": "ordinal",
+            "description": "Quality of Social Overtures (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q35E": {
+            "data-type": "ordinal",
+            "description": "Quality of Social Overtures (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q35Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Quality of Social Overtures (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q35a": {
+            "data-type": "categorical",
+            "description": "Coded: Quality of Social Overtures (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q36": {
+            "data-type": "ordinal",
+            "description": "Range of Facial Expression Used to Communicate (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q36E": {
+            "data-type": "ordinal",
+            "description": "Range of Facial Expression Used to Communicate (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q36Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Range of Facial Expression Used to Communicate (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q36a": {
+            "data-type": "categorical",
+            "description": "Coded: Range of Facial Expression Used to Communicate (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q37": {
+            "data-type": "ordinal",
+            "description": "Inappropriate Facial Expression (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q37E": {
+            "data-type": "ordinal",
+            "description": "Inappropriate Facial Expression (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q37Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Inappropriate Facial Expression (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q37a": {
+            "data-type": "categorical",
+            "description": "Coded: Inappropriate Facial Expression (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q38": {
+            "data-type": "ordinal",
+            "description": "Appropriateness of Social Responses (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q38E": {
+            "data-type": "ordinal",
+            "description": "Appropriateness of Social Reponses (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q38Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Appropriateness of Social Reponses (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q38a": {
+            "data-type": "categorical",
+            "description": "Coded: Appropriateness of Social Responses (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q39": {
+            "data-type": "ordinal",
+            "description": "Initiation of Appropriate Activities (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q39E": {
+            "data-type": "ordinal",
+            "description": "Initiation of Appropriate Activities (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q39Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Initiation of Appropriate Activities (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q39a": {
+            "data-type": "categorical",
+            "description": "Coded: Initiation of Appropriate Activities (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q40": {
+            "data-type": "ordinal",
+            "description": "Imaginative Play (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q40E": {
+            "data-type": "ordinal",
+            "description": "Imaginative Play (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q40Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Imaginative Play (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q40a": {
+            "data-type": "categorical",
+            "description": "Coded: Imaginative Play (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q41": {
+            "data-type": "ordinal",
+            "description": "Imaginative Play with Peers (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q41E": {
+            "data-type": "ordinal",
+            "description": "Imaginative Play with Peers (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q41Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Imaginative Play with Peers (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q41a": {
+            "data-type": "categorical",
+            "description": "Coded: Imaginative Play with Peers (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q42": {
+            "data-type": "ordinal",
+            "description": "Imitative Social Play (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q42E": {
+            "data-type": "ordinal",
+            "description": "Imitative Social Play (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q42Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Imitative Social Play (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q42a": {
+            "data-type": "categorical",
+            "description": "Coded: Imitative Social Play (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q43": {
+            "data-type": "ordinal",
+            "description": "Interest in Children (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q43E": {
+            "data-type": "ordinal",
+            "description": "Interest in Children (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q43Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Interest in Children (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q43a": {
+            "data-type": "categorical",
+            "description": "Coded: Interest in Children (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q44": {
+            "data-type": "ordinal",
+            "description": "Response to Approaches of Other Children (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q44E": {
+            "data-type": "ordinal",
+            "description": "Response to Approaches of Other Children (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q44Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Response to Approaches of Other Children (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q44a": {
+            "data-type": "categorical",
+            "description": "Coded: Response to Approaches of Other Children (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q45": {
+            "data-type": "ordinal",
+            "description": "Group Play with Peers (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q45E": {
+            "data-type": "ordinal",
+            "description": "Group Play with Peers (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q45Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Group Play with Peers (most abnormal 4.0-5.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q45a": {
+            "data-type": "categorical",
+            "description": "Coded: Group Play with Peers (current under 10.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q46": {
+            "data-type": "ordinal",
+            "description": "Friendships (current age 5.0 or older)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q46E": {
+            "data-type": "ordinal",
+            "description": "Friendships (most abnormal 10.0-15.0)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q46Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Friendships (most abnormal 10.0-15.0)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q46a": {
+            "data-type": "categorical",
+            "description": "Coded: Friendships (current age 5.0 or older)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q47": {
+            "data-type": "ordinal",
+            "description": "Circumscribed Interests (current age 4.0 and above)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q47E": {
+            "data-type": "ordinal",
+            "description": "Circumscribed Interests (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q47Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Circumscribed Interests (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q47a": {
+            "data-type": "categorical",
+            "description": "Coded: Circumscribed Interests (current age 4.0 and above)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q48": {
+            "data-type": "ordinal",
+            "description": "Unusual Preoccupations (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q48E": {
+            "data-type": "ordinal",
+            "description": "Unusual Preoccupations (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q48Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Unusual Preoccupations (ever)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q48a": {
+            "data-type": "categorical",
+            "description": "Coded: Unusual Preoccupations (current)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q49": {
+            "data-type": "ordinal",
+            "description": "Repetitive use of Objects or Interest in Parts of Objects (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q49E": {
+            "data-type": "ordinal",
+            "description": "Repetitive use of Objects of Interest in Parts of Objects (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q49Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Repetitive use of Objects of Interest in Parts of Objects (ever)",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q49a": {
+            "data-type": "categorical",
+            "description": "Coded: Repetitive use of Objects or Interest in Parts of Objects (current)",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q50": {
+            "data-type": "ordinal",
+            "description": "Compulsions/Rituals (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q50E": {
+            "data-type": "ordinal",
+            "description": "Compulsions/Rituals (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q50Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Compulsions/Rituals (ever)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q50a": {
+            "data-type": "categorical",
+            "description": "Coded: Compulsions/Rituals (current)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q51": {
+            "data-type": "ordinal",
+            "description": "Unusual Sensory Interests (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q51E": {
+            "data-type": "ordinal",
+            "description": "Unusual Sensory Interests (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q51Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Unusual Sensory Interests (ever)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q51a": {
+            "data-type": "categorical",
+            "description": "Coded: Unusual Sensory Interests (current)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q52": {
+            "data-type": "ordinal",
+            "description": "Hand and Finger Mannerisms (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q52E": {
+            "data-type": "ordinal",
+            "description": "Hand and Finger Mannerisms (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q52Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Hand and Finger Mannerisms (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q52a": {
+            "data-type": "categorical",
+            "description": "Coded: Hand and Finger Mannerisms (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q53": {
+            "data-type": "ordinal",
+            "description": "Other Complex Mannerisms or Stereotyped Body Movements (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q53E": {
+            "data-type": "ordinal",
+            "description": "Other Complex Mannerisms or Stereotyped Body Movements (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q53Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Other Complex Mannerisms or Stereotyped Body Movements (ever)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q53a": {
+            "data-type": "categorical",
+            "description": "Coded: Other Complex Mannerisms or Stereotyped Body Movements (current)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q54": {
+            "data-type": "ordinal",
+            "description": "Self Injury (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q54E": {
+            "data-type": "ordinal",
+            "description": "Self Injury (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q54Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Self Injury (ever)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q54a": {
+            "data-type": "categorical",
+            "description": "Coded: Self Injury (current)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q55": {
+            "data-type": "ordinal",
+            "description": "Age When Abnormality First Evident (Parent) (in months)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q55a": {
+            "data-type": "categorical",
+            "description": "Coded: Age When Abnormality First Evident (Parent) (in months)",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q56": {
+            "data-type": "interval",
+            "description": "Age When Abnormality First Evident (interviewer) (in months)",
+            "maximum": 899,
+            "not": {
+                "enum": [
+                    991,
+                    992,
+                    996,
+                    997,
+                    998,
+                    999
+                ]
+            },
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "Q57": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Visuospatial Ability (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q57E": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Visuospatial Ability (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q57Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Visuospatial Ability (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q57a": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Visuospatial Ability (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q58": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Memory Skill (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q58E": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Memory Skill (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q58Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Memory Skill (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q58a": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Memory Skill (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q59": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Musical Ability (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q59E": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Musical Ability (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q59Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Musical Ability (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q59a": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Musical Ability (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q60": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Drawing Skill (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q60E": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Drawing Skill (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q60Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Drawing Skill (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q60a": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Drawing Skill (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q61": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Reading Ability (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q61E": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Reading Ability (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q61Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Reading Ability (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q61a": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Reading Ability (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q62": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Computational Ability (current)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q62E": {
+            "data-type": "ordinal",
+            "description": "Special Skills: Computational Ability (ever)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q62Ea": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Computational Ability (ever)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q62a": {
+            "data-type": "categorical",
+            "description": "Coded: Special Skills: Computational Ability (current)",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "age": {
+            "description": "Age in months at interview",
+            "minimum": 0,
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "interview_date": {
+            "type": [
+                "string",
+                "null"
+            ]
+        }
+    },
+    "required": [
+        "age",
+        "interview_date",
+        "Q10",
+        "Q10a",
+        "Q10E",
+        "Q10Ea",
+        "Q11",
+        "Q11a",
+        "Q11E",
+        "Q11Ea",
+        "Q12",
+        "Q12a",
+        "Q12E",
+        "Q12Ea",
+        "Q13",
+        "Q13a",
+        "Q13E",
+        "Q13Ea",
+        "Q14",
+        "Q15",
+        "Q15a",
+        "Q15E",
+        "Q15Ea",
+        "Q16",
+        "Q16a",
+        "Q16E",
+        "Q16Ea",
+        "Q17",
+        "Q17a",
+        "Q17E",
+        "Q17Ea",
+        "Q18",
+        "Q18a",
+        "Q18E",
+        "Q18Ea",
+        "Q19",
+        "Q19a",
+        "Q19E",
+        "Q19Ea",
+        "Q02",
+        "Q20",
+        "Q20a",
+        "Q20E",
+        "Q20Ea",
+        "Q21",
+        "Q21a",
+        "Q21E",
+        "Q21Ea",
+        "Q22",
+        "Q22a",
+        "Q22E",
+        "Q22Ea",
+        "Q23",
+        "Q23a",
+        "Q23E",
+        "Q23Ea",
+        "Q24",
+        "Q24a",
+        "Q24E",
+        "Q24Ea",
+        "Q25",
+        "Q25a",
+        "Q25E",
+        "Q25Ea",
+        "Q26",
+        "Q26a",
+        "Q26E",
+        "Q26Ea",
+        "Q27E",
+        "Q27Ea",
+        "Q28",
+        "Q28E",
+        "Q29",
+        "Q29a",
+        "Q29E",
+        "Q29Ea",
+        "Q30",
+        "Q30a",
+        "Q30E",
+        "Q30Ea",
+        "Q31",
+        "Q31a",
+        "Q31E",
+        "Q31Ea",
+        "Q32",
+        "Q32a",
+        "Q32E",
+        "Q32Ea",
+        "Q33",
+        "Q33a",
+        "Q33E",
+        "Q33Ea",
+        "Q34",
+        "Q34a",
+        "Q34E",
+        "Q34Ea",
+        "Q35",
+        "Q35a",
+        "Q35E",
+        "Q35Ea",
+        "Q36",
+        "Q36a",
+        "Q36E",
+        "Q36Ea",
+        "Q37",
+        "Q37a",
+        "Q37E",
+        "Q37Ea",
+        "Q38",
+        "Q38a",
+        "Q38E",
+        "Q38Ea",
+        "Q39",
+        "Q39a",
+        "Q39E",
+        "Q39Ea",
+        "Q04",
+        "Q40",
+        "Q40a",
+        "Q40E",
+        "Q40Ea",
+        "Q41",
+        "Q41a",
+        "Q41E",
+        "Q41Ea",
+        "Q42",
+        "Q42a",
+        "Q42E",
+        "Q42Ea",
+        "Q43",
+        "Q43a",
+        "Q43E",
+        "Q43Ea",
+        "Q44",
+        "Q44a",
+        "Q44E",
+        "Q44Ea",
+        "Q45",
+        "Q45a",
+        "Q45E",
+        "Q45Ea",
+        "Q46",
+        "Q46a",
+        "Q46E",
+        "Q46Ea",
+        "Q47",
+        "Q47a",
+        "Q47E",
+        "Q47Ea",
+        "Q48",
+        "Q48a",
+        "Q48E",
+        "Q48Ea",
+        "Q49",
+        "Q49a",
+        "Q49E",
+        "Q49Ea",
+        "Q05",
+        "Q50",
+        "Q50a",
+        "Q50E",
+        "Q50Ea",
+        "Q51",
+        "Q51a",
+        "Q51E",
+        "Q51Ea",
+        "Q52",
+        "Q52a",
+        "Q52E",
+        "Q52Ea",
+        "Q53",
+        "Q53a",
+        "Q53E",
+        "Q53Ea",
+        "Q54",
+        "Q54a",
+        "Q54E",
+        "Q54Ea",
+        "Q55",
+        "Q55a",
+        "Q56",
+        "Q57",
+        "Q57a",
+        "Q57E",
+        "Q57Ea",
+        "Q58",
+        "Q58a",
+        "Q58E",
+        "Q58Ea",
+        "Q59",
+        "Q59a",
+        "Q59E",
+        "Q59Ea",
+        "Q06",
+        "Q60",
+        "Q60a",
+        "Q60E",
+        "Q60Ea",
+        "Q61",
+        "Q61a",
+        "Q61E",
+        "Q61Ea",
+        "Q62",
+        "Q62a",
+        "Q62E",
+        "Q62Ea",
+        "Q07",
+        "Q07a",
+        "Q07E",
+        "Q07Ea",
+        "Q08",
+        "Q09"
+    ]
+}

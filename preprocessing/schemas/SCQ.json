@@ -1,0 +1,211 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "SCQ",
+	"id": "resource:/schemas/SCQ#",
+	"type": "object",
+	"properties": {
+		"interview_date": {
+			"type": ["string", "null"]
+		},
+		"Q01": {
+			"description": "Talk",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q02": {
+			"description": "To from conversation",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q03": {
+			"description": "Odd phrases",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q04": {
+			"description": "Socially inappropriate",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q05": {
+			"description": "Mixed pronouns",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q06": {
+			"description": "Invents words",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q07": {
+			"description": "Repeats",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q08": {
+			"description": "Particular way",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q09": {
+			"description": "Appropriate facial",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q10": {
+			"description": "Hand tools",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q11": {
+			"description": "Odd interests",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q12": {
+			"description": "Interest parts",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q13": {
+			"description": "Special interests",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q14": {
+			"description": "Sensory interests",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q15": {
+			"description": "Odd manor",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q16": {
+			"description": "Complicated move",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q17": {
+			"description": "Injure self",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q18": {
+			"description": "Carry objects",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q19": {
+			"description": "Friends",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q20": {
+			"description": "Friendly talk",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q21": {
+			"description": "Spontaneous copy",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q22": {
+			"description": "Spontaneous point",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q23": {
+			"description": "Gesture",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q24": {
+			"description": "Node head",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q25": {
+			"description": "Shake head",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q26": {
+			"description": "Look face",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q27": {
+			"description": "Smile",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q28": {
+			"description": "Engage attention",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q29": {
+			"description": "Share",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q30": {
+			"description": "Join",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q31": {
+			"description": "Comfort",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q32": {
+			"description": "Gesture with sound",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q33": {
+			"description": "Facial range",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q34": {
+			"description": "Copy in social game",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q35": {
+			"description": "Play pretend",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q36": {
+			"description": "Interest in other children",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q37": {
+			"description": "Positive approach",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q38": {
+			"description": "Look up talking",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q39": {
+			"description": "Imaginary games",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		},
+		"Q40": {
+			"description": "Cooperative play",
+			"enum": [null, 0, 1],
+			"data-type": "ordinal"
+		}
+	}
+}

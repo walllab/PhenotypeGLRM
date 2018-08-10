@@ -1,0 +1,656 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "ADOS_Module1",
+	"id": "resource:/schemas/ADOS_Module1#",
+	"type": "object",
+	"additionalProperties": false,
+    "properties": {
+        "QA01": {
+            "data-type": "ordinal",
+            "description": "Overall level of non-echoed language.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA01a": {
+            "data-type": "categorical",
+            "description": "Coded: Overall level of non-echoed language.",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA02": {
+            "data-type": "ordinal",
+            "description": "Frequency of vocalization directed to others.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA02a": {
+            "data-type": "categorical",
+            "description": "Coded: Frequency of vocalization directed to others.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QA03": {
+            "data-type": "ordinal",
+            "description": "Intonation of vocalizations or verbalizations.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QA03a": {
+            "data-type": "categorical",
+            "description": "Coded: Intonation of vocalizations or verbalizations.",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA04": {
+            "data-type": "ordinal",
+            "description": "Immediate echolalia.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA04a": {
+            "data-type": "categorical",
+            "description": "Coded: Immediate echolalia.",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA05": {
+            "data-type": "ordinal",
+            "description": "Stereotyped/idiosyncratic use of words or phases.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA05a": {
+            "data-type": "categorical",
+            "description": "Coded: Stereotyped/idiosyncratic use of words or phases.",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA06": {
+            "data-type": "ordinal",
+            "description": "Use of other's body to communicate.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QA06a": {
+            "data-type": "categorical",
+            "description": "Coded: Use of other's body to communicate.",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA07": {
+            "data-type": "ordinal",
+            "description": "Pointing.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA07a": {
+            "data-type": "categorical",
+            "description": "Coded: Pointing.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QA08": {
+            "data-type": "ordinal",
+            "description": "Gestures.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QA08a": {
+            "data-type": "categorical",
+            "description": "Coded: Gestures.",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QB01": {
+            "data-type": "ordinal",
+            "description": "Unusual eye contact.",
+            "enum": [
+                null,
+                0,
+                2
+            ]
+        },
+        "QB01a": {
+            "data-type": "categorical",
+            "description": "Coded: Unusual eye contact.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB02": {
+            "data-type": "ordinal",
+            "description": "Responsive social smile.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB02a": {
+            "data-type": "categorical",
+            "description": "Coded: Responsive social smile.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB03": {
+            "data-type": "ordinal",
+            "description": "Facial expressions directed to others.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB03a": {
+            "data-type": "categorical",
+            "description": "Coded: Facial expressions directed to others.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB04": {
+            "data-type": "ordinal",
+            "description": "Integration of gaze and other behaviors during social overtures.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB04a": {
+            "data-type": "categorical",
+            "description": "Coded: Integration of gaze and other behaviors during social overtures.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB05": {
+            "data-type": "ordinal",
+            "description": "Shared enjoyment in interaction.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB05a": {
+            "data-type": "categorical",
+            "description": "Coded: Shared enjoyment in interaction.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB06": {
+            "data-type": "ordinal",
+            "description": "Response to name.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB06a": {
+            "data-type": "categorical",
+            "description": "Coded: Response to name.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB07": {
+            "data-type": "ordinal",
+            "description": "Requesting.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB07a": {
+            "data-type": "categorical",
+            "description": "Coded: Requesting.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB08": {
+            "data-type": "ordinal",
+            "description": "Giving.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB08a": {
+            "data-type": "categorical",
+            "description": "Coded: Giving.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB09": {
+            "data-type": "ordinal",
+            "description": "Showing.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB09a": {
+            "data-type": "categorical",
+            "description": "Coded: Showing.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB10": {
+            "data-type": "ordinal",
+            "description": "Spontaneous initiation of joint attention.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB10a": {
+            "data-type": "categorical",
+            "description": "Coded: Spontaneous initiation of joint attention.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB11": {
+            "data-type": "ordinal",
+            "description": "Response to joint attention.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB11a": {
+            "data-type": "categorical",
+            "description": "Coded: Response to joint attention.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB12": {
+            "data-type": "ordinal",
+            "description": "Quality of social overtures.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB12a": {
+            "data-type": "categorical",
+            "description": "Coded: Quality of social overtures.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QC01": {
+            "data-type": "ordinal",
+            "description": "Functional play with objects.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QC01a": {
+            "data-type": "categorical",
+            "description": "Coded: Functional play with objects.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QC02": {
+            "data-type": "ordinal",
+            "description": "Imagination/creativity.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QC02a": {
+            "data-type": "categorical",
+            "description": "Coded: Imagination/creativity.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD01": {
+            "data-type": "ordinal",
+            "description": "Unusual sensory interest in play material/person.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD01a": {
+            "data-type": "categorical",
+            "description": "Coded: Unusual sensory interest in play material/person.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD02": {
+            "data-type": "ordinal",
+            "description": "Hand and finger and other complex mannerisms.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD02a": {
+            "data-type": "categorical",
+            "description": "Coded: Hand and finger and other complex mannerisms.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD03": {
+            "data-type": "ordinal",
+            "description": "Self-injurious behaviour.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD03a": {
+            "data-type": "categorical",
+            "description": "Coded: Self-injurious behaviour.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD04": {
+            "data-type": "ordinal",
+            "description": "Unusually repetitive interests or stereotyped behaviors.",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QD04a": {
+            "data-type": "categorical",
+            "description": "Coded: Unusually repetitive interests or stereotyped behaviors.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QE01": {
+            "data-type": "ordinal",
+            "description": "Overactivity.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QE01a": {
+            "data-type": "categorical",
+            "description": "Coded: Overactivity.",
+            "enum": [
+                null,
+                0,
+                7,
+                9
+            ]
+        },
+        "QE02": {
+            "data-type": "ordinal",
+            "description": "Tantrums aggression negative or disruptive behavior.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QE02a": {
+            "data-type": "categorical",
+            "description": "Coded: Tantrums aggression negative or disruptive behavior.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QE03": {
+            "data-type": "ordinal",
+            "description": "Anxiety.",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QE03a": {
+            "data-type": "categorical",
+            "description": "Coded: Anxiety.",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "age": {
+            "description": "Age in months at interview",
+            "minimum": 0,
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "interview_date": {
+            "type": [
+                "string",
+                "null"
+            ]
+        }
+    },
+    "required": [
+        "age",
+        "interview_date",
+        "QA01",
+        "QA01a",
+        "QA02",
+        "QA02a",
+        "QA03",
+        "QA03a",
+        "QA04",
+        "QA04a",
+        "QA05",
+        "QA05a",
+        "QA06",
+        "QA06a",
+        "QA07",
+        "QA07a",
+        "QA08",
+        "QA08a",
+        "QB01",
+        "QB01a",
+        "QB10",
+        "QB10a",
+        "QB11",
+        "QB11a",
+        "QB12",
+        "QB12a",
+        "QB02",
+        "QB02a",
+        "QB03",
+        "QB03a",
+        "QB04",
+        "QB04a",
+        "QB05",
+        "QB05a",
+        "QB06",
+        "QB06a",
+        "QB07",
+        "QB07a",
+        "QB08",
+        "QB08a",
+        "QB09",
+        "QB09a",
+        "QC01",
+        "QC01a",
+        "QC02",
+        "QC02a",
+        "QD01",
+        "QD01a",
+        "QD02",
+        "QD02a",
+        "QD03",
+        "QD03a",
+        "QD04",
+        "QD04a",
+        "QE01",
+        "QE01a",
+        "QE02",
+        "QE02a",
+        "QE03",
+        "QE03a"
+    ]
+}

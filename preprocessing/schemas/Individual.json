@@ -1,0 +1,107 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "Individual",
+	"id": "resource:/schemas/Individual#",
+	"type": "object",
+	"properties": {
+		"dataset": {
+			"type": "string"
+		},
+		"identifier": {
+			"type": "string"
+		},
+		"gender": {
+			"enum": [ "Male", "Female", null ]
+		},
+		"race": {
+			"type": ["string", "null"]
+		},
+		"ethnicity": {
+			"type": ["string", "null"]
+		},
+		"family": {
+			"type": ["string", "null"]
+		},
+		"diagnosis": {
+			"description": "Overall diagnosis calculated from combination of instruments.",
+			"enum": ["Autism", "Control", null]
+		},
+		"clinical_diagnosis": {
+			"description": "Diagnosis given by clinician. Coded value.",
+			"enum": ["Autism", "Control", null]
+		},
+		"clinical_diagnosis_raw": {
+			"description": "Original diagnosis given by clinician. Free text.",
+			"type": ["string", "null"]
+		},
+		"cpea_diagnosis": {
+			"description": "CPEA diagnosis - combines ADIR and ADOS.",
+			"enum": ["Autism", "Autism Spectrum", "Aspergers", "Control", null]
+		},
+		"cpea_adjusted_diagnosis": {
+			"description": "CPEA diagnosis - combines ADIR and ADOS. This diagnosis is adjusted to mark true controls (where both ADOS and ADIR agree that this is a control) from Suspected Control (where ADOS and ADIR disagree).",
+			"enum": ["Autism", "Autism Spectrum", "Aspergers", "Control", "Suspected Control", null]
+		},
+		"ADIR1995": {
+			"type": "object",
+			"$ref": "file:schemas/ADIR1995.json"
+		},
+		"ADIR2003": {
+			"type": "object",
+			"$ref": "file:schemas/ADIR2003.json"
+		},
+		"ADIR2003_Toddler": {
+			"type": "object",
+			"$ref": "file:schemas/ADIR2003_Toddler.json"
+		},
+		"ADOS_Module1": {
+			"type": "object",
+			"$ref": "file:schemas/ADOS_Module1.json"
+		},
+		"ADOS_Module2": {
+			"type": "object",
+			"$ref": "file:schemas/ADOS_Module2.json"
+		},
+		"ADOS_Module3": {
+			"type": "object",
+			"$ref": "file:schemas/ADOS_Module3.json"
+		},
+		"ADOS_Module4": {
+			"type": "object",
+			"$ref": "file:schemas/ADOS_Module4.json"
+		},
+		"ADOS2_Module1": {
+			"type": "object",
+			"$ref": "file:schemas/ADOS2_Module1.json"
+		},
+		"ADOS2_Module2": {
+			"type": "object",
+			"$ref": "file:schemas/ADOS2_Module2.json"
+		},
+		"ADOS2_Module3": {
+			"type": "object",
+			"$ref": "file:schemas/ADOS2_Module3.json"
+		},
+		"ADOS2_Module4": {
+			"type": "object",
+			"$ref": "file:schemas/ADOS2_Module4.json"
+		},
+		"SRS_Child": {
+			"type": "object",
+			"$ref": "file:schemas/SRS_Child.json"
+		},
+		"SRS_Adult": {
+			"type": "object",
+			"$ref": "file:schemas/SRS_Adult.json"
+		},
+		"SRS_Preschool": {
+			"type": "object",
+			"$ref": "file:schemas/SRS_Preschool.json"
+		},
+		"Medical_History": {
+			"type": "object",
+			"$ref": "file:schemas/Medical_History.json"
+		}
+	},
+	"required": ["identifier"]
+}

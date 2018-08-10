@@ -1,0 +1,1457 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "SRS_Adult",
+	"id": "resource:/schemas/SRS_Adult#",
+	"type": "object",
+	"additionalProperties": false,
+    "properties": {
+        "Q01": {
+            "data-type": "ordinal",
+            "description": "Seems much more uncomfortable in social situations than when alone",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q01a": {
+            "data-type": "categorical",
+            "description": "Coded: Seems much more uncomfortable in social situations than when alone",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q02": {
+            "data-type": "ordinal",
+            "description": "Expressions on his or face don't match what he or she is saying",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q02a": {
+            "data-type": "categorical",
+            "description": "Coded: Expressions on his or face don't match what he or she is saying",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q03": {
+            "data-type": "ordinal",
+            "description": "Seems self confident when interacting with others",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q03a": {
+            "data-type": "categorical",
+            "description": "Coded: Seems self confident when interacting with others",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q04": {
+            "data-type": "ordinal",
+            "description": "When under stress he or she shows rigid or inflexible patterns of behavior that seem odd",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q04a": {
+            "data-type": "categorical",
+            "description": "Coded: When under stress he or she shows rigid or inflexible patterns of behavior that seem odd",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q05": {
+            "data-type": "ordinal",
+            "description": "Doesn't recognize when others are trying to take advantage of him or her",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q05a": {
+            "data-type": "categorical",
+            "description": "Coded: Doesn't recognize when others are trying to take advantage of him or her",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q06": {
+            "data-type": "ordinal",
+            "description": "Would rather be alone than with others",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q06a": {
+            "data-type": "categorical",
+            "description": "Coded: Would rather be alone than with others",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q07": {
+            "data-type": "ordinal",
+            "description": "Is aware of what others are thinking or feeling",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q07a": {
+            "data-type": "categorical",
+            "description": "Coded: Is aware of what others are thinking or feeling",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q08": {
+            "data-type": "ordinal",
+            "description": "Behaves in ways than seem strange or bizarre",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q08a": {
+            "data-type": "categorical",
+            "description": "Coded: Behaves in ways than seem strange or bizarre",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q09": {
+            "data-type": "ordinal",
+            "description": "Seems too dependent on others for help when meeting basic needs",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q09a": {
+            "data-type": "categorical",
+            "description": "Coded: Seems too dependent on others for help when meeting basic needs",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q10": {
+            "data-type": "ordinal",
+            "description": "Takes things too literally and doesn't get the real meaning of a conversation",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q10a": {
+            "data-type": "categorical",
+            "description": "Coded: Takes things too literally and doesn't get the real meaning of a conversation",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q11": {
+            "data-type": "ordinal",
+            "description": "Has good self-confidence",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q11a": {
+            "data-type": "categorical",
+            "description": "Coded: Has good self-confidence",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q12": {
+            "data-type": "ordinal",
+            "description": "Is able to communicate his or her feelings to others",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q12a": {
+            "data-type": "categorical",
+            "description": "Coded: Is able to communicate his or her feelings to others",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q13": {
+            "data-type": "ordinal",
+            "description": "Is awkward in turn-taking interactions with peers (e.g. doesn't seem to understand the give-and-take of conversations)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q13a": {
+            "data-type": "categorical",
+            "description": "Coded: Is awkward in turn-taking interactions with peers (e.g. doesn't seem to understand the give-and-take of conversations)",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q14": {
+            "data-type": "ordinal",
+            "description": "Is not well coordinated",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q14a": {
+            "data-type": "categorical",
+            "description": "Coded: Is not well coordinated",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q15": {
+            "data-type": "ordinal",
+            "description": "Recognizes and appropriately responds to changes in other people's tone of voice and facial expressions",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q15a": {
+            "data-type": "categorical",
+            "description": "Coded: Recognizes and appropriately responds to changes in other people's tone of voice and facial expressions",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q16": {
+            "data-type": "ordinal",
+            "description": "Avoids eye contact or has unusual eye contact",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q16a": {
+            "data-type": "categorical",
+            "description": "Coded: Avoids eye contact or has unusual eye contact",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q17": {
+            "data-type": "ordinal",
+            "description": "Recognizes when something is unfair",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q17a": {
+            "data-type": "categorical",
+            "description": "Coded: Recognizes when something is unfair",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q18": {
+            "data-type": "ordinal",
+            "description": "Has difficulty making friends even when trying his or her best",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q18a": {
+            "data-type": "categorical",
+            "description": "Coded: Has difficulty making friends even when trying his or her best",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q19": {
+            "data-type": "ordinal",
+            "description": "Gets frustrated trying to get ideas across in conversations",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q19a": {
+            "data-type": "categorical",
+            "description": "Coded: Gets frustrated trying to get ideas across in conversations",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q20": {
+            "data-type": "ordinal",
+            "description": "Shows unusual sensory interests (eg smelling his or her fingers frequently) or strange repetitive ways of handling or manipulating small items within reach",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q20a": {
+            "data-type": "categorical",
+            "description": "Coded: Shows unusual sensory interests (eg smelling his or her fingers frequently) or strange repetitive ways of handling or manipulating small items within reach",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q21": {
+            "data-type": "ordinal",
+            "description": "Is able to imitate others' actions and demeanor when it is socially appropriate to do so",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q21a": {
+            "data-type": "categorical",
+            "description": "Coded: Is able to imitate others' actions and demeanor when it is socially appropriate to do so",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q22": {
+            "data-type": "ordinal",
+            "description": "Interacts appropriately with other adults",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q22a": {
+            "data-type": "categorical",
+            "description": "Coded: Interacts appropriately with other adults",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q23": {
+            "data-type": "ordinal",
+            "description": "Does not join group activities or social events unless forced to do so",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q23a": {
+            "data-type": "categorical",
+            "description": "Coded: Does not join group activities or social events unless forced to do so",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q24": {
+            "data-type": "ordinal",
+            "description": "Has more difficulty than others with changes in his or her routine",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q24a": {
+            "data-type": "categorical",
+            "description": "Coded: Has more difficulty than others with changes in his or her routine",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q25": {
+            "data-type": "ordinal",
+            "description": "Doesn't seem to mind being out of step with or not on the same wavelength as others",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q25a": {
+            "data-type": "categorical",
+            "description": "Coded: Doesn't seem to mind being out of step with or not on the same wavelength as others",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q26": {
+            "data-type": "ordinal",
+            "description": "Offers comfort to others when they are sad",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q26a": {
+            "data-type": "categorical",
+            "description": "Coded: Offers comfort to others when they are sad",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q27": {
+            "data-type": "ordinal",
+            "description": "Avoids starting social interactions with other adults",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q27a": {
+            "data-type": "categorical",
+            "description": "Coded: Avoids starting social interactions with other adults",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q28": {
+            "data-type": "ordinal",
+            "description": "Thinks or talks about the same thing over and over",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q28a": {
+            "data-type": "categorical",
+            "description": "Coded: Thinks or talks about the same thing over and over",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q29": {
+            "data-type": "ordinal",
+            "description": "Is regarded by others as odd or weird",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q29a": {
+            "data-type": "categorical",
+            "description": "Coded: Is regarded by others as odd or weird",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q30": {
+            "data-type": "ordinal",
+            "description": "Becomes upset in a situation with lots of things going on",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q30a": {
+            "data-type": "categorical",
+            "description": "Coded: Becomes upset in a situation with lots of things going on",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q31": {
+            "data-type": "ordinal",
+            "description": "Can't get his or her mind off something once he or she starts thinking about it",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q31a": {
+            "data-type": "categorical",
+            "description": "Coded: Can't get his or her mind off something once he or she starts thinking about it",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q32": {
+            "data-type": "ordinal",
+            "description": "Has good personal hygiene",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q32a": {
+            "data-type": "categorical",
+            "description": "Coded: Has good personal hygiene",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q33": {
+            "data-type": "ordinal",
+            "description": "Is socially awkward even when trying to be polite",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q33a": {
+            "data-type": "categorical",
+            "description": "Coded: Is socially awkward even when trying to be polite",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q34": {
+            "data-type": "ordinal",
+            "description": "Avoids people who want to be emotionally close to him or her",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q34a": {
+            "data-type": "categorical",
+            "description": "Coded: Avoids people who want to be emotionally close to him or her",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q35": {
+            "data-type": "ordinal",
+            "description": "Has trouble keeping up with the flow of a normal conversation",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q35a": {
+            "data-type": "categorical",
+            "description": "Coded: Has trouble keeping up with the flow of a normal conversation",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q36": {
+            "data-type": "ordinal",
+            "description": "Has difficulty relating to family members",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q36a": {
+            "data-type": "categorical",
+            "description": "Coded: Has difficulty relating to family members",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q37": {
+            "data-type": "ordinal",
+            "description": "Has difficulty relating to adults",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q37a": {
+            "data-type": "categorical",
+            "description": "Coded: Has difficulty relating to adults",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q38": {
+            "data-type": "ordinal",
+            "description": "Responds appropriately to mood changes in others (eg when a friend's mood changes from happy to sad)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q38a": {
+            "data-type": "categorical",
+            "description": "Coded: Responds appropriately to mood changes in others (eg when a friend's mood changes from happy to sad)",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q39": {
+            "data-type": "ordinal",
+            "description": "Has an unusually narrow range of interests",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q39a": {
+            "data-type": "categorical",
+            "description": "Coded: Has an unusually narrow range of interests",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q40": {
+            "data-type": "ordinal",
+            "description": "Is imaginative without losing touch with reality",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q40a": {
+            "data-type": "categorical",
+            "description": "Coded: Is imaginative without losing touch with reality",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q41": {
+            "data-type": "ordinal",
+            "description": "Wanders aimlessly from one activity to another",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q41a": {
+            "data-type": "categorical",
+            "description": "Coded: Wanders aimlessly from one activity to another",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q42": {
+            "data-type": "ordinal",
+            "description": "Seems overly sensitive to sounds textures or smells",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q42a": {
+            "data-type": "categorical",
+            "description": "Coded: Seems overly sensitive to sounds textures or smells",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q43": {
+            "data-type": "ordinal",
+            "description": "Enjoys and is competent with small talk (casual conversation with others)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q43a": {
+            "data-type": "categorical",
+            "description": "Coded: Enjoys and is competent with small talk (casual conversation with others)",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q44": {
+            "data-type": "ordinal",
+            "description": "Doesn't understand how events relate to one another (cause and effect) the way other adults do",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q44a": {
+            "data-type": "categorical",
+            "description": "Coded: Doesn't understand how events relate to one another (cause and effect) the way other adults do",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q45": {
+            "data-type": "ordinal",
+            "description": "Generally gets interested in what others nearby are paying attention to",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q45a": {
+            "data-type": "categorical",
+            "description": "Coded: Generally gets interested in what others nearby are paying attention to",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q46": {
+            "data-type": "ordinal",
+            "description": "Has overly serious facial expressions",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q46a": {
+            "data-type": "categorical",
+            "description": "Coded: Has overly serious facial expressions",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q47": {
+            "data-type": "ordinal",
+            "description": "Laughs at inappropriate times",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q47a": {
+            "data-type": "categorical",
+            "description": "Coded: Laughs at inappropriate times",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q48": {
+            "data-type": "ordinal",
+            "description": "Has a sense of humor understands jokes",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q48a": {
+            "data-type": "categorical",
+            "description": "Coded: Has a sense of humor understands jokes",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q49": {
+            "data-type": "ordinal",
+            "description": "Does extremely well at a few intellectual or computational tasks but does not do as well at most other tasks",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q49a": {
+            "data-type": "categorical",
+            "description": "Coded: Does extremely well at a few intellectual or computational tasks but does not do as well at most other tasks",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q50": {
+            "data-type": "ordinal",
+            "description": "Has repetitive odd behaviors",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q50a": {
+            "data-type": "categorical",
+            "description": "Coded: Has repetitive odd behaviors",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q51": {
+            "data-type": "ordinal",
+            "description": "Has difficulty answering questions directly and ends up talking around the subject",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q51a": {
+            "data-type": "categorical",
+            "description": "Coded: Has difficulty answering questions directly and ends up talking around the subject",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q52": {
+            "data-type": "ordinal",
+            "description": "Knows when he or she is talking too loud or making too much noise",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q52a": {
+            "data-type": "categorical",
+            "description": "Coded: Knows when he or she is talking too loud or making too much noise",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q53": {
+            "data-type": "ordinal",
+            "description": "Talks to people with an unusual tone of voice (e.g. talks like a robot or like he or she is giving a lecture)",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q53a": {
+            "data-type": "categorical",
+            "description": "Coded: Talks to people with an unusual tone of voice (e.g. talks like a robot or like he or she is giving a lecture)",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q54": {
+            "data-type": "ordinal",
+            "description": "Seems to react to people as if they are objects",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q54a": {
+            "data-type": "categorical",
+            "description": "Coded: Seems to react to people as if they are objects",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q55": {
+            "data-type": "ordinal",
+            "description": "Knows when he or she is too close to someone or is invading someone's space",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q55a": {
+            "data-type": "categorical",
+            "description": "Coded: Knows when he or she is too close to someone or is invading someone's space",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q56": {
+            "data-type": "ordinal",
+            "description": "Walks in between two people who are talking",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q56a": {
+            "data-type": "categorical",
+            "description": "Coded: Walks in between two people who are talking",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q57": {
+            "data-type": "ordinal",
+            "description": "Isolative; tends not to leave his or her home",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q57a": {
+            "data-type": "categorical",
+            "description": "Coded: Isolative; tends not to leave his or her home",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q58": {
+            "data-type": "ordinal",
+            "description": "Concentrates too much on parts of things rather than seeing the whole picture",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q58a": {
+            "data-type": "categorical",
+            "description": "Coded: Concentrates too much on parts of things rather than seeing the whole picture",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q59": {
+            "data-type": "ordinal",
+            "description": "Is overly suspicious",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q59a": {
+            "data-type": "categorical",
+            "description": "Coded: Is overly suspicious",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q60": {
+            "data-type": "ordinal",
+            "description": "Is emotionally distant doesn't show his or her feelings",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q60a": {
+            "data-type": "categorical",
+            "description": "Coded: Is emotionally distant doesn't show his or her feelings",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q61": {
+            "data-type": "ordinal",
+            "description": "Is inflexible has a hard time changing his or her mind",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q61a": {
+            "data-type": "categorical",
+            "description": "Coded: Is inflexible has a hard time changing his or her mind",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q62": {
+            "data-type": "ordinal",
+            "description": "Gives unusual or illogical reasons for doing things",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q62a": {
+            "data-type": "categorical",
+            "description": "Coded: Gives unusual or illogical reasons for doing things",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q63": {
+            "data-type": "ordinal",
+            "description": "Touches or greets others in an unusual way",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q63a": {
+            "data-type": "categorical",
+            "description": "Coded: Touches or greets others in an unusual way",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q64": {
+            "data-type": "ordinal",
+            "description": "Is too tense in social settings",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q64a": {
+            "data-type": "categorical",
+            "description": "Coded: Is too tense in social settings",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "Q65": {
+            "data-type": "ordinal",
+            "description": "Stares or gazes off into space",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q65a": {
+            "data-type": "categorical",
+            "description": "Coded: Stares or gazes off into space",
+            "enum": [
+                null,
+                0,
+                999
+            ]
+        },
+        "age": {
+            "description": "Age in months at interview",
+            "minimum": 0,
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "interview_date": {
+            "type": [
+                "string",
+                "null"
+            ]
+        }
+    },
+    "required": [
+        "age",
+        "interview_date",
+        "Q01",
+        "Q01a",
+        "Q10",
+        "Q10a",
+        "Q11",
+        "Q11a",
+        "Q12",
+        "Q12a",
+        "Q13",
+        "Q13a",
+        "Q14",
+        "Q14a",
+        "Q15",
+        "Q15a",
+        "Q16",
+        "Q16a",
+        "Q17",
+        "Q17a",
+        "Q18",
+        "Q18a",
+        "Q19",
+        "Q19a",
+        "Q02",
+        "Q02a",
+        "Q20",
+        "Q20a",
+        "Q21",
+        "Q21a",
+        "Q22",
+        "Q22a",
+        "Q23",
+        "Q23a",
+        "Q24",
+        "Q24a",
+        "Q25",
+        "Q25a",
+        "Q26",
+        "Q26a",
+        "Q27",
+        "Q27a",
+        "Q28",
+        "Q28a",
+        "Q29",
+        "Q29a",
+        "Q03",
+        "Q03a",
+        "Q30",
+        "Q30a",
+        "Q31",
+        "Q31a",
+        "Q32",
+        "Q32a",
+        "Q33",
+        "Q33a",
+        "Q34",
+        "Q34a",
+        "Q35",
+        "Q35a",
+        "Q36",
+        "Q36a",
+        "Q37",
+        "Q37a",
+        "Q38",
+        "Q38a",
+        "Q39",
+        "Q39a",
+        "Q04",
+        "Q04a",
+        "Q40",
+        "Q40a",
+        "Q41",
+        "Q41a",
+        "Q42",
+        "Q42a",
+        "Q43",
+        "Q43a",
+        "Q44",
+        "Q44a",
+        "Q45",
+        "Q45a",
+        "Q46",
+        "Q46a",
+        "Q47",
+        "Q47a",
+        "Q48",
+        "Q48a",
+        "Q49",
+        "Q49a",
+        "Q05",
+        "Q05a",
+        "Q50",
+        "Q50a",
+        "Q51",
+        "Q51a",
+        "Q52",
+        "Q52a",
+        "Q53",
+        "Q53a",
+        "Q54",
+        "Q54a",
+        "Q55",
+        "Q55a",
+        "Q56",
+        "Q56a",
+        "Q57",
+        "Q57a",
+        "Q58",
+        "Q58a",
+        "Q59",
+        "Q59a",
+        "Q06",
+        "Q06a",
+        "Q60",
+        "Q60a",
+        "Q61",
+        "Q61a",
+        "Q62",
+        "Q62a",
+        "Q63",
+        "Q63a",
+        "Q64",
+        "Q64a",
+        "Q65",
+        "Q65a",
+        "Q07",
+        "Q07a",
+        "Q08",
+        "Q08a",
+        "Q09",
+        "Q09a"
+    ]
+}

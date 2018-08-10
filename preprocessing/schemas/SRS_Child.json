@@ -1,0 +1,406 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "SRS_Child",
+	"id": "resource:/schemas/SRS_Child#",
+	"type": "object",
+	"properties": {
+		"respondent": {
+			"description": "Interview respondent",
+			"enum": ["Parent", "Teacher", "Mother", "Father", "Other relative", "Other specialist", null]
+		},
+		"age": {
+			"description": "Age in months at interview",
+			"type": ["integer", "null"],
+			"minimum": 0
+		},
+		"interview_date": {
+			"type": ["string", "null"]
+		},
+		"diagnosis": {
+			"description": "Diagnosis calculated from instrument.",
+			"enum": ["Autism", "Autism Spectrum", "Control", null]
+		},
+		"diagnosis_num_nulls": {
+			"description": "Number of null entries encountered when calculating diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0
+		},
+		"social_awareness": {
+			"description": "Social awareness. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"social_cognition": {
+			"description": "Social cognition. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"social_communication": {
+			"description": "Social communication. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"social_motivation": {
+			"description": "Social motivation. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"autistic_mannerisms": {
+			"description": "Autistic mannerisms. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"total_raw_score": {
+			"description": "Raw score. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"total_t_score": {
+			"description": "T score. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"Q01": {
+			"description": "Seems much more fidgety in social situations than when alone.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q02": {
+			"description": "Expressions on his or her face don't match what he or she is saying.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q03": {
+			"description": "Seems self-confident when interacting with others.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q04": {
+			"description": "When under stress, he or she shows rigid or inflexible patterns of behavior that seem odd.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q05": {
+			"description": "Doesn't recognize when others are trying to take advantage of him or her.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q06": {
+			"description": "Would rather be alone than with others.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q07": {
+			"description": "Is aware of what others are thinking or feeling.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q08": {
+			"description": "Behaves in ways that seem strange or bizarre.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q09": {
+			"description": "Clings to adults, seems too dependent on them.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q10": {
+			"description": "Takes things too literally and doesn't get the real meaning of a conversation.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q11": {
+			"description": "Has good self-confidence.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q12": {
+			"description": "Is able to communicate his or her feelins to others.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q13": {
+			"description": "Is akward in turn-taking interactions with peers.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q14": {
+			"description": "Is not well coordinated.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q15": {
+			"description": "Is able to understand the meaning of other people's tone of voice and facial expressions.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q16": {
+			"description": "Avoids eye contact or has unusual eye contact.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q17": {
+			"description": "Recognizes when something is unfair.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q18": {
+			"description": "Has difficulty making friends, even when trying his or her best.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q19": {
+			"description": "Gets frustrated trying to get ideas across in conversations.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q20": {
+			"description": "Shows unusual sensory interests or strange ways of playing with toys.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q21": {
+			"description": "Is able to imitate others' actions.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q22": {
+			"description": "Plays appropriately with children his or her age.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q23": {
+			"description": "Does not join group activities unless told to do so.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q24": {
+			"description": "Has more difficulty than other children with changes in his or her routine.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q25": {
+			"description": "Doesn't seem to mind being out of step with others.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q26": {
+			"description": "Offers comfort to others when they are sad.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q27": {
+			"description": "Avoids starting social interactions with peers or adults.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q28": {
+			"description": "Thinks or talks about the same thing over and over.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q29": {
+			"description": "Is regarded by other children as odd or weird.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q30": {
+			"description": "Becomes upset in a sitaution with lots of things going on.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q31": {
+			"description": "Can't get his or her mind off somethign once he or she starts thinking about it.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q32": {
+			"description": "Has good personal hygiene.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q33": {
+			"description": "Is socially awkward, even when he or she is trying to be polite.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q34": {
+			"description": "Avoids people who want to be emotionally close to him or her.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q35": {
+			"description": "Has trouble keeping up with the flow of a normal conversation.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q36": {
+			"description": "Bas difficulty relating to adults.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q37": {
+			"description": "Has difficulty relating to peers.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q38": {
+			"description": "Responds appropriately to mood changes in others.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q39": {
+			"description": "Has an unusually narrow range of interests.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q40": {
+			"description": "Is imaginative, good at pretending.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q41": {
+			"description": "Wanders aimlessly from one activity to another.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q42": {
+			"description": "Seems overly sensitive to sounds, textures, or smells.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q43": {
+			"description": "Separates easily from caregivers.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q44": {
+			"description": "Doesn't understand how events relate to one another.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q45": {
+			"description": "Focuses his or her attention to where others are looking or listening.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q46": {
+			"description": "Has overly serious facial expressions.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q47": {
+			"description": "Is too silly or laughs inappropriately.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q48": {
+			"description": "Has a sense of humor, understands jokes.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q49": {
+			"description": "Does extremely well at a few tasks, but does not do as well at most other tasks.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q50": {
+			"description": "Has repetitive, odd behaviors such as hand flapping or rocking.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q51": {
+			"description": "Has difficulty answering questions directly and ends up talking around the subject.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q52": {
+			"description": "Knows when he or she is talking too loud or making too much noise.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q53": {
+			"description": "Talks to people with an unusual tone of voice.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q54": {
+			"description": "Seems to react to people as if they are objects.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q55": {
+			"description": "Knows when he or she is too close to someone or invading someone's space.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q56": {
+			"description": "Walks in between two people who are talking.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q57": {
+			"description": "Gets teased a lot.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q58": {
+			"description": "Concentrates too much on parts of things rather than seeing the whole picture.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q59": {
+			"description": "Is overly suspicious.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q60": {
+			"description": "Is emotionally distant, doesn't show his or her feelings.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q61": {
+			"description": "Is inflexible, has a hard time changing his or her mind.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q62": {
+			"description": "Gives unusual or illogical reasons for doing things.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q63": {
+			"description": "Touches others in an unusual way.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q64": {
+			"description": "Is too tense in social settings,",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"Q65": {
+			"description": "Stares or gazes off into space.",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		}
+	},
+	"additionalProperties": false,
+	"required": ["Q01", "Q02", "Q03", "Q04", "Q05", "Q06", "Q07", "Q08", "Q09", "Q10", 
+				"Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17", "Q18", "Q19", "Q20",
+				"Q21", "Q22", "Q23", "Q24", "Q25", "Q26", "Q27", "Q28", "Q29", "Q30",
+				"Q31", "Q32", "Q33", "Q34", "Q35", "Q36", "Q37", "Q38", "Q39", "Q40",
+				"Q41", "Q42", "Q43", "Q44", "Q45", "Q46", "Q47", "Q48", "Q49", "Q50",
+				"Q51", "Q52", "Q53", "Q54", "Q55", "Q56", "Q57", "Q58", "Q59", "Q60",
+				"Q61", "Q62", "Q63", "Q64", "Q65",
+				"age", "interview_date", "diagnosis", "diagnosis_num_nulls", "total_raw_score", "total_t_score",
+				"social_awareness", "social_cognition", "social_communication", "social_motivation", "autistic_mannerisms"]
+}

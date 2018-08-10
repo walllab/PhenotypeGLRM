@@ -1,0 +1,50 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "Medical_History",
+	"id": "resource:/schemas/Medical_History#",
+	"type": "object",
+	"properties": {
+		"ID": {
+			"description": "Secondary diagnosis of ID (ex. fragile X, speech delay, aphasia)",
+			"enum": [null, 0, 1],
+			"data-type": "binary"
+		},
+		"Seizures": {
+			"description": "Secondary diagnosis of seizures (ex. epilepsy, absence seizures, Landau-Kleffner syndrome)",
+			"enum": [null, 0, 1],
+			"data-type": "binary"
+		},
+		"Tourette or Tic Disorder": {
+			"description": "Secondary diagnosis of Tourette or tic disorder",
+			"enum": [null, 0, 1],
+			"data-type": "binary"
+		},
+		"Mood Disorder": {
+			"description": "Secondary diagnosis of mood disorder (ex. depression, bipolar)",
+			"enum": [null, 0, 1],
+			"data-type": "binary"
+		},
+		"Anxiety Disorder": {
+			"description": "Secondary diagnosis of anxiety disorder (ex. OCD, anxiety, pica)",
+			"enum": [null, 0, 1],
+			"data-type": "binary"
+		},
+		"Psychotic Disorder": {
+			"description": "Secondary diagnosis of psychotic disorder",
+			"enum": [null, 0, 1],
+			"data-type": "binary"
+		},
+		"Autoimmune/Allergic": {
+			"description": "Secondary diagnosis of autoimmune/allergic (ex. asthma, allergies, lactose intolerant)",
+			"enum": [null, 0, 1],
+			"data-type": "binary"
+		},
+		"Behavior": {
+			"description": "Secondary diagnosis of behavior (ex. ADD, ADHD, ODD)",
+			"enum": [null, 0, 1],
+			"data-type": "binary"
+		}
+	},
+	"additionalProperties": false,
+	"required": ["ID", "Seizures", "Tourette or Tic Disorder", "Mood Disorder", "Anxiety Disorder", "Psychotic Disorder", "Autoimmune/Allergic", "Behavior"]
+}

@@ -1,0 +1,1226 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "ADOS2_Module1",
+	"id": "resource:/schemas/ADOS2_Module1#",
+	"type": "object",
+	"additionalProperties": false,
+    "properties": {
+        "Q100": {
+            "data-type": "ordinal",
+            "description": "Asking for help",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q100a": {
+            "data-type": "categorical",
+            "description": "Coded: Asking for help",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q200": {
+            "data-type": "ordinal",
+            "description": "Symbolic/pretend play",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q200a": {
+            "data-type": "categorical",
+            "description": "Coded: Symbolic/pretend play",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "Q300a": {
+            "data-type": "ordinal",
+            "description": "Reciprocity in play",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q300aa": {
+            "data-type": "categorical",
+            "description": "Coded: Reciprocity in play",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q300b": {
+            "data-type": "ordinal",
+            "description": "Gives help to interviewer",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "Q300ba": {
+            "data-type": "categorical",
+            "description": "Coded: Gives help to interviewer",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q400": {
+            "data-type": "ordinal",
+            "description": "Turn-taking in drawing",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4
+            ]
+        },
+        "Q400a": {
+            "data-type": "categorical",
+            "description": "Coded: Turn-taking in drawing",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q500": {
+            "data-type": "ordinal",
+            "description": "Demonstration/mime",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q500a": {
+            "data-type": "categorical",
+            "description": "Coded: Demonstration/mime",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q600": {
+            "data-type": "ordinal",
+            "description": "Description of poster",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ]
+        },
+        "Q600a": {
+            "data-type": "categorical",
+            "description": "Coded: Description of poster",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q700": {
+            "data-type": "ordinal",
+            "description": "Telling a sequential story",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q700a": {
+            "data-type": "categorical",
+            "description": "Coded: Telling a sequential story",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q900a": {
+            "data-type": "ordinal",
+            "description": "Questions about emotions",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q900aa": {
+            "data-type": "categorical",
+            "description": "Coded: Questions about emotions",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q900b": {
+            "data-type": "ordinal",
+            "description": "Questions about qualities of persons",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q900ba": {
+            "data-type": "categorical",
+            "description": "Coded: Questions about qualities of persons",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "Q900c": {
+            "data-type": "ordinal",
+            "description": "Concept of friendship",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q900ca": {
+            "data-type": "categorical",
+            "description": "Coded: Concept of friendship",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "Q900d": {
+            "data-type": "ordinal",
+            "description": "Marriage",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "Q900da": {
+            "data-type": "categorical",
+            "description": "Coded: Marriage",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA01": {
+            "data-type": "ordinal",
+            "description": "Usual mode of communication",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA01a": {
+            "data-type": "categorical",
+            "description": "Coded: Usual mode of communication",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QA02": {
+            "data-type": "ordinal",
+            "description": "Overall level of nonechoed language",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA02a": {
+            "data-type": "categorical",
+            "description": "Coded: Overall level of nonechoed language",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA03": {
+            "data-type": "ordinal",
+            "description": "Conversation",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA03a": {
+            "data-type": "categorical",
+            "description": "Coded: Conversation",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA04": {
+            "data-type": "ordinal",
+            "description": "Language production and linked nonverbal communication",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                6
+            ]
+        },
+        "QA04a": {
+            "data-type": "categorical",
+            "description": "Coded: Language production and linked nonverbal communication",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA05": {
+            "data-type": "ordinal",
+            "description": "Report of things day's activities interests and plans",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA05a": {
+            "data-type": "categorical",
+            "description": "Coded: Report of things day's activities interests and plans",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "QA06": {
+            "data-type": "ordinal",
+            "description": "Intelligibility",
+            "enum": [
+                null,
+                0,
+                2
+            ]
+        },
+        "QA06a": {
+            "data-type": "categorical",
+            "description": "Coded: Intelligibility",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA07": {
+            "data-type": "ordinal",
+            "description": "Speech abnormalities associated with autism: intonation/volume/rhythm/rate",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA07a": {
+            "data-type": "categorical",
+            "description": "Coded: Speech abnormalities associated with autism: intonation/volume/rhythm/rate",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "QA08": {
+            "data-type": "ordinal",
+            "description": "Pronomial reversal",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA08a": {
+            "data-type": "categorical",
+            "description": "Coded: Pronomial reversal",
+            "enum": [
+                null,
+                0,
+                7,
+                8,
+                9
+            ]
+        },
+        "QA09": {
+            "data-type": "ordinal",
+            "description": "Immediate echolalia",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA09a": {
+            "data-type": "categorical",
+            "description": "Coded: Immediate echolalia",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA10": {
+            "data-type": "ordinal",
+            "description": "Stereotyped phrases",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QA10a": {
+            "data-type": "categorical",
+            "description": "Coded: Stereotyped phrases",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA11": {
+            "data-type": "ordinal",
+            "description": "Neologisms/idiosyncratic language",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QA11a": {
+            "data-type": "categorical",
+            "description": "Coded: Neologisms/idiosyncratic language",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QA12": {
+            "data-type": "ordinal",
+            "description": "Inappropriate questions and statements",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QA12a": {
+            "data-type": "categorical",
+            "description": "Coded: Inappropriate questions and statements",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QB01": {
+            "data-type": "ordinal",
+            "description": "Amount of social overtures",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB01a": {
+            "data-type": "categorical",
+            "description": "Coded: Amount of social overtures",
+            "enum": [
+                null,
+                0,
+                7,
+                9
+            ]
+        },
+        "QB02": {
+            "data-type": "ordinal",
+            "description": "Quality of social overtures",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB02a": {
+            "data-type": "categorical",
+            "description": "Coded: Quality of social overtures",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QB03": {
+            "data-type": "ordinal",
+            "description": "Quality of social response",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB03a": {
+            "data-type": "categorical",
+            "description": "Coded: Quality of social response",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QB04": {
+            "data-type": "ordinal",
+            "description": "Amount of reciprocal social communication",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB04a": {
+            "data-type": "categorical",
+            "description": "Coded: Amount of reciprocal social communication",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB05": {
+            "data-type": "ordinal",
+            "description": "Shared enjoyment in interaction",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB05a": {
+            "data-type": "categorical",
+            "description": "Coded: Shared enjoyment in interaction",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QB06": {
+            "data-type": "ordinal",
+            "description": "Overall quality of rapport",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB06a": {
+            "data-type": "categorical",
+            "description": "Coded: Overall quality of rapport",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB07": {
+            "data-type": "ordinal",
+            "description": "Social distance/posture",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB07a": {
+            "data-type": "categorical",
+            "description": "Coded: Social distance/posture",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB08": {
+            "data-type": "ordinal",
+            "description": "Social disinhibition",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB08a": {
+            "data-type": "categorical",
+            "description": "Coded: Social disinhibition",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB09": {
+            "data-type": "ordinal",
+            "description": "Unusual eye contact",
+            "enum": [
+                null,
+                0,
+                2
+            ]
+        },
+        "QB09a": {
+            "data-type": "categorical",
+            "description": "Coded: Unusual eye contact",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB10": {
+            "data-type": "ordinal",
+            "description": "Facial expression",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QB10a": {
+            "data-type": "categorical",
+            "description": "Coded: Facial expression",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QB11": {
+            "data-type": "ordinal",
+            "description": "Smiling",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QB11a": {
+            "data-type": "categorical",
+            "description": "Coded: Smiling",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QC01": {
+            "data-type": "ordinal",
+            "description": "Imagination/creativity",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QC01a": {
+            "data-type": "categorical",
+            "description": "Coded: Imagination/creativity",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD01": {
+            "data-type": "ordinal",
+            "description": "Unusual preoccupation with special interests or activities",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QD01a": {
+            "data-type": "categorical",
+            "description": "Coded: Unusual preoccupation with special interests or activities",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD02": {
+            "data-type": "ordinal",
+            "description": "Unusual sensory interest in play material/person",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD02a": {
+            "data-type": "categorical",
+            "description": "Coded: Unusual sensory interest in play material/person",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD03": {
+            "data-type": "ordinal",
+            "description": "Compulsions or rituals",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD03a": {
+            "data-type": "categorical",
+            "description": "Coded: Compulsions or rituals",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD04": {
+            "data-type": "ordinal",
+            "description": "Mannerisms and stereotyped movements",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD04a": {
+            "data-type": "categorical",
+            "description": "Coded: Mannerisms and stereotyped movements",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD05": {
+            "data-type": "ordinal",
+            "description": "Other mannerisms or stereotyped movements",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD05a": {
+            "data-type": "categorical",
+            "description": "Coded: Other mannerisms or stereotyped movements",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD06": {
+            "data-type": "ordinal",
+            "description": "Tics",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD06a": {
+            "data-type": "categorical",
+            "description": "Coded: Tics",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD07": {
+            "data-type": "ordinal",
+            "description": "Vocal Tics",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD07a": {
+            "data-type": "categorical",
+            "description": "Coded: Vocal Tics",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QD08": {
+            "data-type": "ordinal",
+            "description": "Self-injury",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QD08a": {
+            "data-type": "categorical",
+            "description": "Coded: Self-injury",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QE01": {
+            "data-type": "ordinal",
+            "description": "Appearance",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QE01a": {
+            "data-type": "categorical",
+            "description": "Coded: Appearance",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QE02": {
+            "data-type": "ordinal",
+            "description": "Overactivity",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QE02a": {
+            "data-type": "categorical",
+            "description": "Coded: Overactivity",
+            "enum": [
+                null,
+                0,
+                7,
+                9
+            ]
+        },
+        "QE03": {
+            "data-type": "ordinal",
+            "description": "Attention",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QE03a": {
+            "data-type": "categorical",
+            "description": "Coded: Attention",
+            "enum": [
+                null,
+                0,
+                8,
+                9
+            ]
+        },
+        "QE04": {
+            "data-type": "ordinal",
+            "description": "Tantrums or aggression",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QE04a": {
+            "data-type": "categorical",
+            "description": "Coded: Tantrums or aggression",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QE05": {
+            "data-type": "ordinal",
+            "description": "Disruptive behaviour",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QE05a": {
+            "data-type": "categorical",
+            "description": "Coded: Disruptive behaviour",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QE06": {
+            "data-type": "ordinal",
+            "description": "Negativism",
+            "enum": [
+                null,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        "QE06a": {
+            "data-type": "categorical",
+            "description": "Coded: Negativism",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QF01": {
+            "data-type": "ordinal",
+            "description": "Overall distress",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QF01a": {
+            "data-type": "categorical",
+            "description": "Coded: Overall distress",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QF02": {
+            "data-type": "ordinal",
+            "description": "Anxiety",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QF02a": {
+            "data-type": "categorical",
+            "description": "Coded: Anxiety",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QF03": {
+            "data-type": "ordinal",
+            "description": "Misery",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QF03a": {
+            "data-type": "categorical",
+            "description": "Coded: Misery",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "QF04": {
+            "data-type": "ordinal",
+            "description": "Inappropriate cheerfulness",
+            "enum": [
+                null,
+                0,
+                1,
+                2
+            ]
+        },
+        "QF04a": {
+            "data-type": "categorical",
+            "description": "Coded: Inappropriate cheerfulness",
+            "enum": [
+                null,
+                0,
+                9
+            ]
+        },
+        "age": {
+            "description": "Age in months at interview",
+            "minimum": 0,
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "interview_date": {
+            "type": [
+                "string",
+                "null"
+            ]
+        }
+    },
+    "required": [
+        "age",
+        "interview_date",
+        "Q100",
+        "Q100a",
+        "Q200",
+        "Q200a",
+        "Q300a",
+        "Q300aa",
+        "Q300b",
+        "Q300ba",
+        "Q400",
+        "Q400a",
+        "Q500",
+        "Q500a",
+        "Q600",
+        "Q600a",
+        "Q700",
+        "Q700a",
+        "Q900a",
+        "Q900aa",
+        "Q900b",
+        "Q900ba",
+        "Q900c",
+        "Q900ca",
+        "Q900d",
+        "Q900da",
+        "QA01",
+        "QA01a",
+        "QA10",
+        "QA10a",
+        "QA11",
+        "QA11a",
+        "QA12",
+        "QA12a",
+        "QA02",
+        "QA02a",
+        "QA03",
+        "QA03a",
+        "QA04",
+        "QA04a",
+        "QA05",
+        "QA05a",
+        "QA06",
+        "QA06a",
+        "QA07",
+        "QA07a",
+        "QA08",
+        "QA08a",
+        "QA09",
+        "QA09a",
+        "QB01",
+        "QB01a",
+        "QB10",
+        "QB10a",
+        "QB11",
+        "QB11a",
+        "QB02",
+        "QB02a",
+        "QB03",
+        "QB03a",
+        "QB04",
+        "QB04a",
+        "QB05",
+        "QB05a",
+        "QB06",
+        "QB06a",
+        "QB07",
+        "QB07a",
+        "QB08",
+        "QB08a",
+        "QB09",
+        "QB09a",
+        "QC01",
+        "QC01a",
+        "QD01",
+        "QD01a",
+        "QD02",
+        "QD02a",
+        "QD03",
+        "QD03a",
+        "QD04",
+        "QD04a",
+        "QD05",
+        "QD05a",
+        "QD06",
+        "QD06a",
+        "QD07",
+        "QD07a",
+        "QD08",
+        "QD08a",
+        "QE01",
+        "QE01a",
+        "QE02",
+        "QE02a",
+        "QE03",
+        "QE03a",
+        "QE04",
+        "QE04a",
+        "QE05",
+        "QE05a",
+        "QE06",
+        "QE06a",
+        "QF01",
+        "QF01a",
+        "QF02",
+        "QF02a",
+        "QF03",
+        "QF03a",
+        "QF04",
+        "QF04a"
+    ]
+}

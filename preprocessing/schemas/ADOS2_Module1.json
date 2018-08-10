@@ -1,0 +1,261 @@
+{
+	"$schema": "http://json-schema.org/schema#",
+	"title": "ADOS2_Module1",
+	"id": "resource:/schemas/ADOS2_Module1#",
+	"type": "object",
+	"properties": {
+		"age": {
+			"description": "Age in months at interview",
+			"type": ["integer", "null"],
+			"minimum": 0
+		},
+		"interview_date": {
+			"type": ["string", "null"]
+		},
+		"diagnosis": {
+			"description": "Diagnosis calculated from instrument.",
+			"enum": ["Autism", "Autism Spectrum", "Control", null]
+		},
+		"diagnosis_num_nulls": {
+			"description": "Number of null entries encountered when calculating diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0
+		},
+		"communication": {
+			"description": "Communication. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"social_interaction": {
+			"description": "Social interaction. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"restricted_repetitive_behavior": {
+			"description": "Restricted repetitive behavior. Subscore used in assigning diagnosis.",
+			"type": ["integer", "null"],
+			"minimum": 0,
+			"data-type": "score"
+		},
+		"QA01": {
+			"description": "Overall level of non-echoed spoken language",
+			"enum": [null, 0, 1, 2, 3, 4],
+			"data-type": "ordinal"
+		},
+		"QA02": {
+			"description": "Frequency of spontaneous vocalization directed to others",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QA03": {
+			"description": "Intonation of vocalization or verbalizations",
+			"enum": [null, 0, 1, 2],
+			"data-type": "ordinal"
+		},
+		"QA03a": {
+			"description": "Coded: Intonation of vocalization or verbalizations",
+			"enum": [null, 0, 8],
+			"data-type": "categorical"
+		},
+		"QA04": {
+			"description": "Immediate echolalia",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QA04a": {
+			"description": "Coded: Immediate echolalia",
+			"enum": [null, 0, 8],
+			"data-type": "categorical"
+		},
+		"QA05": {
+			"description": "Stereotyped/idiosyncratic use of words or phrases",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QA05a": {
+			"description": "Coded: Stereotyped/idiosyncratic use of words or phrases",
+			"enum": [null, 0, 8],
+			"data-type": "categorical"
+		},
+		"QA06": {
+			"description": "Use of another's body",
+			"enum": [null, 0, 1, 2],
+			"data-type": "ordinal"
+		},
+		"QA06a": {
+			"description": "Coded: Use of another's body",
+			"enum": [null, 0, 8],
+			"data-type": "categorical"
+		},
+		"QA07": {
+			"description": "Pointing",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QA08": {
+			"description": "Gestures",
+			"enum": [null, 0, 1, 2],
+			"data-type": "ordinal"
+		},
+		"QA08a": {
+			"description": "Coded: Gestures",
+			"enum": [null, 0, 8],
+			"data-type": "categorical"
+		},
+		"QB01": {
+			"description": "Unusual eye contact",
+			"enum": [null, 0, 2],
+			"data-type": "ordinal"
+		},
+		"QB02": {
+			"description": "Responsive social smile",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB03": {
+			"description": "Facial expressions directed to others",
+			"enum": [null, 0, 1, 2],
+			"data-type": "ordinal"
+		},
+		"QB04": {
+			"description": "Integration of gaze and other behaviors during social overtures",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB05": {
+			"description": "Shared enjoyment in interaction",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB06": {
+			"description": "Response to name",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB07": {
+			"description": "Requesting",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB08": {
+			"description": "Giving",
+			"enum": [null, 0, 1, 2],
+			"data-type": "ordinal"
+		},
+		"QB09": {
+			"description": "Showing",
+			"enum": [null, 0, 1, 2],
+			"data-type": "ordinal"
+		},
+		"QB10": {
+			"description": "Spontaneous initiation of joint attention",
+			"enum": [null, 0, 1, 2],
+			"data-type": "ordinal"
+		},
+		"QB11": {
+			"description": "Response to joint attention",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB12": {
+			"description": "Quality of social overtures",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB13.1": {
+			"description": "Amount of social overtures/maintenance of attention to examiner",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB13.1a": {
+			"description": "Coded: Amount of social overtures/maintenance of attention to examiner",
+			"enum": [null, 0, 7],
+			"data-type": "categorical"
+		},
+		"QB13.2": {
+			"description": "Amount of social overtures/maintenance of attention to parent",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB13.2a": {
+			"description": "Coded: Amount of social overtures/maintenance of attention to parent",
+			"enum": [null, 0, 7, 8],
+			"data-type": "categorical"
+		},
+		"QB14": {
+			"description": "Quality of social response",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB15": {
+			"description": "Level of engagement",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QB16": {
+			"description": "Overall quality of rapport",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QC01": {
+			"description": "Functional play with objects",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QC02": {
+			"description": "Imagination/creativity",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QD01": {
+			"description": "Unusual sensory interest in play material/person",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QD02": {
+			"description": "Hand and finger and other complex mannerisms",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QD03": {
+			"description": "Self-injurious behavior",
+			"enum": [null, 0, 1, 2],
+			"data-type": "ordinal"
+		},
+		"QD04": {
+			"description": "Unusually repetitive interests or stereotyped behaviors",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QE01": {
+			"description": "Overactivity",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QE01a": {
+			"description": "Coded: Overactivity",
+			"enum": [null, 0, 7],
+			"data-type": "categorical"
+		},
+		"QE02": {
+			"description": "Tantrums, aggression, negative or disruptive behavior",
+			"enum": [null, 0, 1, 2, 3],
+			"data-type": "ordinal"
+		},
+		"QE03": {
+			"description": "Anxiety",
+			"enum": [null, 0, 1, 2],
+			"data-type": "ordinal"
+		}
+	},
+	"additionalProperties": false,
+	"required": ["QA01", "QA02", "QA03", "QA03a", "QA04", "QA04a", "QA05", "QA05a", "QA06", "QA06a", "QA07", "QA08", "QA08a", 
+	"QB01", "QB02", "QB03", "QB04", "QB05", "QB06", "QB07", "QB08", "QB09", "QB10", "QB11", "QB12", "QB13.1", "QB13.1a", "QB13.2", "QB13.2a", "QB14", "QB15", "QB16", 
+	"QC01", "QC02", 
+	"QD01", "QD02", "QD03", "QD04", 
+	"QE01", "QE01a", "QE02", "QE03",
+	"age", "interview_date", "diagnosis", "diagnosis_num_nulls",
+	"social_interaction", "communication", "restricted_repetitive_behavior"]
+}
