@@ -17,25 +17,33 @@ import sys
 
 filename = sys.argv[1]
 
-with open("AutismPhenotype.json") as schema_file:    
+with open("schemas/Individual.json") as schema_file:    
 	pheno_schema = json.load(schema_file)
 
-# Accumulate missing data counts for rows and columns
-with open(filename + '.csv', 'r') as infile:
-	reader = csv.reader(infile)
-	col_null_counts = [0.0]*len(next(reader))
-	row_null_counts = []
+ordinal_features = set()
+for instrument in [k for k, v in pheno_schema['properties'].items() if 'type' in v and v['type'] == 'object']:
+	with open('schemas/%s.json' % instrument) as instrument_schema_file:
+		instrument_schema = json.load(instrument_schema_file)
+		for feature in instrument_schema['properties'].keys():
+			if 'data-type' in instrument_schema['properties'][feature] and instrument_schema['properties'][feature]['data-type'] == 'ordinal':
+				ordinal_features.add('%s:%s' % (instrument, feature))
 
-	for row in reader:
-		c = 0
-		for j, e in enumerate(row):
-			if e == '' or e == 'None':
-				col_null_counts[j] += 1
-				c += 1
-		row_null_counts.append(c)
+# # Accumulate missing data counts for rows and columns
+# with open(filename + '.csv', 'r') as infile:
+# 	reader = csv.reader(infile)
+# 	col_null_counts = [0.0]*len(next(reader))
+# 	row_null_counts = []
 
-col_null_counts = [x/len(row_null_counts) for x in col_null_counts]
-row_null_counts = [x/len(col_null_counts) for x in row_null_counts]
+# 	for row in reader:
+# 		c = 0
+# 		for j, e in enumerate(row):
+# 			if e == '' or e == 'None':
+# 				col_null_counts[j] += 1
+# 				c += 1
+# 		row_null_counts.append(c)
+
+# col_null_counts = [x/len(row_null_counts) for x in col_null_counts]
+# row_null_counts = [x/len(col_null_counts) for x in row_null_counts]
 
 # Pull ordinal features
 with open(filename + '.csv', 'r') as infile:
@@ -43,43 +51,39 @@ with open(filename + '.csv', 'r') as infile:
 	header = next(reader)
 
 	label_cols = [
-		header.index('identifier'), 
-		header.index('diagnosis'), header.index('ADIR:diagnosis'), header.index('ADIR:diagnosis_num_nulls'), header.index('ADIR:communication'), header.index('ADIR:social_interaction'), header.index('ADIR:restricted_repetitive_behavior'),
-		header.index('ADOS:diagnosis'), header.index('ADOS:diagnosis_num_nulls'), header.index('ADOS:communication'), header.index('ADOS:social_interaction'), header.index('ADOS:restricted_repetitive_behavior'),
-		header.index('SRS:diagnosis'), header.index('SRS:diagnosis_num_nulls'), header.index('SRS:social_awareness'), header.index('SRS:social_cognition'), header.index('SRS:social_communication'), header.index('SRS:social_motivation'), header.index('SRS:autistic_mannerisms'),
-		header.index('cpea_diagnosis'), header.index('cpea_adjusted_diagnosis')
+		header.index('identifier'), header.index('diagnosis'), header.index('gender'),
+		header.index('ADIR2003:diagnosis'), header.index('ADIR2003:diagnosis_num_nulls'),
+		header.index('ADOS_Module1:diagnosis'), header.index('ADOS_Module1:diagnosis_num_nulls'), 
+		header.index('ADOS_Module2:diagnosis'), header.index('ADOS_Module2:diagnosis_num_nulls'), 
+		header.index('ADOS_Module3:diagnosis'), header.index('ADOS_Module3:diagnosis_num_nulls'), 
+		header.index('ADOS_Module4:diagnosis'), header.index('ADOS_Module4:diagnosis_num_nulls'), 
+		header.index('ADOS2_Module1:diagnosis'), header.index('ADOS2_Module1:diagnosis_num_nulls'), 
+		header.index('ADOS2_Module2:diagnosis'), header.index('ADOS2_Module2:diagnosis_num_nulls'), 
+		header.index('ADOS2_Module3:diagnosis'), header.index('ADOS2_Module3:diagnosis_num_nulls'), 
+		header.index('ADOS2_Module4:diagnosis'), header.index('ADOS2_Module4:diagnosis_num_nulls'), 
+		header.index('SRS_Child:diagnosis'), header.index('SRS_Child:diagnosis_num_nulls')
 	]
 
 	keep_cols = [header.index('identifier')]
 
 	# Pull ordinal features
 	for i, h in enumerate(header):
-		if col_null_counts[i] <= 1: #.4:
-			if ':' in h:
-				pieces = h.strip().split(':')
-				json_item = pheno_schema['definitions']
-				for piece in pieces:
-					if piece in json_item:
-						json_item = json_item[piece]
-					elif piece in json_item['properties']:
-						json_item = json_item['properties'][piece]
-					else:
-						print('Problem!', piece)
-				if 'data-type' in json_item and json_item['data-type'] == 'ordinal' and not pieces[0].startswith('ADOS_'):
-					keep_cols.append(i)
+		#if col_null_counts[i] <= 1: #.4:
+		if h in ordinal_features:
+			keep_cols.append(i)
 
 	print('Keeping %d features' % (len(keep_cols)-1))
 
-	with open(filename + '_filtered_labels.csv', 'w+') as label_outfile:
-		with open(filename + '_filtered.csv', 'w+') as outfile:
+	with open(filename + '_ordinal_labels.csv', 'w+') as label_outfile:
+		with open(filename + '_ordinal.csv', 'w+') as outfile:
 			label_writer = csv.writer(label_outfile)
 			writer = csv.writer(outfile)
 
 			label_writer.writerow([header[i] for i in label_cols])
 			writer.writerow([header[i] for i in keep_cols])
 			for i, row in enumerate(reader):
-				if row_null_counts[i] <= 1: #.6:
-					label_writer.writerow([("None" if row[i] == '' else row[i]) for i in label_cols])
-					writer.writerow([("None" if row[i] == '' else row[i]) for i in keep_cols])
+				#if row_null_counts[i] <= 1: #.6:
+				label_writer.writerow([("None" if row[i] == '' else row[i]) for i in label_cols])
+				writer.writerow([("None" if row[i] == '' else row[i]) for i in keep_cols])
 
 

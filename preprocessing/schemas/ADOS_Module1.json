@@ -5,6 +5,39 @@
 	"type": "object",
 	"additionalProperties": false,
     "properties": {
+        "diagnosis": {
+            "description": "Diagnosis calculated from instrument.",
+            "enum": ["Autism", "Autism Spectrum", "Control", null]
+        },
+        "diagnosis_num_nulls": {
+            "description": "Number of null entries encountered when calculating diagnosis.",
+            "type": ["integer", "null"],
+            "minimum": 0
+        },
+        "communication": {
+            "description": "Communication. Subscore used in assigning diagnosis.",
+            "type": ["integer", "null"],
+            "minimum": 0,
+            "data-type": "score"
+        },
+        "social_interaction": {
+            "description": "Social interaction. Subscore used in assigning diagnosis.",
+            "type": ["integer", "null"],
+            "minimum": 0,
+            "data-type": "score"
+        },
+        "restricted_repetitive_behavior": {
+            "description": "Restricted repetitive behavior. Subscore used in assigning diagnosis.",
+            "type": ["integer", "null"],
+            "minimum": 0,
+            "data-type": "score"
+        },
+        "creativity": {
+            "description": "Creativity. Subscore used in assigning diagnosis.",
+            "type": ["integer", "null"],
+            "minimum": 0,
+            "data-type": "score"
+        },
         "QA01": {
             "data-type": "ordinal",
             "description": "Overall level of non-echoed language.",
@@ -22,8 +55,7 @@
             "enum": [
                 null,
                 0,
-                8,
-                9
+                8
             ]
         },
         "QA02": {
@@ -35,15 +67,6 @@
                 1,
                 2,
                 3
-            ]
-        },
-        "QA02a": {
-            "data-type": "categorical",
-            "description": "Coded: Frequency of vocalization directed to others.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QA03": {
@@ -62,8 +85,7 @@
             "enum": [
                 null,
                 0,
-                8,
-                9
+                8
             ]
         },
         "QA04": {
@@ -83,8 +105,7 @@
             "enum": [
                 null,
                 0,
-                8,
-                9
+                8
             ]
         },
         "QA05": {
@@ -104,8 +125,7 @@
             "enum": [
                 null,
                 0,
-                8,
-                9
+                8
             ]
         },
         "QA06": {
@@ -124,8 +144,7 @@
             "enum": [
                 null,
                 0,
-                8,
-                9
+                8
             ]
         },
         "QA07": {
@@ -137,15 +156,6 @@
                 1,
                 2,
                 3
-            ]
-        },
-        "QA07a": {
-            "data-type": "categorical",
-            "description": "Coded: Pointing.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QA08": {
@@ -164,8 +174,7 @@
             "enum": [
                 null,
                 0,
-                8,
-                9
+                8
             ]
         },
         "QB01": {
@@ -175,15 +184,6 @@
                 null,
                 0,
                 2
-            ]
-        },
-        "QB01a": {
-            "data-type": "categorical",
-            "description": "Coded: Unusual eye contact.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QB02": {
@@ -197,15 +197,6 @@
                 3
             ]
         },
-        "QB02a": {
-            "data-type": "categorical",
-            "description": "Coded: Responsive social smile.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QB03": {
             "data-type": "ordinal",
             "description": "Facial expressions directed to others.",
@@ -214,15 +205,6 @@
                 0,
                 1,
                 2
-            ]
-        },
-        "QB03a": {
-            "data-type": "categorical",
-            "description": "Coded: Facial expressions directed to others.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QB04": {
@@ -236,15 +218,6 @@
                 3
             ]
         },
-        "QB04a": {
-            "data-type": "categorical",
-            "description": "Coded: Integration of gaze and other behaviors during social overtures.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QB05": {
             "data-type": "ordinal",
             "description": "Shared enjoyment in interaction.",
@@ -253,15 +226,6 @@
                 0,
                 1,
                 2
-            ]
-        },
-        "QB05a": {
-            "data-type": "categorical",
-            "description": "Coded: Shared enjoyment in interaction.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QB06": {
@@ -275,15 +239,6 @@
                 3
             ]
         },
-        "QB06a": {
-            "data-type": "categorical",
-            "description": "Coded: Response to name.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QB07": {
             "data-type": "ordinal",
             "description": "Requesting.",
@@ -293,15 +248,6 @@
                 1,
                 2,
                 3
-            ]
-        },
-        "QB07a": {
-            "data-type": "categorical",
-            "description": "Coded: Requesting.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QB08": {
@@ -314,15 +260,6 @@
                 2
             ]
         },
-        "QB08a": {
-            "data-type": "categorical",
-            "description": "Coded: Giving.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QB09": {
             "data-type": "ordinal",
             "description": "Showing.",
@@ -333,15 +270,6 @@
                 2
             ]
         },
-        "QB09a": {
-            "data-type": "categorical",
-            "description": "Coded: Showing.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QB10": {
             "data-type": "ordinal",
             "description": "Spontaneous initiation of joint attention.",
@@ -350,15 +278,6 @@
                 0,
                 1,
                 2
-            ]
-        },
-        "QB10a": {
-            "data-type": "categorical",
-            "description": "Coded: Spontaneous initiation of joint attention.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QB11": {
@@ -372,15 +291,6 @@
                 3
             ]
         },
-        "QB11a": {
-            "data-type": "categorical",
-            "description": "Coded: Response to joint attention.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QB12": {
             "data-type": "ordinal",
             "description": "Quality of social overtures.",
@@ -390,15 +300,6 @@
                 1,
                 2,
                 3
-            ]
-        },
-        "QB12a": {
-            "data-type": "categorical",
-            "description": "Coded: Quality of social overtures.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QC01": {
@@ -412,15 +313,6 @@
                 3
             ]
         },
-        "QC01a": {
-            "data-type": "categorical",
-            "description": "Coded: Functional play with objects.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QC02": {
             "data-type": "ordinal",
             "description": "Imagination/creativity.",
@@ -430,15 +322,6 @@
                 1,
                 2,
                 3
-            ]
-        },
-        "QC02a": {
-            "data-type": "categorical",
-            "description": "Coded: Imagination/creativity.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QD01": {
@@ -451,15 +334,6 @@
                 2
             ]
         },
-        "QD01a": {
-            "data-type": "categorical",
-            "description": "Coded: Unusual sensory interest in play material/person.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QD02": {
             "data-type": "ordinal",
             "description": "Hand and finger and other complex mannerisms.",
@@ -470,15 +344,6 @@
                 2
             ]
         },
-        "QD02a": {
-            "data-type": "categorical",
-            "description": "Coded: Hand and finger and other complex mannerisms.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QD03": {
             "data-type": "ordinal",
             "description": "Self-injurious behaviour.",
@@ -487,15 +352,6 @@
                 0,
                 1,
                 2
-            ]
-        },
-        "QD03a": {
-            "data-type": "categorical",
-            "description": "Coded: Self-injurious behaviour.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "QD04": {
@@ -509,15 +365,6 @@
                 3
             ]
         },
-        "QD04a": {
-            "data-type": "categorical",
-            "description": "Coded: Unusually repetitive interests or stereotyped behaviors.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QE01": {
             "data-type": "ordinal",
             "description": "Overactivity.",
@@ -525,17 +372,7 @@
                 null,
                 0,
                 1,
-                2
-            ]
-        },
-        "QE01a": {
-            "data-type": "categorical",
-            "description": "Coded: Overactivity.",
-            "enum": [
-                null,
-                0,
-                7,
-                9
+                2, 7
             ]
         },
         "QE02": {
@@ -548,15 +385,6 @@
                 2
             ]
         },
-        "QE02a": {
-            "data-type": "categorical",
-            "description": "Coded: Tantrums aggression negative or disruptive behavior.",
-            "enum": [
-                null,
-                0,
-                9
-            ]
-        },
         "QE03": {
             "data-type": "ordinal",
             "description": "Anxiety.",
@@ -565,15 +393,6 @@
                 0,
                 1,
                 2
-            ]
-        },
-        "QE03a": {
-            "data-type": "categorical",
-            "description": "Coded: Anxiety.",
-            "enum": [
-                null,
-                0,
-                9
             ]
         },
         "age": {
@@ -594,63 +413,11 @@
     "required": [
         "age",
         "interview_date",
-        "QA01",
-        "QA01a",
-        "QA02",
-        "QA02a",
-        "QA03",
-        "QA03a",
-        "QA04",
-        "QA04a",
-        "QA05",
-        "QA05a",
-        "QA06",
-        "QA06a",
-        "QA07",
-        "QA07a",
-        "QA08",
-        "QA08a",
-        "QB01",
-        "QB01a",
-        "QB10",
-        "QB10a",
-        "QB11",
-        "QB11a",
-        "QB12",
-        "QB12a",
-        "QB02",
-        "QB02a",
-        "QB03",
-        "QB03a",
-        "QB04",
-        "QB04a",
-        "QB05",
-        "QB05a",
-        "QB06",
-        "QB06a",
-        "QB07",
-        "QB07a",
-        "QB08",
-        "QB08a",
-        "QB09",
-        "QB09a",
-        "QC01",
-        "QC01a",
-        "QC02",
-        "QC02a",
-        "QD01",
-        "QD01a",
-        "QD02",
-        "QD02a",
-        "QD03",
-        "QD03a",
-        "QD04",
-        "QD04a",
-        "QE01",
-        "QE01a",
-        "QE02",
-        "QE02a",
-        "QE03",
-        "QE03a"
+        "diagnosis", "diagnosis_num_nulls", "communication", "social_interaction", "restricted_repetitive_behavior", "creativity",
+        "QA01", "QA02", "QA03", "QA03a", "QA04", "QA04a", "QA05", "QA05a", "QA06", "QA06a", "QA07", "QA08", "QA08a", 
+        "QB01", "QB02", "QB03", "QB04", "QB05", "QB06", "QB07", "QB08", "QB09", "QB10", "QB11", "QB12",
+        "QC01", "QC02", 
+        "QD01", "QD02", "QD03", "QD04", 
+        "QE01", "QE02", "QE03"
     ]
 }

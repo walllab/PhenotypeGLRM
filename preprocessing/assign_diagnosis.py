@@ -32,8 +32,9 @@ def calculate_subscore(score_name, sample, instrument, features, additional_scor
 	num_nulls = sum(x is None for x in score_entries)
 	return num_nulls
 
-def assign_adir_diagnosis(sample):
-	instrument = 'ADIR'
+
+def assign_adir2003_diagnosis(sample):
+	instrument = 'ADIR2003'
 	if instrument in sample:
 
 		# Social interacton
@@ -97,8 +98,32 @@ def assign_adir_diagnosis(sample):
 		sample[instrument]['diagnosis_num_nulls'] = a_num_nulls + b_num_nulls + c_num_nulls + d_num_nulls + (1 if is_verbal is None else 0)
 
 
-def assign_ados1_diagnosis(sample):
+def assign_adosm1_diagnosis(sample):
 	instrument = 'ADOS_Module1'
+	if instrument in sample:
+
+		a_num_nulls = calculate_subscore('communication', sample, instrument,  
+			['QA02', 'QA05', 'QA06', 'QA07', 'QA08'])
+		
+		b_num_nulls = calculate_subscore('social_interaction', sample, instrument,  
+			['QB01', 'QB03', 'QB05', 'QB09', 'QB10', 'QB11', 'QB12'])
+
+		c_num_nulls = calculate_subscore('creativity', sample, instrument,  
+			['QC01', 'QC02'])
+
+		d_num_nulls = calculate_subscore('restricted_repetitive_behavior', sample, instrument,  
+			['QD01', 'QD02', 'QD04'])
+
+		if sample[instrument]['communication'] >= 4 and sample[instrument]['social_interaction'] >= 7 and sample[instrument]['communication']+sample[instrument]['social_interaction'] >= 12:
+			sample[instrument]['diagnosis'] = 'Autism'
+		elif sample[instrument]['communication'] >= 2 and sample[instrument]['social_interaction'] >= 4 and sample[instrument]['communication']+sample[instrument]['social_interaction'] >= 7:
+			sample[instrument]['diagnosis'] = 'Autism Spectrum'
+		else:
+			sample[instrument]['diagnosis'] = 'Control'
+		sample[instrument]['diagnosis_num_nulls'] = a_num_nulls + b_num_nulls
+
+def assign_ados2m1_diagnosis(sample):
+	instrument = 'ADOS2_Module1'
 	if instrument in sample:
 
 		a_num_nulls = calculate_subscore('communication', sample, instrument,  
@@ -118,9 +143,32 @@ def assign_ados1_diagnosis(sample):
 			sample[instrument]['diagnosis'] = 'Autism' if score >= 12 else ('Autism Spectrum' if score >= 8 else 'Control')
 		sample[instrument]['diagnosis_num_nulls'] = a_num_nulls + b_num_nulls + c_num_nulls + (1 if has_words is None else 0)
 
-
-def assign_ados2_diagnosis(sample):
+def assign_adosm2_diagnosis(sample):
 	instrument = 'ADOS_Module2'
+	if instrument in sample:
+
+		a_num_nulls = calculate_subscore('communication', sample, instrument,  
+			['QA02', 'QA05', 'QA06', 'QA07', 'QA08'])
+
+		b_num_nulls = calculate_subscore('social_interaction', sample, instrument,
+			['QB01', 'QB02', 'QB06', 'QB08', 'QB09', 'QB10', 'QB11'])
+
+		c_num_nulls = calculate_subscore('creativity', sample, instrument,
+			['QC02'])
+
+		d_num_nulls = calculate_subscore('restricted_repetitive_behavior', sample, instrument,
+			['QD01', 'QD02', 'QD04'])
+
+		if sample[instrument]['communication'] >= 5 and sample[instrument]['social_interaction'] >= 6 and sample[instrument]['communication']+sample[instrument]['social_interaction'] >= 12:
+			sample[instrument]['diagnosis'] = 'Autism'
+		elif sample[instrument]['communication'] >= 3 and sample[instrument]['social_interaction'] >= 4 and sample[instrument]['communication']+sample[instrument]['social_interaction'] >= 8:
+			sample[instrument]['diagnosis'] = 'Autism Spectrum'
+		else:
+			sample[instrument]['diagnosis'] = 'Control'
+		sample[instrument]['diagnosis_num_nulls'] = a_num_nulls + b_num_nulls
+
+def assign_ados2m2_diagnosis(sample):
+	instrument = 'ADOS2_Module2'
 	if instrument in sample:
 
 		a_num_nulls = calculate_subscore('communication', sample, instrument,  
@@ -141,8 +189,32 @@ def assign_ados2_diagnosis(sample):
 			sample[instrument]['diagnosis'] = 'Autism' if score >= 10 else ('Autism Spectrum' if score >= 7 else 'Control')
 		sample[instrument]['diagnosis_num_nulls'] = a_num_nulls + b_num_nulls + c_num_nulls + (1 if age is None else 0)
 
-def assign_ados3_diagnosis(sample):
+def assign_adosm3_diagnosis(sample):
 	instrument = 'ADOS_Module3'
+	if instrument in sample:
+
+		a_num_nulls = calculate_subscore('communication', sample, instrument,  
+			['QA04', 'QA07', 'QA08', 'QA09'])
+
+		b_num_nulls = calculate_subscore('social_interaction', sample, instrument,
+			['QB01', 'QB02', 'QB06', 'QB07', 'QB08', 'QB09', 'QB10'])
+
+		c_num_nulls = calculate_subscore('creativity', sample, instrument,
+			['QC01'])
+		
+		d_num_nulls = calculate_subscore('restricted_repetitive_behavior', sample, instrument,
+			['QD01', 'QD02', 'QD04', 'QD05'])
+
+		if sample[instrument]['communication'] >= 3 and sample[instrument]['social_interaction'] >= 6 and sample[instrument]['communication']+sample[instrument]['social_interaction'] >= 10:
+			sample[instrument]['diagnosis'] = 'Autism'
+		elif sample[instrument]['communication'] >= 2 and sample[instrument]['social_interaction'] >= 4 and sample[instrument]['communication']+sample[instrument]['social_interaction'] >= 7:
+			sample[instrument]['diagnosis'] = 'Autism Spectrum'
+		else:
+			sample[instrument]['diagnosis'] = 'Control'
+		sample[instrument]['diagnosis_num_nulls'] = a_num_nulls + b_num_nulls
+
+def assign_ados2m3_diagnosis(sample):
+	instrument = 'ADOS2_Module3'
 	if instrument in sample:
 
 		a_num_nulls = calculate_subscore('communication', sample, instrument,  
@@ -158,8 +230,32 @@ def assign_ados3_diagnosis(sample):
 		sample[instrument]['diagnosis'] = 'Autism' if score >= 9 else ('Autism Spectrum' if score >= 7 else 'Control')
 		sample[instrument]['diagnosis_num_nulls'] = a_num_nulls + b_num_nulls + c_num_nulls
 
-def assign_ados4_diagnosis(sample):
+def assign_adosm4_diagnosis(sample):
 	instrument = 'ADOS_Module4'
+	if instrument in sample:
+
+		a_num_nulls = calculate_subscore('communication', sample, instrument,  
+			['QA04', 'QA08', 'QA09', 'QA10'])
+
+		b_num_nulls = calculate_subscore('social_interaction', sample, instrument,  
+			['QB01', 'QB02', 'QB06', 'QB08', 'QB09', 'QB10', 'QB11'])
+		
+		c_num_nulls = calculate_subscore('creativity', sample, instrument,
+			['QC01'])
+
+		d_num_nulls = calculate_subscore('restricted_repetitive_behavior', sample, instrument,
+			['QD01', 'QD02', 'QD04', 'QD05'])
+		
+		if sample[instrument]['communication'] >= 3 and sample[instrument]['social_interaction'] >= 6 and sample[instrument]['communication'] + sample[instrument]['social_interaction'] >= 10:
+			sample[instrument]['diagnosis'] = 'Autism'
+		elif sample[instrument]['communication'] >= 2 and sample[instrument]['social_interaction'] >= 4 and sample[instrument]['communication'] + sample[instrument]['social_interaction'] >= 7:
+			sample[instrument]['diagnosis'] = 'Autism Spectrum'
+		else:
+			sample[instrument]['diagnosis'] = 'Control'
+		sample[instrument]['diagnosis_num_nulls'] = a_num_nulls + b_num_nulls + c_num_nulls
+
+def assign_ados2m4_diagnosis(sample):
+	instrument = 'ADOS2_Module4'
 	if instrument in sample:
 
 		a_num_nulls = calculate_subscore('communication', sample, instrument,  
@@ -178,13 +274,6 @@ def assign_ados4_diagnosis(sample):
 		else:
 			sample[instrument]['diagnosis'] = 'Control'
 		sample[instrument]['diagnosis_num_nulls'] = a_num_nulls + b_num_nulls + c_num_nulls
-
-
-def assign_ados_diagnosis(sample):
-	if 'ADOS' in sample:
-		module = sample['ADOS']['module']
-		for feature in ('diagnosis', 'diagnosis_num_nulls', 'communication', 'social_interaction', 'restricted_repetitive_behavior'):
-			sample['ADOS'][feature] = sample[module][feature]
 
 srs_male = [34, 34, 35, 35, 36, 36, 37, 37, 38, 38, 
 			39, 39, 40, 40, 41, 41, 42, 42, 42, 43, 
@@ -229,7 +318,7 @@ srs_female = [35, 35, 36, 36, 37, 38, 38, 39, 39, 40,
 			140, 140, 141, 141, 142, 142]
 
 def assign_srs_diagnosis(sample):
-	instrument = 'SRS'
+	instrument = 'SRS_Child'
 	if instrument in sample:
 
 		awa_num_nulls = calculate_subscore('social_awareness', sample, instrument,  
@@ -319,7 +408,15 @@ def assign_cpea_adjusted_diagnosis(sample):
 
 
 def assign_diagnosis(sample):
-	sample['diagnosis'] = sample['clinical_diagnosis']
+	has_autism = False
+
+	if sample['clinical_diagnosis'] in {'Autism', 'Asperger', 'PDD-NOS'}:
+		has_autism = True
+	for instrument in ['ADIR2003', 'ADOS_Module1', 'ADOS_Module2', 'ADOS_Module3', 'ADOS_Module4', 'ADOS2_Module1', 'ADOS2_Module2', 'ADOS2_Module3', 'ADOS2_Module4', 'SRS_Child']:
+		if instrument in sample and sample[instrument]['diagnosis'] in {'Autism', 'Autism Spectrum'}:
+			has_autism = True
+
+	sample['diagnosis'] = 'Autism' if has_autism else 'Control'
 
 def assign_clinical_diagnosis(sample):
 	if sample['clinical_diagnosis_raw'] is not None:
@@ -340,18 +437,22 @@ def assign_clinical_diagnosis(sample):
 			print(sample['dataset'], sample['identifier'], cd)
 
 def assign_all_diagnoses(sample):
-	assign_adir_diagnosis(sample)
+	assign_adir2003_diagnosis(sample)
 
-	assign_ados1_diagnosis(sample)
-	assign_ados2_diagnosis(sample)
-	assign_ados3_diagnosis(sample)
-	assign_ados4_diagnosis(sample)
-	assign_ados_diagnosis(sample)
+	assign_adosm1_diagnosis(sample)
+	assign_adosm2_diagnosis(sample)
+	assign_adosm3_diagnosis(sample)
+	assign_adosm4_diagnosis(sample)
+	
+	assign_ados2m1_diagnosis(sample)
+	assign_ados2m2_diagnosis(sample)
+	assign_ados2m3_diagnosis(sample)
+	assign_ados2m4_diagnosis(sample)
 
 	assign_srs_diagnosis(sample)
 
-	assign_cpea_diagnosis(sample)
-	assign_cpea_adjusted_diagnosis(sample)
+	#assign_cpea_diagnosis(sample)
+	#assign_cpea_adjusted_diagnosis(sample)
 
 	assign_clinical_diagnosis(sample)
 	assign_diagnosis(sample)
@@ -383,14 +484,13 @@ if __name__ == '__main__':
 			print(key)
 			print(Counter([s[key] for s in samples]))
 
-		print('ADIR')
-		print(Counter([None if 'ADIR' not in s else s['ADIR']['diagnosis'] for s in samples]))
-
-		print('ADOS')
-		print(Counter([None if 'ADOS' not in s else s['ADOS']['diagnosis'] for s in samples]))
-
-		print('SRS')
-		print(Counter([None if 'SRS' not in s else s['SRS']['diagnosis'] for s in samples]))
+		for instrument in ['ADIR2003', 
+		'ADOS_Module1', 'ADOS_Module2', 'ADOS_Module3', 'ADOS_Module4',
+		'ADOS2_Module1', 'ADOS2_Module2', 'ADOS2_Module3', 'ADOS2_Module4',
+		'SRS_Child'
+		]:
+			print(instrument)
+			print(Counter([None if instrument not in s else s[instrument]['diagnosis'] for s in samples]))
 
 		# Write to file
 		with open(sys.argv[2], 'w+') as outfile:

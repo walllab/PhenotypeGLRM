@@ -86,6 +86,10 @@
 			"type": "object",
 			"$ref": "file:schemas/ADOS2_Module4.json"
 		},
+		"ADOS2_Module_Toddler": {
+			"type": "object",
+			"$ref": "file:schemas/ADOS2_Module_Toddler.json"
+		},
 		"SRS_Child": {
 			"type": "object",
 			"$ref": "file:schemas/SRS_Child.json"

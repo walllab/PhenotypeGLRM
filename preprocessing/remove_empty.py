@@ -13,7 +13,7 @@ for i, sample in enumerate(samples):
 	for key, value in sample.items():
 		if isinstance(value, dict):
 			# this is an instrument
-			nonnull_items = len([v for k, v in value.items() if v is not None and k.startswith('Q')])
+			nonnull_items = len([v for k, v in value.items() if v is not None and k.startswith('Q') and not k.endswith('a')])
 			if nonnull_items == 0:
 				to_be_removed[key].append(i)
 
