@@ -22,9 +22,11 @@
 		"family": {
 			"type": ["string", "null"]
 		},
-		"diagnosis": {
-			"description": "Overall diagnosis calculated from combination of instruments.",
-			"enum": ["Autism", "Control", null]
+		"mother_id": {
+			"type": ["string", "null"]
+		},
+		"father_id": {
+			"type": ["string", "null"]
 		},
 		"clinical_diagnosis": {
 			"description": "Diagnosis given by clinician. Coded value.",
@@ -107,5 +109,7 @@
 			"$ref": "file:schemas/Medical_History.json"
 		}
 	},
-	"required": ["identifier"]
+	"required": ["identifier", "dataset", "gender", "race", "ethnicity", "family",
+	"mother_id", "father_id", "clinical_diagnosis", "clinical_diagnosis_raw", 
+	"cpea_diagnosis", "cpea_adjusted_diagnosis"]
 }

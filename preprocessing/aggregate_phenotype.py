@@ -55,6 +55,7 @@ import jsonschema
 import csv
 import os
 import sys
+from collections import defaultdict
 
 # Load schema
 with open('schemas/Individual.json') as schema_file:    
@@ -85,6 +86,30 @@ def print_codes_for_instrument(instrument):
 			if feature.startswith('Q') and not feature.endswith('a'):
 				items.append(feature)
 	print(items)
+
+ped_diag_map = {'': None, '0': None, '-9': None, '1': 'unaffected', '2': 'affected'}
+gender_map = {'': None, '0': None, 
+'1': 'Male', 'M': 'Male', 'Male': 'Male', 'MALE': 'Male', 'm': 'Male', 'male': 'Male',
+'2': 'Female', 'F': 'Female', 'Female': 'Female', 'FEMALE': 'Female', 'f': 'Female', 'female': 'Female'}
+def standardize_race(race):
+	race = race.lower()
+	if 'white' in race:
+		return 'White'
+	elif 'black' in race:
+		return 'Black'
+	elif 'asian' in race:
+		return 'Asian'
+	elif 'islander' in race:
+		return 'Native Hawaiian or Pacific Islander'
+
+def standardize_ethnicity(eth):
+	eth = eth.lower()
+	if 'non' in eth or 'not' in eth:
+		return 'Not Hispanic'
+	elif 'hispanic' in eth:
+		return 'Hispanic'
+	elif 'unknown' in eth:
+		return None
 
 # These are entry errors in our datasets that need to be taken care of
 instrument_to_exceptions = {
@@ -306,6 +331,9 @@ bad_samples = {('National Database for Autism Research', 'NDARXR035XHH'),
 				('National Database for Autism Research', 'NDARAR525KTT'),
 				('National Database for Autism Research', 'NDARTL111HBN'),
 				('National Database for Autism Research', 'NDARKF518CEK'),
+				('National Database for Autism Research', 'NDARJY994MNC'),
+				('National Database for Autism Research', 'NDARNR449BVC'),
+				('National Database for Autism Research', 'NDARRF219BND'),
 				('AGRE', 'AU2619303')}
 
 # These are aggregated features, scores, and diagnoses that will be filled in by assign_diagnosis.py
@@ -314,10 +342,10 @@ instrument_to_scores = {
 	"ADIR2003": ['diagnosis', 'diagnosis_num_nulls', 'social_interaction', 'communication', 'restricted_repetitive_behavior', 'abnormality_evident_before_3_years',
 		'A1', 'A2', 'A3', 'A4', 'B1', 'B2', 'B3', 'B4', 'C1', 'C2', 'C3', 'C4'],
 	"ADIR2003_Toddler": [],
-	"ADOS_Module1": ['diagnosis', 'diagnosis_num_nulls', 'social_interaction', 'communication', 'play', 'restricted_repetitive_behavior'],
+	"ADOS_Module1": ['diagnosis', 'diagnosis_num_nulls', 'social_interaction', 'communication', 'creativity', 'restricted_repetitive_behavior'],
 	"ADOS_Module2": ['diagnosis', 'diagnosis_num_nulls', 'social_interaction', 'communication', 'creativity', 'restricted_repetitive_behavior'],
-	"ADOS_Module3": [],
-	"ADOS_Module4": [],
+	"ADOS_Module3": ['diagnosis', 'diagnosis_num_nulls', 'social_interaction', 'communication', 'creativity', 'restricted_repetitive_behavior'],
+	"ADOS_Module4": ['diagnosis', 'diagnosis_num_nulls', 'social_interaction', 'communication', 'creativity', 'restricted_repetitive_behavior'],
 	"ADOS2_Module1": ['diagnosis', 'diagnosis_num_nulls', 'social_interaction', 'communication', 'restricted_repetitive_behavior'],
 	"ADOS2_Module2": ['diagnosis', 'diagnosis_num_nulls', 'social_interaction', 'communication', 'restricted_repetitive_behavior'],
 	"ADOS2_Module3": ['diagnosis', 'diagnosis_num_nulls', 'social_interaction', 'communication', 'restricted_repetitive_behavior'],
@@ -359,15 +387,9 @@ directory = sys.argv[1]
 # We'll fill up this dictionary with samples
 identifier_to_samples = {}
 
-def update_sample(sample, key, value):
-	if sample[key] is None:
-		sample[key] = value
-	elif key not in ['age', 'interview_date'] and value is not None and sample[key] != value:
-		print("%s mismatch" % key, sample['identifier'], sample[key], value)
-
 # This is a very general method that converts csv data to json given a mapping
 def convert_phenotypes(filename, dataset, instrument, lambdas, cols, 
-	num_headers=1, delimiter=',', value_transform=None):
+	num_headers=1, delimiter=',', value_transform=None, known_data=None):
 	print("Importing %s" % filename)
 
 	with open("%s/%s" % (directory, filename), encoding='utf-8', errors='ignore') as f:
@@ -386,110 +408,155 @@ def convert_phenotypes(filename, dataset, instrument, lambdas, cols,
 				sample = identifier_to_samples[identifier]
 
 				# Update sample with new information, if it exists
+				new_info = dict()
 				for key, value in lambdas.items():
-					update_sample(sample, key, value(pieces))
+					v = value(pieces)
+					if v is not None and value != '':
+						new_info[key] = v
+
+				if known_data is not None:
+					for key, value in known_data[identifier].items():
+						if value is not None and value != '':
+							new_info[key] = value
+
+				for key, value in new_info.items():
+					if sample[key] is None:
+						sample[key] = value
+					elif key not in ['age', 'interview_date'] and value is not None and sample[key] != value:
+						print("%s mismatch" % key, sample['identifier'], sample[key], value)
 			else:
 				# Create new sample
 				sample = {
 					"dataset": dataset,
-					"diagnosis": None,
 					"clinical_diagnosis": None,
+					"clinical_diagnosis_raw": None,
 					"cpea_diagnosis": None,
-					"cpea_adjusted_diagnosis": None
+					"cpea_adjusted_diagnosis": None,
+					"gender": None,
+					"race": None,
+					"ethnicity": None,
+					"family": None,
+					"mother_id": None,
+					"father_id": None,
+					"interview_date": None,
+					'age': None
 				}
+				
 				for key, value in lambdas.items():
-					sample[key] = value(pieces)
+					v = value(pieces)
+					if v is not None and value != '':
+						sample[key] = v
+
+				if known_data is not None:
+					for key, value in known_data[identifier].items():
+						if value is not None and value != '':
+							sample[key] = value
 				identifier_to_samples[identifier] = sample
 
 			# Skip bad samples
 			if identifier not in [x[1] for x in bad_samples]:
 
 				# Only pull latest instrument for each sample
-				age = lambdas["age"](pieces)
-				if (instrument not in sample) or (sample[instrument]["age"] is None) or (age is not None and sample[instrument]["age"] < age):
-					sample[instrument] = {
-						"age": age,
-						"interview_date": lambdas["interview_date"](pieces),
-					}
+				sample[instrument] = {
+					"age": sample['age'],
+					"interview_date": sample["interview_date"],
+				}
 
-					# Add empty scores for each instrument to be filled in later
-					for score in instrument_to_scores[instrument]:
-						sample[instrument][score] = None
+				# Add empty scores for each instrument to be filled in later
+				for score in instrument_to_scores[instrument]:
+					sample[instrument][score] = None
 
-					# Pull phenotype information
-					exceptions = instrument_to_exceptions[instrument]
-					codes = instrument_to_codes[instrument]
-					missing_data = instrument_to_missing_data[instrument]
+				# Pull phenotype information
+				exceptions = instrument_to_exceptions[instrument]
+				codes = instrument_to_codes[instrument]
+				missing_data = instrument_to_missing_data[instrument]
 
-					for q_num, col in cols.items():
-						# If answer is split into multiple columns, combine them
-						if isinstance(col, tuple):
-							answer = pieces[col[1]] if pieces[col[0]] in missing_data else pieces[col[0]]
-							if len(col) != 2:
-								print('Tuple longer than expected:', col)
-						elif col == None:
-							answer = None
-						else:
-							answer = pieces[col]
+				for q_num, col in cols.items():
+					# If answer is split into multiple columns, combine them
+					if isinstance(col, tuple):
+						answer = pieces[col[1]] if pieces[col[0]] in missing_data else pieces[col[0]]
+						if len(col) != 2:
+							print('Tuple longer than expected:', col)
+					elif col == None:
+						answer = None
+					else:
+						answer = pieces[col]
 
-						# Trasnform answer
-						if value_transform is not None and answer not in missing_data:
-							answer = value_transform(q_num, answer)
+					# Trasnform answer
+					if value_transform is not None and answer not in missing_data:
+						answer = value_transform(q_num, answer)
 
-						# Transform answer in the case of an exception
-						if q_num in exceptions:
-							q_except = exceptions[q_num]
-							if answer in q_except:
-								answer = q_except[answer]
+					# Transform answer in the case of an exception
+					if q_num in exceptions:
+						q_except = exceptions[q_num]
+						if answer in q_except:
+							answer = q_except[answer]
 
-						# Grab set of code values from table
-						coded_values = codes[q_num]
+					# Grab set of code values from table
+					coded_values = codes[q_num]
 
-						# Determine the ordinal and coded value for this entry
-						ord_value = None
-						cod_value = None
+					# Determine the ordinal and coded value for this entry
+					ord_value = None
+					cod_value = None
 
-						if answer in missing_data:
-							pass
-						else:
-							answer = int(round(float(answer), 0))
-							if coded_values is not None:
-								ord_value = answer if answer not in coded_values else None
-								cod_value = answer if answer in coded_values else 0
-							else:
-								ord_value = answer
-						
-						# Enter values into sample
-						sample[instrument][q_num] = ord_value
+					if answer in missing_data:
+						pass
+					else:
+						answer = int(round(float(answer), 0))
 						if coded_values is not None:
-							sample[instrument]["%sa" % q_num] = cod_value
+							ord_value = answer if answer not in coded_values else None
+							cod_value = answer if answer in coded_values else 0
+						else:
+							ord_value = answer
+					
+					# Enter values into sample
+					sample[instrument][q_num] = ord_value
+					if coded_values is not None:
+						sample[instrument]["%sa" % q_num] = cod_value
 
-					jsonschema.validate(sample, pheno_schema)
+				jsonschema.validate(sample, pheno_schema)
 
-# # # ***************************************************************************************************************
-# # # *
-# # # --------------------------------------------------- AGRE ------------------------------------------------------
-# # # *
-# # # ***************************************************************************************************************
+# # ***************************************************************************************************************
+# # *
+# # --------------------------------------------------- AGRE ------------------------------------------------------
+# # *
+# # ***************************************************************************************************************
 
 # Pull diagnosis
-agre_diagnosis = {}
+agre_info = defaultdict(dict)
 with open(directory + "/AGRE_2015/AGRE Pedigree Catalog 10-05-12/AGRE Pedigree Catalog 10-05-2012.csv", 'r', encoding = "ISO-8859-1") as f:
 	reader = csv.reader(f)
 	header = next(reader)[1:]
-	agre_diagnosis.update([(x[2], x[11]) for x in reader])
+	for x in reader:
+		ind_id = x[2]
+		agre_info[ind_id]['clinical_diagnosis_raw'] = x[11]
+		agre_info[ind_id]['race'] = standardize_race(x[17])
+		agre_info[ind_id]['ethnicity'] = standardize_ethnicity(x[16])
+		agre_info[ind_id]['family'] = x[6]
+		agre_info[ind_id]['gender'] = x[10]
 
 with open(directory + "/AGRE_2010/AGREpedigreesR_102007.csv", 'r', encoding = "ISO-8859-1") as f:
 	reader = csv.reader(f)
 	header = next(reader)[1:]
-	agre_diagnosis.update([(x[2], x[10]) for x in reader])
+	for x in reader:
+		ind_id = x[2]
+		agre_info[ind_id]['clinical_diagnosis_raw'] = x[10]
+		agre_info[ind_id]['race'] = standardize_race(x[16])
+		agre_info[ind_id]['ethnicity'] = standardize_ethnicity(x[15])
+		agre_info[ind_id]['family'] = x[5]
+		agre_info[ind_id]['gender'] = x[9]
 
-ped_map = {'0': None, '-9': None, '1': 'unaffected', '2': 'affected'}
 with open(directory + '/160826.ped', 'r') as f:
 	reader = csv.reader(f, delimiter='\t')
 	for line in reader:
-		if line[5] != '' and line[1] not in agre_diagnosis:
-			agre_diagnosis[line[1]] = ped_map[line[5]]
+		ind_id = line[1]
+		if ped_diag_map[line[5]] is not None:
+			agre_info[ind_id]['clinical_diagnosis_raw'] = ped_diag_map[line[5]]
+		agre_info[ind_id]['family'] = line[0]
+		agre_info[ind_id]['mother_id'] = x[3]
+		agre_info[ind_id]['father_id'] = x[2]
+		if gender_map[line[4]] is not None:
+			agre_info[ind_id]['gender'] = gender_map[line[4]]
 
 # ADIR1995
 map1995 = {
@@ -508,29 +575,23 @@ map1995 = {
 convert_phenotypes("AGRE_2010/ADIR/ADIR_combined1995.csv", "AGRE", "ADIR1995",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[12]), 0)),
 		"interview_date": lambda x: "%s/%s/%s" % (x[9], x[10], x[11]),
-		"family": lambda x: x[7],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
+		"clinical_diagnosis_raw": lambda x: x[17]
 	}, 
-	map1995)
+	map1995, 
+	known_data=agre_info)
 
 # ADIR1995
 convert_phenotypes("AGRE_2015/ADIR/ADIR_combined1995.csv", "AGRE", "ADIR1995",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
+		"clinical_diagnosis_raw": lambda x: x[21]
 	}, 
-	dict([(k, v+4 if v <= 220 else v+3 if v <= 242 else v+2) for k, v in map1995.items()]))
+	dict([(k, v+4 if v <= 220 else v+3 if v <= 242 else v+2) for k, v in map1995.items()]),
+	known_data=agre_info)
 
 
 # ADIR2003
@@ -549,41 +610,33 @@ map2003 = {
 convert_phenotypes("AGRE_2010/ADIR/ADIR_combined2003.csv", "AGRE", "ADIR2003",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[12]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[9], x[10], x[11]),
-		"family": lambda x: x[7],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
+		"clinical_diagnosis_raw": lambda x: x[17]
 	}, 
-	map2003)
+	map2003,
+	known_data=agre_info)
 
 # ADIR2003
 convert_phenotypes("AGRE_2015/ADIR/ADIR_combined2003.csv", "AGRE", "ADIR2003",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
+		"clinical_diagnosis_raw": lambda x: x[21]
 	}, 
-	dict([(k, v+4) for k, v in map2003.items()]))
+	dict([(k, v+4) for k, v in map2003.items()]),
+	known_data=agre_info)
 
 # ADOS_Module1 (This is the old version)
 convert_phenotypes("AGRE_2015/ADOS Mod1/ADOS_combined.csv", "AGRE", "ADOS_Module1",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	{
 		"QA01": 20, "QA02": 21, "QA03": 22, "QA04": 23, "QA05": 24, "QA06": 25, "QA07": 26, "QA08": 27, 
@@ -591,19 +644,16 @@ convert_phenotypes("AGRE_2015/ADOS Mod1/ADOS_combined.csv", "AGRE", "ADOS_Module
 		"QC01": 45, "QC02": 46, 
 		"QD01": 47, "QD02": 48, "QD03": 49, "QD04": 50, 
 		"QE01": 51, "QE02": 52, "QE03": 53
-	})
+	},
+	known_data=agre_info)
 
 # ADOS2_Module1
 convert_phenotypes("AGRE_2015/ADOS Mod1/ADOS2_combined.csv", "AGRE", "ADOS2_Module1",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	{
 		"QA01": 20, "QA02": 21, "QA03": 22, "QA04": 23, "QA05": 24, "QA06": 25, "QA07": 26, "QA08": 27, 
@@ -611,19 +661,16 @@ convert_phenotypes("AGRE_2015/ADOS Mod1/ADOS2_combined.csv", "AGRE", "ADOS2_Modu
 		"QC01": 45, "QC02": 46, 
 		"QD01": 47, "QD02": 48, "QD03": 49, "QD04": 50, 
 		"QE01": 51, "QE02": 52, "QE03": 53
-	})
+	},
+	known_data=agre_info)
 
 # ADOS_Module1 (This is the old version)
 convert_phenotypes("AGRE_2010/ADOS Module 1/ADOS11.csv", "AGRE", "ADOS_Module1",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[12]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[9], x[10], x[11]),
-		"family": lambda x: x[7],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	{
 		"QA01": 47, "QA02": 48, "QA03": 49, "QA04": 50, "QA05": 51, "QA06": 52, "QA07": 53, "QA08": 54, 
@@ -631,19 +678,16 @@ convert_phenotypes("AGRE_2010/ADOS Module 1/ADOS11.csv", "AGRE", "ADOS_Module1",
 		"QC01": 67, "QC02": 68, 
 		"QD01": 69, "QD02": 70, "QD03": 71, "QD04": 72, 
 		"QE01": 73, "QE02": 74, "QE03": 75
-	})
+	},
+	known_data=agre_info)
 
 # ADOS_Module2
 convert_phenotypes("AGRE_2015/ADOS Mod2/ADOS_combined.csv", "AGRE", "ADOS_Module2",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	{
 		"QA01": 20, "QA02": 35, "QA03": 21, "QA04": 22, "QA05": 23, "QA06": 24, 'QA07': 25, 'QA08': 26, 
@@ -651,19 +695,16 @@ convert_phenotypes("AGRE_2015/ADOS Mod2/ADOS_combined.csv", "AGRE", "ADOS_Module
 		"QC01": 40, "QC02": 41, 
 		"QD01": 42, "QD02": 43, "QD03": 44, "QD04": 45, 
 		"QE01": 46, "QE02": 47, "QE03": 48
-	})
+	},
+	known_data=agre_info)
 
 # ADOS2_Module2
 convert_phenotypes("AGRE_2015/ADOS Mod2/ADOS2_combined.csv", "AGRE", "ADOS2_Module2",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	{
 		"QA01": 20, "QA02": 21, "QA03": 22, "QA04": 23, "QA05": 24, "QA06": 25, "QA07": 26, 
@@ -671,19 +712,16 @@ convert_phenotypes("AGRE_2015/ADOS Mod2/ADOS2_combined.csv", "AGRE", "ADOS2_Modu
 		"QC01": 40, "QC02": 41, 
 		"QD01": 42, "QD02": 43, "QD03": 44, "QD04": 45, 
 		"QE01": 46, "QE02": 47, "QE03": 48
-	})
+	},
+	known_data=agre_info)
 
 # ADOS_Module2
 convert_phenotypes("AGRE_2010/ADOS Module 2/ADOS21.csv", "AGRE", "ADOS_Module2",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[12]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[9], x[10], x[11]),
-		"family": lambda x: x[7],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	},  
 	{
 		"QA01": 46, "QA02": 47, "QA03": 48, "QA04": 49, "QA05": 50, "QA06": 51, 'QA07': 52, 'QA08': 53, 
@@ -691,19 +729,16 @@ convert_phenotypes("AGRE_2010/ADOS Module 2/ADOS21.csv", "AGRE", "ADOS_Module2",
 		"QC01": 65, "QC02": 66, 
 		"QD01": 67, "QD02": 68, "QD03": 69, "QD04": 70, 
 		"QE01": 71, "QE02": 72, "QE03": 73
-	})
+	},
+	known_data=agre_info)
 
 # ADOS_Module3
 convert_phenotypes("AGRE_2015/ADOS Mod3/ADOS_combined.csv", "AGRE", "ADOS_Module3",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	{
 		"QA01": 20, "QA02": 21, "QA03": 22, "QA04": 23, "QA05": 24, "QA06": 25, "QA07": 26, "QA08": 27, "QA09": 28, 
@@ -711,19 +746,16 @@ convert_phenotypes("AGRE_2015/ADOS Mod3/ADOS_combined.csv", "AGRE", "ADOS_Module
 		"QC01": 40,
 		"QD01": 41, "QD02": 42, "QD03": 43, "QD04": 44, "QD05": 45,
 		"QE01": 46, "QE02": 47, "QE03": 48
-	})
+	},
+	known_data=agre_info)
 
 # ADOS2_Module3
 convert_phenotypes("AGRE_2015/ADOS Mod3/ADOS2_combined.csv", "AGRE", "ADOS2_Module3",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	{
 		"QA01": 20, "QA02": 21, "QA03": 22, "QA04": 23, "QA05": 24, "QA06": 25, "QA07": 26, "QA08": 27, "QA09": 28, 
@@ -731,19 +763,16 @@ convert_phenotypes("AGRE_2015/ADOS Mod3/ADOS2_combined.csv", "AGRE", "ADOS2_Modu
 		"QC01": 40,
 		"QD01": 41, "QD02": 42, "QD03": 43, "QD04": 44, "QD05": 45,
 		"QE01": 46, "QE02": 47, "QE03": 48
-	})
+	},
+	known_data=agre_info)
 
 # ADOS_Module3
 convert_phenotypes("AGRE_2010/ADOS Module 3/ADOS31.csv", "AGRE", "ADOS_Module3",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[12]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[9], x[10], x[11]),
-		"family": lambda x: x[7],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	},  
 	{
  		"QA01": 46, "QA02": 47, "QA03": 48, "QA04": 49, "QA05": 50, "QA06": 51, "QA07": 52, "QA08": 53, "QA09": 54, 
@@ -751,19 +780,16 @@ convert_phenotypes("AGRE_2010/ADOS Module 3/ADOS31.csv", "AGRE", "ADOS_Module3",
  		"QC01": 65,
  		"QD01": 66, "QD02": 67, "QD03": 68, "QD04": 69, "QD05": 70,
  		"QE01": 71, "QE02": 72, "QE03": 73
- 	})
+ 	},
+ 	known_data=agre_info)
 
 # ADOS_Module4
 convert_phenotypes("AGRE_2015/ADOS Mod4/ADOS41.csv", "AGRE", "ADOS_Module4",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	{
  		"QA01": 20, "QA02": 21, "QA03": 22, "QA04": 23, "QA05": 24, "QA06": 25, "QA07": 26, "QA08": 27, "QA09": 28, "QA10": 29, 
@@ -771,19 +797,16 @@ convert_phenotypes("AGRE_2015/ADOS Mod4/ADOS41.csv", "AGRE", "ADOS_Module4",
  		"QC01": 43, 
  		"QD01": 44, "QD02": 45, "QD03": 46, "QD04": 47, "QD05": 48,
  		"QE01": 49, "QE02": 50, "QE03": 51
- 	})
+ 	},
+ 	known_data=agre_info)
 
 # ADOS_Module4
 convert_phenotypes("AGRE_2010/ADOS Module 4/ADOS41.csv", "AGRE", "ADOS_Module4",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[12]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[9], x[10], x[11]),
-		"family": lambda x: x[7],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	},  
 	{
 		"QA01": 49, "QA02": 50, "QA03": 51, "QA04": 52, "QA05": 53, "QA06": 54, "QA07": 55, "QA08": 56, "QA09": 57, "QA10": 58, 
@@ -791,91 +814,74 @@ convert_phenotypes("AGRE_2010/ADOS Module 4/ADOS41.csv", "AGRE", "ADOS_Module4",
 		"QC01": 71, 
 		"QD01": 72, "QD02": 73, "QD03": 74, "QD04": 75, "QD05": 76,
 		"QE01": 77, "QE02": 78, "QE03": 79
-	})
+	},
+	known_data=agre_info)
 
 # SRS
 convert_phenotypes("AGRE_2010/SRS Child/SRS_Child1.csv", "AGRE", "SRS_Child",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[12]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[9], x[10], x[11]),
-		"family": lambda x: x[7],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(20, 85))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(20, 85))),
+	known_data=agre_info)
 
 # SRS_Preschool
 convert_phenotypes("AGRE_2015/SRS/SRS_2006_Preschool1.csv", "AGRE", "SRS_Preschool",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(24, 89))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(24, 89))),
+	known_data=agre_info)
 
 # SRS_Child
 convert_phenotypes("AGRE_2015/SRS/SRS_20061_Child.csv", "AGRE", "SRS_Child",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(24, 89))), 
-	value_transform=srs_transform)
+	value_transform=srs_transform,
+	known_data=agre_info)
 
 # SRS_Adult
 convert_phenotypes("AGRE_2015/SRS/SRS_20061_Adult.csv", "AGRE", "SRS_Adult",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(24, 89))), 
-	value_transform=srs_transform)
+	value_transform=srs_transform,
+	known_data=agre_info)
 
 convert_phenotypes("AGRE_2015/SRS/SRS2_SRS20021_Preschool.csv", "AGRE", "SRS_Preschool",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(24, 89))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(24, 89))),
+	known_data=agre_info)
 
 convert_phenotypes("AGRE_2015/SRS/SRS2_SRS20021_Child.csv", "AGRE", "SRS_Child",
 	{
 		"identifier": lambda x: x[6],
-		"gender": lambda x: "Male" if x[5] == "1" else ("Female" if x[5] == "2" else None),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: int(round(12*float(x[16]), 0)),
+		'gender': lambda x: gender_map[x[5]],
 		"interview_date": lambda x: "%s/%s/%s" % (x[13], x[14], x[15]),
-		"family": lambda x: x[10],
-		"clinical_diagnosis_raw": lambda x: None if x[6] not in agre_diagnosis else agre_diagnosis[x[6]]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(24, 89))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(24, 89))),
+	known_data=agre_info)
 
 # Medical History
 print("Importing %s" % "%s/%s" % (directory, "AGRE_2015/secondary_diagnoses.txt"))
@@ -893,8 +899,8 @@ with open("%s/%s" % (directory, "AGRE_2015/secondary_diagnoses.txt")) as f:
 	next(f)
 	for line in f:
 		pieces = line.split("\t")
-		if ("AGRE", pieces[0]) in identifier_to_samples:
-			sample = identifier_to_samples[("AGRE", pieces[0])]
+		if pieces[0] in identifier_to_samples:
+			sample = identifier_to_samples[pieces[0]]
 			sample["Medical History"] = {
 				"ID": 0,
 				"Seizures": 0,
@@ -920,29 +926,38 @@ print("Secondary diagnoses not found:", sorted(not_found))
 # ***************************************************************************************************************
 
 # Pull diagnosis
-ac_diagnosis = {}
+ac_info = defaultdict(dict)
 with open(directory + "/Autism_Consortium_Data/All_Measures/AC_Medical_History.csv", 'r') as f:
 	reader = csv.reader(f)
 	header = next(reader)[1:]
 	for x in reader:
+		ind_id = x[0]
 		if x[645] == '2':
-			ac_diagnosis[x[0]] = 'autism'
+			ac_info[ind_id]['clinical_diagnosis_raw'] = 'autism'
 		elif x[660] == '2':
-			ac_diagnosis[x[0]] = 'aspergers'
+			ac_info[ind_id]['clinical_diagnosis_raw'] = 'aspergers'
 		elif x[675] == '2':
-			ac_diagnosis[x[0]] = 'PDD-NOS'
+			ac_info[ind_id]['clinical_diagnosis_raw'] = 'PDD-NOS'
+		ac_info[ind_id]['gender'] = gender_map[x[1]]
+		ac_info[ind_id]['race'] = standardize_race(x[2])
+		ac_info[ind_id]['ethnicity'] = standardize_ethnicity(x[3])
+		ac_info[ind_id]['age'] = None if x[8] == '' or int(x[8]) < 0 else int(x[8])
+		ac_info[ind_id]['interview_date'] = x[10]
+		ac_info[ind_id]['family'] = x[0][0:x[0].rfind("-")]
+
+		if x[5] == 'Proband' or x[5] == 'Sibling':
+			ac_info[ind_id]['mother_id'] = ac_info[ind_id]['family'] + '_mother'
+			ac_info[ind_id]['father_id'] = ac_info[ind_id]['family'] + '_father'
 
 # ADIR2003
 convert_phenotypes("Autism_Consortium_Data/All_Measures/ADI_R.csv", "Autism Consortium", "ADIR2003",
 	{
 		"identifier": lambda x: x[0],
 		"gender": lambda x: "Male" if x[1] == "M" else ("Female" if x[1] == "F" else None),
-		"race": lambda x: x[2],
 		"ethnicity": lambda x: x[3],
 		"age": lambda x: int(round(float(x[8]), 0)),
 		"interview_date": lambda x: x[10],
-		"family": lambda x: x[0][0:x[0].rfind("-")],
-		"clinical_diagnosis_raw": lambda x: x[6] if x[0] not in ac_diagnosis else ac_diagnosis[x[0]]
+		"clinical_diagnosis_raw": lambda x: x[6]
 	}, 
 	{
 		"Q02": (36, 37), "Q04": 39, "Q05": (40, 41), "Q06": (42, 43), "Q07": (44, 45), "Q08": (46, 47), "Q09": (48, 49), "Q10": (50, 51),
@@ -955,19 +970,18 @@ convert_phenotypes("Autism_Consortium_Data/All_Measures/ADI_R.csv", "Autism Cons
 		"Q71.1": 162, "Q71.2": 163, "Q72.1": 164, "Q72.2": 165, "Q73.1": 166, "Q73.2": 167, "Q74.1": 168, "Q74.2": 169, "Q75.1": 170, "Q75.2": 171, "Q76.1": 172, "Q76.2": 173, "Q77.1": 175, "Q77.2": 175, "Q78.1": 176, "Q78.2": 177, "Q79.1": 178, "Q79.2": 179, "Q80.1": 180, "Q80.2": 181,
 		"Q81.1": 182, "Q81.2": 183, "Q82.1": 184, "Q82.2": 185, "Q83.1": 186, "Q83.2": 187, "Q84.1": 188, "Q84.2": 189, "Q85.1": 190, "Q85.2": 191, "Q86": 192, "Q87": 193, "Q88.1": 194, "Q88.2": 195, "Q89.1": 196, "Q89.2": 197, "Q90.1": 198, "Q90.2": 199,
 		"Q91.1": 200, "Q91.2": 201, "Q92.1": 202, "Q92.2": 203, "Q93.1": 204, "Q93.2": 205
-	})
+	},
+	known_data=ac_info)
 
 # ADOS_Module1
 convert_phenotypes("Autism_Consortium_Data/All_Measures/ADOS_Module_1.csv", "Autism Consortium", "ADOS_Module1",
 	{
 		"identifier": lambda x: x[0],
 		"gender": lambda x: "Male" if x[1] == "M" else ("Female" if x[1] == "F" else None),
-		"race": lambda x: x[2],
 		"ethnicity": lambda x: x[3],
 		"age": lambda x: int(round(float(x[8]), 0)),
 		"interview_date": lambda x: x[10],
-		"family": lambda x: x[0][0:x[0].rfind("-")],
-		"clinical_diagnosis_raw": lambda x: x[6] if x[0] not in ac_diagnosis else ac_diagnosis[x[0]]
+		"clinical_diagnosis_raw": lambda x: x[6]
 	}, 
 	{
 		"QA01": 11, "QA02": 12, "QA03": 13, "QA04": 14, "QA05": 15, "QA06": 16, "QA07": 17, "QA08": 18, 
@@ -975,7 +989,8 @@ convert_phenotypes("Autism_Consortium_Data/All_Measures/ADOS_Module_1.csv", "Aut
 		"QC01": 31, "QC02": 32, 
 		"QD01": 33, "QD02": 35, "QD03": 37, "QD04": 38, 
 		"QE01": 40, "QE02": 41, "QE03": 42
-	})
+	},
+	known_data=ac_info)
 
 # ADOS_Module2
 # print_codes_for_instrument('ADOS_Module2')
@@ -983,12 +998,11 @@ convert_phenotypes("Autism_Consortium_Data/All_Measures/ADOS_Module_2.csv", "Aut
 	{
 		"identifier": lambda x: x[0],
 		"gender": lambda x: "Male" if x[1] == "M" else ("Female" if x[1] == "F" else None),
-		"race": lambda x: x[2],
 		"ethnicity": lambda x: x[3],
 		"age": lambda x: int(round(float(x[8]), 0)),
 		"interview_date": lambda x: x[10],
 		"family": lambda x: x[0][0:x[0].rfind("-")],
-		"clinical_diagnosis_raw": lambda x: x[6] if x[0] not in ac_diagnosis else ac_diagnosis[x[0]]
+		"clinical_diagnosis_raw": lambda x: x[6]
 	},   
 	{
 		'QA01': 11, 'QA02': 12, 'QA03': 13, 'QA04': 14, 'QA05': 15, 'QA06': 16, 'QA07': 17, 'QA08': 18, 
@@ -996,19 +1010,19 @@ convert_phenotypes("Autism_Consortium_Data/All_Measures/ADOS_Module_2.csv", "Aut
 		'QC01': 30, 'QC02': 31, 
 		"QD01": 32, "QD02": 34, "QD03": 36, "QD04": 37, 
 		"QE01": 39, "QE02": 40, "QE03": 41
-	})
+	},
+	known_data=ac_info)
 
 # ADOS_Module3
 convert_phenotypes("Autism_Consortium_Data/All_Measures/ADOS_Module_3.csv", "Autism Consortium", "ADOS_Module3",
 	{
 		"identifier": lambda x: x[0],
 		"gender": lambda x: "Male" if x[1] == "M" else ("Female" if x[1] == "F" else None),
-		"race": lambda x: x[2],
 		"ethnicity": lambda x: x[3],
 		"age": lambda x: int(round(float(x[8]), 0)),
 		"interview_date": lambda x: x[10],
 		"family": lambda x: x[0][0:x[0].rfind("-")],
-		"clinical_diagnosis_raw": lambda x: x[6] if x[0] not in ac_diagnosis else ac_diagnosis[x[0]]
+		"clinical_diagnosis_raw": lambda x: x[6]
 	},   
 	{
 		"QA01": 11, "QA02": 12, "QA03": 13, "QA04": 14, "QA05": 15, "QA06": 16, "QA07": 17, "QA08": 18, "QA09": 19, 
@@ -1016,19 +1030,19 @@ convert_phenotypes("Autism_Consortium_Data/All_Measures/ADOS_Module_3.csv", "Aut
 		"QC01": 30,
 		"QD01": 31, "QD02": 33, "QD03": 35, "QD04": 36, "QD05": 37, 
 		"QE01": 39, "QE02": 40, "QE03": 41
-	})
+	},
+	known_data=ac_info)
 
 # ADOS_Module4
 convert_phenotypes("Autism_Consortium_Data/All_Measures/ADOS_Module_4.csv", "Autism Consortium", "ADOS_Module4",
 	{
 		"identifier": lambda x: x[0],
 		"gender": lambda x: "Male" if x[1] == "M" else ("Female" if x[1] == "F" else None),
-		"race": lambda x: x[2],
 		"ethnicity": lambda x: x[3],
 		"age": lambda x: int(round(float(x[8]), 0)),
 		"interview_date": lambda x: x[10],
 		"family": lambda x: x[0][0:x[0].rfind("-")],
-		"clinical_diagnosis_raw": lambda x: x[6] if x[0] not in ac_diagnosis else ac_diagnosis[x[0]]
+		"clinical_diagnosis_raw": lambda x: x[6]
 	},   
 	{
 		"QA01": 11, "QA02": 12, "QA03": 13, "QA04": 14, "QA05": 15, "QA06": 16, "QA07": 17, "QA08": 18, "QA09": 19, "QA10": 20, 
@@ -1036,104 +1050,148 @@ convert_phenotypes("Autism_Consortium_Data/All_Measures/ADOS_Module_4.csv", "Aut
 		"QC01": 33,
 		"QD01": 34, "QD02": 36, "QD03": 38, "QD04": 39, "QD05": 40, 
 		"QE01": 42, "QE02": 43, "QE03": 44
-	})
+	},
+	known_data=ac_info)
 
 # SRS_Preschool
 convert_phenotypes("Autism_Consortium_Data/All_Measures/SRS_Preschool.csv", "Autism Consortium", "SRS_Preschool",
 	{
 		"identifier": lambda x: x[0],
 		"gender": lambda x: "Male" if x[1] == "M" else ("Female" if x[1] == "F" else None),
-		"race": lambda x: x[2],
 		"ethnicity": lambda x: x[3],
 		"age": lambda x: int(round(float(x[8]), 0)),
 		"interview_date": lambda x: x[10],
 		"family": lambda x: x[0][0:x[0].rfind("-")],
-		"clinical_diagnosis_raw": lambda x: x[6] if x[0] not in ac_diagnosis else ac_diagnosis[x[0]]
+		"clinical_diagnosis_raw": lambda x: x[6]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(76, 141))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(76, 141))),
+	known_data=ac_info)
 
 # SRS_Child
 convert_phenotypes("Autism_Consortium_Data/All_Measures/SRS_Parent.csv", "Autism Consortium", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
 		"gender": lambda x: "Male" if x[1] == "M" else ("Female" if x[1] == "F" else None),
-		"race": lambda x: x[2],
 		"ethnicity": lambda x: x[3],
 		"age": lambda x: int(round(float(x[8]), 0)),
 		"interview_date": lambda x: x[10],
 		"family": lambda x: x[0][0:x[0].rfind("-")],
-		"clinical_diagnosis_raw": lambda x: x[6] if x[0] not in ac_diagnosis else ac_diagnosis[x[0]]
+		"clinical_diagnosis_raw": lambda x: x[6]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(76, 141))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(76, 141))),
+	known_data=ac_info)
 
 # SRS_Adult
 convert_phenotypes("Autism_Consortium_Data/All_Measures/SRS_Adult.csv", "Autism Consortium", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
 		"gender": lambda x: "Male" if x[1] == "M" else ("Female" if x[1] == "F" else None),
-		"race": lambda x: x[2],
 		"ethnicity": lambda x: x[3],
 		"age": lambda x: int(round(float(x[8]), 0)),
 		"interview_date": lambda x: x[10],
 		"family": lambda x: x[0][0:x[0].rfind("-")],
-		"clinical_diagnosis_raw": lambda x: x[6] if x[0] not in ac_diagnosis else ac_diagnosis[x[0]]
+		"clinical_diagnosis_raw": lambda x: x[6]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(76, 141))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(76, 141))),
+	known_data=ac_info)
 
-# # ***************************************************************************************************************
-# # *
-# # --------------------------------------------------- NDAR ------------------------------------------------------
-# # *
-# # ***************************************************************************************************************
+# ***************************************************************************************************************
+# *
+# --------------------------------------------------- NDAR ------------------------------------------------------
+# *
+# ***************************************************************************************************************
 
 path = "ndar.phenotype.collection"
+ndar_info = defaultdict(dict)
 for filename in os.listdir("%s/%s" % (directory, path)):
 	subpath = os.path.join(path, filename)
 
-	if os.path.isdir("%s/%s" % (directory, subpath)) and 'AGRE' not in subpath:
+	if os.path.isdir("%s/%s" % (directory, subpath)) and 'AGRE' not in subpath and 'AGP' not in subpath and '1700.Genes' not in subpath:
+		print(subpath)
 
 		# Pull diagnosis
-		ndar_diagnosis = {}
-		try:
-			with open('%s/%s/ndar_aggregate.txt' % (directory, subpath), 'r') as f:
+		filename = os.path.join(subpath, "ndar_subject01.txt")
+		if os.path.isfile("%s/%s" % (directory, filename)):
+			with open("%s/%s" % (directory, filename), 'r') as f:
 				reader = csv.reader(f, delimiter='\t')
 				header = next(reader)[1:]
-				ndar_diagnosis = dict([(x[0], x[4] if x[4] != '' else x[3]) for x in reader])
-		except:
-			print('Diagnosis file not found', '%s/%s/ndar_aggregate.txt' % (directory, subpath))
+				next(reader) # skip double header
+				for line in reader:
+					_, _, ind_id, identifier, interview_date, age, gender, race, ethnicity, \
+					pheno1, pheno2 = line[:11]
+					ndar_info[ind_id]['gender'] = gender_map[gender]
+					ndar_info[ind_id]['age'] = None if age == '' else int(round(float(age), 0))
+					ndar_info[ind_id]['race'] = standardize_race(race)
+					ndar_info[ind_id]['ethnicity'] = standardize_ethnicity(ethnicity)
+					if pheno1 != '':
+						ndar_info[ind_id]['clinical_diagnosis_raw'] = pheno1 + ' ' + pheno2
+					ndar_info[ind_id]['interview_date'] = interview_date
 
-		# Assign diagnosis to alternate ids
-		id_to_id = {}
-		try:
-			with open('%s/%s/guid_parent_child.txt' % (directory, subpath), 'r') as f:
+		filename = os.path.join(subpath, "genomics_subject02.txt")
+		if os.path.isfile("%s/%s" % (directory, filename)):
+			with open("%s/%s" % (directory, filename), 'r') as f:
+				reader = csv.reader(f, delimiter='\t')
+				header = next(reader)[1:]
+				next(reader) # skip double header
+				for line in reader:
+					_, _, ind_id, identifier, interview_date, age, gender, race, ethnicity, \
+					pheno1, pheno2 = line[:11]
+					ndar_info[ind_id]['gender'] = gender_map[gender]
+					ndar_info[ind_id]['age'] = None if age == '' else int(round(float(age), 0))
+					ndar_info[ind_id]['race'] = standardize_race(race)
+					ndar_info[ind_id]['ethnicity'] = standardize_ethnicity(ethnicity)
+					if pheno1 != '':
+						ndar_info[ind_id]['clinical_diagnosis_raw'] = pheno1 + ' ' + pheno2
+					ndar_info[ind_id]['interview_date'] = interview_date
+		
+		filename = os.path.join(subpath, "ndar_aggregate.txt")
+		if os.path.isfile("%s/%s" % (directory, filename)):
+			with open("%s/%s" % (directory, filename), 'r') as f:
+				reader = csv.reader(f, delimiter='\t')
+				header = next(reader)[1:]
+				next(reader) # skip double header
+				for line in reader:
+					ind_id, age, gender, _, diag = line[:5]
+					ndar_info[ind_id]['gender'] = gender_map[gender]
+					ndar_info[ind_id]['age'] = None if age == '' else int(round(float(age), 0))
+					ndar_info[ind_id]['clinical_diagnosis_raw'] = diag
+
+		filename = os.path.join(subpath, "cs_general02.txt")
+		if os.path.isfile("%s/%s" % (directory, filename)):
+			with open("%s/%s" % (directory, filename), 'r') as f:
+				reader = csv.reader(f, delimiter='\t')
+				header = next(reader)[1:]
+				next(reader) # skip double header
+				for line in reader:
+					ind_id, age, diag, gender, race = line[2], line[8], line[15], line[17], line[25]
+					ndar_info[ind_id]['gender'] = gender_map[gender]
+					ndar_info[ind_id]['age'] = None if age == '' else int(round(float(age), 0))
+					if diag == '1':
+						ndar_info[ind_id]['clinical_diagnosis_raw'] = 'Autism'
+					elif diag == '0':
+						ndar_info[ind_id]['clinical_diagnosis_raw'] = 'Control'
+					ndar_info[ind_id]['race'] = standardize_race(race)
+		
+		filename = os.path.join(subpath, "guid_parent_child.txt")
+		if os.path.isfile("%s/%s" % (directory, filename)):
+			with open("%s/%s" % (directory, filename), 'r') as f:
 				reader = csv.reader(f, delimiter='\t')
 				header = next(reader)[1:]
 				for parent, child in reader:
-					if parent in ndar_diagnosis:
-						ndar_diagnosis[child] = ndar_diagnosis[parent]
-					elif child in ndar_diagnosis:
-						ndar_diagnosis[parent] = ndar_diagnosis[child]
-					id_to_id[child] = parent
-		except:
-			pass
-			#print('Id file not found', '%s/%s/guid_parent_child.txt' % (directory, subpath))
+					if parent in ndar_info:
+						ndar_info[child] = ndar_info[parent]
+					elif child in ndar_info:
+						ndar_info[parent] = ndar_info[child]
 
-		identifier_lambda = lambda x: x[2] if x[2] not in id_to_id else id_to_id[x[2]]
-		clinical_diagnosis_lambda = lambda x: None if x[2] not in ndar_diagnosis else ndar_diagnosis[x[2]]
-		
 		# ADIR2003
 		filename = os.path.join(subpath, "adi_200304.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", 'ADIR2003', 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[22] == "M" else ("Female" if x[22] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[3]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[22]],
+					"age": lambda x: None if x[3] == '' else int(round(float(x[3]), 0)),
 					"interview_date": lambda x: x[5],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
 				},
 				{
 					"Q02": 26, "Q04": 28, "Q05": 31, "Q06": 33, "Q07": 34, "Q08": 35, "Q09": 37, "Q10": 41,
@@ -1146,22 +1204,19 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 					"Q71.1": 181, "Q71.2": 182, "Q72.1": 184, "Q72.2": 185, "Q73.1": 186, "Q73.2": 187, "Q74.1": 189, "Q74.2": 190, "Q75.1": 192, "Q75.2": 193, "Q76.1": 195, "Q76.2": 196, "Q77.1": 198, "Q77.2": 199, "Q78.1": 201, "Q78.2": 202, "Q79.1": 204, "Q79.2": 205, "Q80.1": 206, "Q80.2": 207,
 					"Q81.1": 209, "Q81.2": 210, "Q82.1": 212, "Q82.2": 213, "Q83.1": 215, "Q83.2": 216, "Q84.1": 218, "Q84.2": 219, "Q85.1": 220, "Q85.2": 221, "Q86": 223, "Q87": 224, "Q88.1": 225, "Q88.2": 226, "Q89.1": 227, "Q89.2": 228, "Q90.1": 229, "Q90.2": 230,
 					"Q91.1": 231, "Q91.2": 232, "Q92.1": 233, "Q92.2": 234, "Q93.1": 235, "Q93.2": 236
-				}, num_headers=2, delimiter='\t')
+				}, 
+				num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADIR2003
 		filename = os.path.join(subpath, "adi_c02.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADIR2003", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
 					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"Q02": 13, "Q04": 12, "Q05": 14, "Q06": 15, "Q07": 16, "Q08": 17, "Q09": 18, "Q10": 19,
 					"Q11": 20, "Q12": 21, "Q13": 22, "Q14": 23, "Q15": 24, "Q16": 25, "Q17": 26, "Q18": 27, "Q19": 28, "Q20": 29,
@@ -1173,7 +1228,8 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 					"Q71.1": 116, "Q71.2": 117, "Q72.1": 118, "Q72.2": 119, "Q73.1": 120, "Q73.2": None, "Q74.1": 121, "Q74.2": 122, "Q75.1": 123, "Q75.2": 124, "Q76.1": 125, "Q76.2": 126, "Q77.1": 127, "Q77.2": 128, "Q78.1": 129, "Q78.2": 130, "Q79.1": 131, "Q79.2": 132, "Q80.1": 133, "Q80.2": 134,
 					"Q81.1": 135, "Q81.2": 136, "Q82.1": 137, "Q82.2": 138, "Q83.1": 139, "Q83.2": 140, "Q84.1": 141, "Q84.2": 142, "Q85.1": 143, "Q85.2": 144, "Q86": 145, "Q87": 146, "Q88.1": None, "Q88.2": None, "Q89.1": None, "Q89.2": None, "Q90.1": None, "Q90.2": None,
 					"Q91.1": None, "Q91.2": None, "Q92.1": None, "Q92.2": None, "Q93.1": None, "Q93.2": None
-				}, num_headers=2, delimiter='\t')
+				}, 
+				num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADIR2003_Toddler
 		#print_codes_for_instrument('ADIR2003_Toddler')
@@ -1181,15 +1237,10 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADIR2003_Toddler", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
+					"identifier": lambda x: x[2],
 					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{'Q002': 9, 'Q004': 14, 'Q005': 15, 'Q006': 16, 'Q007': 17, 'Q008': 18, 'Q009': 19, 
 				'Q010': 20, 'Q011': 21, 'Q012': 22, 'Q012E': 23, 'Q013': 24, 'Q014': 25, 'Q015.1': 26, 'Q015.2': None, 'Q015.3': None, 'Q016': 27, 'Q017': 28, 'Q018': 29, 'Q019': 30, 
 				'Q020': 31, 'Q021': 32, 'Q022': 33, 'Q023': 34, 'Q024': 35, 'Q025.1': 36, 'Q025.2': 37, 'Q026': 38, 'Q027': 39, 'Q028': 40, 'Q029': 41, 
@@ -1209,22 +1260,18 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 				'Q100.1': 189, 'Q100.2': 190, 'Q100.3': 191, 'Q101.1': 192, 'Q101.2': 193, 'Q101.3': 194, 'Q102.1': 195, 'Q102.2': 196, 'Q102.3': 197, 'Q103.1': 198, 'Q103.2': 199, 'Q103.3': 200, 'Q104.1': 201, 'Q104.2': 202, 'Q104.3': 203, 'Q105.1': 204, 'Q105.2': 205, 'Q105.3': 206, 'Q106.1': 207, 'Q106.2': 208, 'Q106.3': 209, 'Q107.1': 210, 'Q107.2': 211, 'Q107.3': 212, 'Q108.1': 213, 'Q108.2': 214, 'Q108.3': 215, 'Q109.1': 216, 'Q109.2': 217, 'Q109.3':218, 
 				'Q110.1': 219, 'Q110.2': 220, 'Q110.3': 221, 'Q111.1': 222, 'Q111.2': 223, 'Q111.3': 224, 'Q112.1': 225, 'Q112.2': 226, 'Q112.3': 227, 'Q113.1': 228, 'Q113.2': 229, 'Q113.3': 230, 'Q114.1': 231, 'Q114.2': 232, 'Q115.1': 233, 'Q115.2': 234, 'Q116.1':235, 'Q116.2': 236, 'Q117.1': 237, 'Q117.2': 238, 'Q118': 239, 'Q119': 240, 
 				'Q120': 241, 'Q121': 242, 'Q122': 243, 'Q123.1': 244, 'Q123.2': 245, 'Q124.1': 246, 'Q124.2': 247, 'Q125.1': 248, 'Q125.2': 249, 'Q126.1': 250, 'Q126.2': 251, 'Q127.1': 252, 'Q127.2': 253, 'Q128.1': 254, 'Q128.2': 255, 'Q129.1': 256, 'Q129.2': 257
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADIR2003_Toddler
 		filename = os.path.join(subpath, "adir_t_200603.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADIR2003_Toddler", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
 					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{'Q002': 8, 'Q004': 14, 'Q005': 15, 'Q006': 16, 'Q007': 17, 'Q008': 18, 'Q009': 19, 
 				'Q010': 20, 'Q011': 21, 'Q012': 24, 'Q012E': 25, 'Q013': 26, 'Q014': 27, 'Q015.1': 28, 'Q015.2': 29, 'Q015.3': 30, 'Q016': 31, 'Q017': 32, 'Q018': 33, 'Q019': None, 
 				'Q020': 34, 'Q021': 37, 'Q022': 33, 'Q023': 23, 'Q024': 44, 'Q025.1': 46, 'Q025.2': 47, 'Q026': 48, 'Q027': 49, 'Q028': 50, 'Q029': 51, 
@@ -1243,43 +1290,18 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 				'Q100.1': 179, 'Q100.2': 180, 'Q100.3': 181, 'Q101.1': 182, 'Q101.2': 183, 'Q101.3': 184, 'Q102.1': 185, 'Q102.2': 186, 'Q102.3': 187, 'Q103.1': 188, 'Q103.2': 189, 'Q103.3': 190, 'Q104.1': 191, 'Q104.2': 192, 'Q104.3': 193, 'Q105.1': 194, 'Q105.2': 195, 'Q105.3': 196, 'Q106.1': 197, 'Q106.2': 198, 'Q106.3': 199, 'Q107.1': 200, 'Q107.2': 201, 'Q107.3': 202, 'Q108.1': 203, 'Q108.2': 204, 'Q108.3': 205, 'Q109.1': 206, 'Q109.2': 207, 'Q109.3':208, 
 				'Q110.1': 209, 'Q110.2': 210, 'Q110.3': 211, 'Q111.1': 212, 'Q111.2': 213, 'Q111.3': 214, 'Q112.1': 215, 'Q112.2': 216, 'Q112.3': 217, 'Q113.1': 218, 'Q113.2': 219, 'Q113.3': 220, 'Q114.1': 221, 'Q114.2': 222, 'Q115.1': 223, 'Q115.2': 224, 'Q116.1':225, 'Q116.2': 226, 'Q117.1': 227, 'Q117.2': 228, 'Q118': 229, 'Q119': 230, 
 				'Q120': 231, 'Q121': 232, 'Q122': 233, 'Q123.1': 234, 'Q123.2': 235, 'Q124.1': 236, 'Q124.2': 237, 'Q125.1': 238, 'Q125.2': 239, 'Q126.1': 240, 'Q126.2': 241, 'Q127.1': 242, 'Q127.2': 243, 'Q128.1': 244, 'Q128.2': 245, 'Q129.1': 246, 'Q129.2': 247
-				}, num_headers=2, delimiter='\t')
+				}, 
+				num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module1
 		filename = os.path.join(subpath, "ados1_200102.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module1", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[7] == "M" else ("Female" if x[7] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None if x[5].strip() == '' else int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[7]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
-				{
-					"QA01": 53, "QA02": 54, "QA03": 55, "QA04": 56, "QA05": 57, "QA06": 58, "QA07": 59, "QA08": 60, 
-					"QB01": 61, "QB02": 62, "QB03": 63, "QB04": 64, "QB05": 65, "QB06": 66, "QB07": 67, "QB08": 68, "QB09": 69, "QB10": 70, "QB11": 71, "QB12": 72,
-					"QC01": 73, "QC02": 74, 
-					"QD01": 75, "QD02": 77, "QD03": 79, "QD04": 80, 
-					"QE01": 82, "QE02": 83, "QE03": 84
-				}, num_headers=2, delimiter='\t')
-	
-		# ADOS_Module1
-		filename = os.path.join(subpath, "ados1_200701.txt")
-		if os.path.isfile("%s/%s" % (directory, filename)):
-			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module1", 
-				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
-					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
 				},
 				{
 					"QA01": 53, "QA02": 54, "QA03": 55, "QA04": 56, "QA05": 57, "QA06": 58, "QA07": 59, "QA08": 60, 
@@ -1287,43 +1309,52 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 					"QC01": 73, "QC02": 74, 
 					"QD01": 75, "QD02": 77, "QD03": 79, "QD04": 80, 
 					"QE01": 82, "QE02": 83, "QE03": 84
-				}, num_headers=2, delimiter='\t')
-
-		# ADOS2_Module1
-		filename = os.path.join(subpath, "ados1_201201.txt")
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
+	
+		# ADOS_Module1
+		filename = os.path.join(subpath, "ados1_200701.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
-			convert_phenotypes(filename, "National Database for Autism Research", "ADOS2_Module1", 
+			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module1", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
-					"QA01": 20, "QA02": 21, "QA03": 22, "QA04": 23, "QA05": 24, "QA06": 25, "QA07": 26, "QA08": 27, 
-					"QB01": 28, "QB02": 29, "QB03": 30, "QB04": 31, "QB05": 32, "QB06": 33, "QB07": 34, "QB08": 35, "QB09": 36, "QB10": 37, "QB11": 38, "QB12": 39, "QB13.1": 40, "QB13.2": 41, "QB14": 42, "QB15": 43, "QB16": 44,
-					"QC01": 45, "QC02": 46, 
-					"QD01": 47, "QD02": 49, "QD03": 41, "QD04": 42, 
-					"QE01": 54, "QE02": 55, "QE03": 56
-				}, num_headers=2, delimiter='\t')
+					"QA01": 53, "QA02": 54, "QA03": 55, "QA04": 56, "QA05": 57, "QA06": 58, "QA07": 59, "QA08": 60, 
+					"QB01": 61, "QB02": 62, "QB03": 63, "QB04": 64, "QB05": 65, "QB06": 66, "QB07": 67, "QB08": 68, "QB09": 69, "QB10": 70, "QB11": 71, "QB12": 72,
+					"QC01": 73, "QC02": 74, 
+					"QD01": 75, "QD02": 77, "QD03": 79, "QD04": 80, 
+					"QE01": 82, "QE02": 83, "QE03": 84
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
+
+		# # ADOS2_Module1
+		# having some trouble with bad data on this import 
+		# filename = os.path.join(subpath, "ados1_201201.txt")
+		# if os.path.isfile("%s/%s" % (directory, filename)):
+		# 	convert_phenotypes(filename, "National Database for Autism Research", "ADOS2_Module1", 
+		# 		{
+		#			"identifier": lambda x: x[2],
+		#			"gender": lambda x: gender_map[x[6]],
+		#			"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
+		#			"interview_date": lambda x: x[4],
+		#		},
+		# 		{
+		# 			"QA01": 20, "QA02": 21, "QA03": 22, "QA04": 23, "QA05": 24, "QA06": 25, "QA07": 26, "QA08": 27, 
+		# 			"QB01": 28, "QB02": 29, "QB03": 30, "QB04": 31, "QB05": 32, "QB06": 33, "QB07": 34, "QB08": 35, "QB09": 36, "QB10": 37, "QB11": 38, "QB12": 39, "QB13.1": 40, "QB13.2": 41, "QB14": 42, "QB15": 43, "QB16": 44,
+		# 			"QC01": 45, "QC02": 46, 
+		# 			"QD01": 47, "QD02": 49, "QD03": 41, "QD04": 42, 
+		# 			"QE01": 54, "QE02": 55, "QE03": 56
+		# 		}, num_headers=2, delimiter='\t')
 
 		# ADOS_Module1
 		filename = os.path.join(subpath, "cs_ados_g_102.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module1", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
 				}, 
 				{
 					"QA01": 29, "QA02": 25, "QA03": 28, "QA04": 27, "QA05": 31, "QA06": 32, "QA07": 30, "QA08": 26, 
@@ -1331,51 +1362,39 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 					"QC01": 37, "QC02": 38, 
 					"QD01": 55, "QD02": 52, "QD03": 53, "QD04": 54, 
 					"QE01": 35, "QE02": 36, "QE03": 34
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module1
 		filename = os.path.join(subpath, "cs_ados_pre_published01.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module1", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"QA01": 22, "QA02": 15, "QA03": 20, "QA04": 17, "QA05": 31, "QA06": 33, "QA07": 26, "QA08": 16, 
 					"QB01": 68, "QB02": 58, "QB03": 46, "QB04": 48, "QB05": 62, "QB06": 59, "QB07": 55, "QB08": 47, "QB09": 64, "QB10": 66, "QB11": 57, "QB12": 53,
 					"QC01": 38, "QC02": 39, 
 					"QD01": 75, "QD02": 73, "QD03": None, "QD04": 74, 
 					"QE01": 36, "QE02": 37, "QE03": 35
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module1
 		filename = os.path.join(subpath, "cs_ados_wps_102.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module1", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"QA01": 31, "QA02": 26, "QA03": 29, "QA04": 28, "QA05": 35, "QA06": 36, "QA07": 32, "QA08": 27, 
 					"QB01": 63, "QB02": 58, "QB03": 47, "QB04": 49, "QB05": 60, "QB06": 59, "QB07": 55, "QB08": 48, "QB09": 61, "QB10": 62, "QB11": 57, "QB12": 53,
 					"QC01": 41, "QC02": 42, 
 					"QD01": 70, "QD02": 67, "QD03": 68, "QD04": 69, 
 					"QE01": 39, "QE02": 40, "QE03": 38
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module2
 		# If we see a directory, and it has an ados file, then read it
@@ -1384,44 +1403,36 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module2", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[7] == "M" else ("Female" if x[7] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None if x[5].strip() == '' else int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[7]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"QA01": 40, "QA02": 41, "QA03": 42, "QA04": 43, "QA05": 44, "QA06": 45, 'QA07': 46, 'QA08': 47,
 					'QB01': 48, 'QB02': 49, 'QB03': 50, "QB04": 51, 'QB05': 52, 'QB06': 53, 'QB07': 54, 'QB08': 55, 'QB09': 56, 'QB10': 57, 'QB11': 58,
 					"QC01": 59, "QC02": 60, 
 					"QD01": 61, "QD02": 63, "QD03": 65, "QD04": 66, 
 					"QE01": 68, "QE02": 69, "QE03": 70
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 	
 		# ADOS_Module2
 		filename = os.path.join(subpath, "ados2_200701.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module2", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"QA01": 40, "QA02": 41, "QA03": 42, "QA04": 43, "QA05": 44, "QA06": 45, 'QA07': 46, 'QA08': 47,
 					'QB01': 48, 'QB02': 49, 'QB03': 50, "QB04": 51, 'QB05': 52, 'QB06': 53, 'QB07': 54, 'QB08': 55, 'QB09': 56, 'QB10': 57, 'QB11': 58,
 					"QC01": 59, "QC02": 60, 
 					"QD01": 61, "QD02": 63, "QD03": 65, "QD04": 66, 
 					"QE01": 68, "QE02": 69, "QE03": 70
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS2_Module2
 		# print_codes_for_instrument('ADOS2_Module2')
@@ -1429,14 +1440,10 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS2_Module2", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
 				},
 				{
 					"QA01": 24, "QA02": 25, "QA03": 26, "QA04": 27, "QA05": 28, "QA06": 29, "QA07": 30, 
@@ -1444,7 +1451,7 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 					"QC01": 44, "QC02": 45, 
 					"QD01": 46, "QD02": 47, "QD03": 48, "QD04": 49, 
 					"QE01": 50, "QE02": 51, "QE03": 52
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module2
 		#print_codes_for_instrument('ADOS_Module2')
@@ -1452,44 +1459,32 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module2", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					'QA01': 28, 'QA02': 24, 'QA03': 30, 'QA04': 27, 'QA05': 31, 'QA06': 25, 'QA07': 29, 'QA08': 26, 
 					'QB01': 48, 'QB02': 39, 'QB03': 45, 'QB04': 44, 'QB05': 46, 'QB06': 47, 'QB07': 43, 'QB08': 41, 'QB09': 42, 'QB10': 38, 'QB11': 40, 
 					'QC01': 36, 'QC02': 37, 
 					'QD01': 52, 'QD02': 49, 'QD03': 50, 'QD04': 51, 
 					'QE01': 34, 'QE02': 35, 'QE03': 33
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module2
 		filename = os.path.join(subpath, "cs_ados_wps_202.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module2", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					'QA01': 33, 'QA02': 23, 'QA03': 37, 'QA04': 29, 'QA05': 39, 'QA06': 24, 'QA07': 35, 'QA08': 25, 
 					'QB01': 70, 'QB02': 52, 'QB03': 67, 'QB04': 65, 'QB05': 68, 'QB06': 69, 'QB07': 62, 'QB08': 58, 'QB09': 59, 'QB10': 48, 'QB11': 57, 
 					'QC01': 45, 'QC02': 47, 
 					'QD01': 76, 'QD02': 73, 'QD03': 74, 'QD04': 75, 
 					'QE01': 43, 'QE02': 44, 'QE03': 42
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module3
 		# If we see a directory, and it has an ados file, then read it
@@ -1497,80 +1492,62 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module3", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[7] == "M" else ("Female" if x[7] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None if x[5].strip() == '' else int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[7]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"QA01": 23, "QA02": 24, "QA03": 25, "QA04": 26, "QA05": 27, "QA06": 28, "QA07": 29, "QA08": 30, "QA09": 31, 
 					"QB01": 32, "QB02": 33, "QB03": 34, "QB04": 35, "QB05": 36, "QB06": 37, "QB07": 38, "QB08": 39, "QB09": 40, "QB10": 41,
 					"QC01": 42, 
 					"QD01": 43, "QD02": 45, "QD03": 47, "QD04": 48,  "QD05": 49,
 					"QE01": 51, "QE02": 52, "QE03": 53
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 	
 		# ADOS_Module3
 		filename = os.path.join(subpath, "ados3_200701.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module3", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"QA01": 23, "QA02": 24, "QA03": 25, "QA04": 26, "QA05": 27, "QA06": 28, "QA07": 29, "QA08": 30, "QA09": 31, 
 					"QB01": 32, "QB02": 33, "QB03": 34, "QB04": 35, "QB05": 36, "QB06": 37, "QB07": 38, "QB08": 39, "QB09": 40, "QB10": 41,
 					"QC01": 42, 
 					"QD01": 43, "QD02": 45, "QD03": 47, "QD04": 48,  "QD05": 49,
 					"QE01": 51, "QE02": 52, "QE03": 53
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS2_Module3
 		filename = os.path.join(subpath, "ados3_201201.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS2_Module3", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"QA01": 23, "QA02": 24, "QA03": 25, "QA04": 26, "QA05": 27, "QA06": 28, "QA07": 29, "QA08": 30, "QA09": 31,   
 					"QB01": 32, "QB02": 33, "QB03": 34, "QB04": 35, "QB05": 36, "QB06": 37, "QB07": 38, "QB08": 39, "QB09": 40, "QB10": 41, "QB11": 42,
 					"QC01": 43, 
 					"QD01": 44, "QD02": 46, "QD03": 48, "QD04": 49, "QD05": 50,
 					"QE01": 52, "QE02": 53, "QE03": 54
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module3
 		filename = os.path.join(subpath, "cs_ados_g_302.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module3", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
 				}, 
 				{
 					"QA01": 25, "QA02": 27, "QA03": 23, "QA04": 28, "QA05": 24, "QA06": 19, "QA07": 26, "QA08": 20, "QA09": 21, 
@@ -1578,21 +1555,15 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 					"QC01": 33, 
 					"QD01": 47, "QD02": 46, "QD03": 46, "QD04": 45,  "QD05": 44,
 					"QE01": 31, "QE02": 32, "QE03": 30
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module3
 		filename = os.path.join(subpath, "cs_ados_wps_302.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module3", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
 				},
 				{
 					"QA01": 28, "QA02": 30, "QA03": 25, "QA04": 31, "QA05": 27, "QA06": 18, "QA07": 29, "QA08": 20, "QA09": 21, 
@@ -1600,29 +1571,25 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 					"QC01": 38, 
 					"QD01": 63, "QD02": 60, "QD03": 61, "QD04": 59,  "QD05": 58,
 					"QE01": 35, "QE02": 36, "QE03": 34
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module4
 		filename = os.path.join(subpath, "ados4_200102.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module4", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[7] == "M" else ("Female" if x[7] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None if x[5].strip() == '' else int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[7]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"QA01": 24, "QA02": 25, "QA03": 26, "QA04": 27, "QA05": 28, "QA06": 29, "QA07": 30, "QA08": 31, "QA09": 32, "QA10": 33, 
 					"QB01": 34, "QB02": 35, "QB03": 36, "QB04": 37, "QB05": 38, "QB06": 39, "QB07": 40, "QB08": 41, "QB09": 42, "QB10": 43, "QB11": 44, "QB12": 45,
 					"QC01": 46, 
 					"QD01": 47, "QD02": 49, "QD03": 51, "QD04": 52,  "QD05": 53,
 					"QE01": 55, "QE02": 56, "QE03": 57
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS2_Module4
 		# print_codes_for_instrument('ADOS2_Module4')
@@ -1630,22 +1597,18 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(os.path.join(subpath, "ados4_201201.txt"), "National Database for Autism Research", "ADOS2_Module4", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					"QA01": 24, "QA02": 25, "QA03": 26, "QA04": 27, "QA05": 28, "QA06": 29, "QA07": 30, "QA08": 31, "QA09": 32, "QA10": 33, 
 					"QB01": 34, "QB02": 35, "QB03": 36, "QB04": 37, "QB05": 38, "QB06": 39, "QB07": 40, "QB08": 41, "QB09": 42, "QB10": 43, "QB11": 44, "QB12": 45, "QB13": 46,
 					"QC01": 47, 
 					"QD01": 48, "QD02": 50, "QD03": 52, "QD04": 53,  "QD05": 54,
 					"QE01": 56, "QE02": 57, "QE03": 58
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module4
 		# print_codes_for_instrument('ADOS_Module4')
@@ -1653,22 +1616,16 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module4", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 				'QA01': 26, 'QA02': 28, 'QA03': 24, 'QA04': 29, 'QA05': 25, 'QA06': 20, 'QA07': 27, 'QA08': 21, 'QA09': 22, 'QA10': 23, 
 				'QB01': 45, 'QB02': 38, 'QB03': 40, 'QB04': None, 'QB05': 36, 'QB06': 37, 'QB07': 39, 'QB08': 44, 'QB09': 42, 'QB10': 43, 'QB11': 35, 'QB12': 41, 
 				'QC01': 34, 
 				'QD01': 51, 'QD02': 49, 'QD03': 50, 'QD04': 48, 'QD05': 47, 
 				'QE01': 32, 'QE02': 33, 'QE03': 31
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS_Module4
 		# print_codes_for_instrument('ADOS2_Module4')
@@ -1676,14 +1633,8 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "ADOS_Module4", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
 				},
 				{
 					'QA01': 27, 'QA02': 29, 'QA03': 24, 'QA04': 30, 'QA05': 26, 'QA06': 17, 'QA07': 28, 'QA08': 19, 'QA09': 20, 'QA10': 21, 
@@ -1691,7 +1642,7 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 					'QC01': 37, 
 					'QD01': 66, 'QD02': 63, 'QD03': 64, 'QD04': 62, 'QD05': 61, 
 					'QE01': 34, 'QE02': 35, 'QE03': 33
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# ADOS2_Module_Toddler
 		# print_codes_for_instrument('ADOS2_Module_Toddler')
@@ -1699,22 +1650,18 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(os.path.join(subpath, "ados_t02.txt"), "National Database for Autism Research", "ADOS2_Module_Toddler", 
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 					'QA01': 8, 'QA02': 20, 'QA03': 21, 'QA04': 22, 'QA05': 23, 'QA06': 24, 'QA07': 25, 'QA08': 26, 'QA09': 27, 
 					'QB01': 28, 'QB02': 29, 'QB03': 30, 'QB04': 31, 'QB05': 32, 'QB06': 33, 'QB07': 34, 'QB08': 35, 'QB09': 36, 'QB10': 37, 'QB11': 38, 'QB12': 39, 'QB13': 40, 'QB14': 41, 'QB15': 42, 'QB16.1': 43, 'QB16.2': 44, 'QB17': 45, 'QB18': 46, 
 					'QC01': 47, 'QC02': 48, 'QC03': 49, 
 					'QD01': 50, 'QD02': 52, 'QD03': 54, 'QD04': 56, 'QD05': 57, 
 					'QE01': 59, 'QE02': 60, 'QE03': 61, 'QE04': 62
-				}, num_headers=2, delimiter='\t')
+				}, num_headers=2, delimiter='\t', known_data=ndar_info)
 		
 		# SRS_Child
 		# print_codes_for_instrument('SRS_Child')
@@ -1722,15 +1669,9 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "SRS_Child",
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: 'Male' if x[16] != '' else 'Female' if x[10] != '' else None,
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: None,
+					"identifier": lambda x: x[2],
 					"interview_date": lambda x: x[3],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				{
 				'Q01': 21, 'Q02': 32, 'Q03': 43, 'Q04': 54, 'Q05': 65, 'Q06': 76, 'Q07': 83, 'Q08': 84, 'Q09': 85, 
 				'Q10': 22, 'Q11': 23, 'Q12': 24, 'Q13': 25, 'Q14': 26, 'Q15': 27, 'Q16': 28, 'Q17': 29, 'Q18': 30, 'Q19': 31, 
@@ -1740,116 +1681,100 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 				'Q50': 66, 'Q51': 67, 'Q52': 68, 'Q53': 69, 'Q54': 70, 'Q55': 71, 'Q56': 72, 'Q57': 73, 'Q58': 74, 'Q59': 75, 
 				'Q60': 77, 'Q61': 78, 'Q62': 79, 'Q63': 80, 'Q64': 81, 'Q65': 82
 				},
-				value_transform=srs_transform, num_headers=2, delimiter='\t')
+				value_transform=srs_transform, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# SRS
 		filename = os.path.join(subpath, "srs02.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "SRS_Child",
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(37, 102))),
-				value_transform=srs_transform, num_headers=2, delimiter='\t')
+				value_transform=srs_transform, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# SRS_Adult
 		filename = os.path.join(subpath, "srs_adult03.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "SRS_Adult",
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(25, 90))), 
-				value_transform=srs_transform, num_headers=2, delimiter='\t')
+				value_transform=srs_transform, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# SRS_Child
 		filename = os.path.join(subpath, "srs201.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "SRS_Child",
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(13, 78))), 
-				value_transform=srs_transform, num_headers=2, delimiter='\t')
+				value_transform=srs_transform, num_headers=2, delimiter='\t', known_data=ndar_info)
 
 		# SRS_Preschool
 		filename = os.path.join(subpath, "srs_preschool_200601.txt")
 		if os.path.isfile("%s/%s" % (directory, filename)):
 			convert_phenotypes(filename, "National Database for Autism Research", "SRS_Preschool",
 				{
-					"identifier": identifier_lambda,
-					"gender": lambda x: "Male" if x[6] == "M" else ("Female" if x[6] == "F" else None),
-					"race": lambda x: None,
-					"ethnicity": lambda x: None,
-					"age": lambda x: int(round(float(x[5]), 0)),
+					"identifier": lambda x: x[2],
+					"gender": lambda x: gender_map[x[6]],
+					"age": lambda x: None if x[5] == '' else int(round(float(x[5]), 0)),
 					"interview_date": lambda x: x[4],
-					"family": lambda x: None,
-					"clinical_diagnosis_raw": clinical_diagnosis_lambda
-				}, 
+				},
 				dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(11, 76))), 
-				value_transform=srs_transform, num_headers=2, delimiter='\t')
+				value_transform=srs_transform, num_headers=2, delimiter='\t', known_data=ndar_info)
 
-# # ***************************************************************************************************************
-# # *
-# # --------------------------------------------------- SSC ------------------------------------------------------
-# # *
-# # ***************************************************************************************************************
+# ***************************************************************************************************************
+# *
+# --------------------------------------------------- SSC ------------------------------------------------------
+# *
+# ***************************************************************************************************************
 
 # pull diagnosis
-ssc_diagnosis = {}
-ssc_demographics = {}
-with open(directory + "/SSC Version 15 Phenotype Data Set 2/Proband Data/ssc_core_descriptive.csv", 'r') as f:
-	reader = csv.reader(f)
-	header = next(reader)[1:]
-	ssc_demographics.update([(x[0], x[1:]) for x in reader])
+ssc_info = defaultdict(dict)
 
-with open(directory + "/SSC Version 15 Phenotype Data Set 2/Proband Data/ssc_diagnosis.csv", 'r') as f:
-	reader = csv.reader(f)
-	header = next(reader)[1:]
-	ssc_diagnosis.update([(x[0], x[15]) for x in reader])
+for subd in ['Proband Data', 'MZ Twin Data', 'Mother Data', 'Father Data', 'Other Sibling Data', 'Designated Unaffected Sibling Data']:
+	with open(directory + "/SSC Version 15 Phenotype Data Set 2/%s/ssc_core_descriptive.csv" % subd, 'r') as f:
+		reader = csv.reader(f)
+		header = next(reader)[1:]
+		for line in reader:
+			ind_id = line[0]
+			ssc_info[ind_id]['ethnicity'] = standardize_ethnicity(line[21])
+			ssc_info[ind_id]['race'] = standardize_race(line[35])
+			ssc_info[ind_id]['gender'] = gender_map[line[40]]
+			ssc_info[ind_id]['family'] = ind_id[:-3]
 
-with open(directory + "/SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ssc_core_descriptive.csv", 'r') as f:
-	reader = csv.reader(f)
-	header = next(reader)[1:]
-	ssc_demographics.update([(x[0], x[1:]) for x in reader])
+for subd in ['Proband Data', 'MZ Twin Data']:
+	with open(directory + "/SSC Version 15 Phenotype Data Set 2/%s/ssc_diagnosis.csv" % subd, 'r') as f:
+		reader = csv.reader(f)
+		header = next(reader)[1:]
+		for line in reader:
+			ssc_info[line[0]]['clinical_diagnosis_raw'] = line[15]
 
-with open(directory + "/SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ssc_diagnosis.csv", 'r') as f:
-	reader = csv.reader(f)
-	header = next(reader)[1:]
-	ssc_diagnosis.update([(x[0], x[15]) for x in reader])
+with open(directory + '/SSC Version 15 Phenotype Data Set 2/ssc.ped', 'r') as f:
+	reader = csv.reader(f, delimiter='\t')
+	for line in reader:
+		ind_id = line[1]
+		ssc_info[ind_id]['family'] = line[0]
+		ssc_info[ind_id]['gender'] = gender_map[line[4]]
+		ssc_info[ind_id]['clinical_diagnosis_raw'] = ped_diag_map[line[5]]
 
 # ADIR2003
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/adi_r.csv", "Simons Simplex Collection", "ADIR2003", 
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"Q02": (2, 3), "Q04": 4, "Q05": (5, 6), "Q06": (7, 8), "Q07": (9, 10), "Q08": (11, 12), "Q09": (13, 14), "Q10": (15, 16),
@@ -1862,19 +1787,13 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/adi_r.csv",
 		"Q71.1": 122, "Q71.2": 123, "Q72.1": 124, "Q72.2": 125, "Q73.1": 126, "Q73.2": 127, "Q74.1": 128, "Q74.2": 129, "Q75.1": 130, "Q75.2": 131, "Q76.1": 132, "Q76.2": 133, "Q77.1": 134, "Q77.2": 135, "Q78.1": 136, "Q78.2": 137, "Q79.1": 138, "Q79.2": 139, "Q80.1": 140, "Q80.2": 141,
 		"Q81.1": 142, "Q81.2": 143, "Q82.1": 144, "Q82.2": 145, "Q83.1": 146, "Q83.2": 147, "Q84.1": 148, "Q84.2": 149, "Q85.1": 150, "Q85.2": 151, "Q86": 152, "Q87": (153, 154), "Q88.1": 155, "Q88.2": 156, "Q89.1": 157, "Q89.2": 158, "Q90.1": 159, "Q90.2": 160,
 		"Q91.1": 161, "Q91.2": 162, "Q92.1": 163, "Q92.2": 164, "Q93.1": 165, "Q93.2": 166
-	})
+	}, known_data=ssc_info)
 
 # ADIR2003
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/adi_r.csv", "Simons Simplex Collection", "ADIR2003", 
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"Q02": (2, 3), "Q04": 4, "Q05": (5, 6), "Q06": (7, 8), "Q07": (9, 10), "Q08": (11, 12), "Q09": (13, 14), "Q10": (15, 16),
@@ -1887,19 +1806,12 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/adi_r.csv",
 		"Q71.1": 122, "Q71.2": 123, "Q72.1": 124, "Q72.2": 125, "Q73.1": 126, "Q73.2": 127, "Q74.1": 128, "Q74.2": 129, "Q75.1": 130, "Q75.2": 131, "Q76.1": 132, "Q76.2": 133, "Q77.1": 134, "Q77.2": 135, "Q78.1": 136, "Q78.2": 137, "Q79.1": 138, "Q79.2": 139, "Q80.1": 140, "Q80.2": 141,
 		"Q81.1": 142, "Q81.2": 143, "Q82.1": 144, "Q82.2": 145, "Q83.1": 146, "Q83.2": 147, "Q84.1": 148, "Q84.2": 149, "Q85.1": 150, "Q85.2": 151, "Q86": 152, "Q87": (153, 154), "Q88.1": 155, "Q88.2": 156, "Q89.1": 157, "Q89.2": 158, "Q90.1": 159, "Q90.2": 160,
 		"Q91.1": 161, "Q91.2": 162, "Q92.1": 163, "Q92.2": 164, "Q93.1": 165, "Q93.2": 166
-	})
+	}, known_data=ssc_info)
 
 # ADOS_Module1
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_1_raw.csv", "Simons Simplex Collection", "ADOS_Module1", 
-	{
-		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
+	{"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"QA01": 2, "QA02": 3, "QA03": 4, "QA04": 5, "QA05": 6, "QA06": 7, "QA07": 8, "QA08": 9, 
@@ -1907,19 +1819,13 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_1_raw.
 		"QC01": 22, "QC02": 23, 
 		"QD01": 24, "QD02": 25, "QD03": 26, "QD04": 27, 
 		"QE01": 28, "QE02": 29, "QE03": 30
-	})
+	}, known_data=ssc_info)
 
 # ADOS_Module1
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_1_raw.csv", "Simons Simplex Collection", "ADOS_Module1", 
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"QA01": 2, "QA02": 3, "QA03": 4, "QA04": 5, "QA05": 6, "QA06": 7, "QA07": 8, "QA08": 9, 
@@ -1927,19 +1833,13 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_1_raw.
 		"QC01": 22, "QC02": 23, 
 		"QD01": 24, "QD02": 25, "QD03": 26, "QD04": 27, 
 		"QE01": 28, "QE02": 29, "QE03": 30
-	})
+	}, known_data=ssc_info)
 
 # ADOS_Module2
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_2_raw.csv", "Simons Simplex Collection", "ADOS_Module2", 
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"QA01": 2, "QA02": 3, "QA03": 4, "QA04": 5, "QA05": 6, "QA06": 7, "QA07": 8, "QA08": 9,
@@ -1947,19 +1847,13 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_2_raw.
 		"QC01": 21, "QC02": 22, 
 		"QD01": 23, "QD02": 24, "QD03": 25, "QD04": 26, 
 		"QE01": 27, "QE02": 28, "QE03": 29
-	})
+	}, known_data=ssc_info)
 
 # ADOS_Module2
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_2_raw.csv", "Simons Simplex Collection", "ADOS_Module2", 
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"QA01": 2, "QA02": 3, "QA03": 4, "QA04": 5, "QA05": 6, "QA06": 7, "QA07": 8, "QA08": 9,
@@ -1967,19 +1861,13 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_2_raw.
 		"QC01": 21, "QC02": 22, 
 		"QD01": 23, "QD02": 24, "QD03": 25, "QD04": 26, 
 		"QE01": 27, "QE02": 28, "QE03": 29
-	})
+	}, known_data=ssc_info)
 
 # ADOS_Module3
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_3_raw.csv", "Simons Simplex Collection", "ADOS_Module3", 
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"QA01": 2, "QA02": 3, "QA03": 4, "QA04": 5, "QA05": 6, "QA06": 7, "QA07": 8, "QA08": 9, "QA09": 10,
@@ -1987,19 +1875,13 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_3_raw.
 		"QC01": 21,
 		"QD01": 22, "QD02": 23, "QD03": 24, "QD04": 25, "QD05": 26, 
 		"QE01": 27, "QE02": 28, "QE03": 29
- 	})
+ 	}, known_data=ssc_info)
 
 # ADOS_Module3
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_3_raw.csv", "Simons Simplex Collection", "ADOS_Module3", 
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"QA01": 2, "QA02": 3, "QA03": 4, "QA04": 5, "QA05": 6, "QA06": 7, "QA07": 8, "QA08": 9, "QA09": 10,
@@ -2007,19 +1889,13 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_3_raw.
 		"QC01": 21,
 		"QD01": 22, "QD02": 23, "QD03": 24, "QD04": 25, "QD05": 26, 
 		"QE01": 27, "QE02": 28, "QE03": 29
-	})
+	}, known_data=ssc_info)
 
 # ADOS_Module4	
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_4_raw.csv", "Simons Simplex Collection", "ADOS_Module4", 
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"QA01": 3, "QA02": 4, "QA03": 5, "QA04": 6, "QA05": 7, "QA06": 8, "QA07": 9, "QA08": 10, "QA09": 11, "QA10": 2,
@@ -2027,19 +1903,13 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_4_raw.
 		"QC01": 24,
 		"QD01": 25, "QD02": 26, "QD03": 27, "QD04": 28, "QD05": 29, 
 		"QE01": 30, "QE02": 31, "QE03": 32
-	})
+	}, known_data=ssc_info)
 
 # ADOS_Module4
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_4_raw.csv", "Simons Simplex Collection", "ADOS_Module4", 
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
 	{
 		"QA01": 3, "QA02": 4, "QA03": 5, "QA04": 6, "QA05": 7, "QA06": 8, "QA07": 9, "QA08": 10, "QA09": 11, "QA10": 2,
@@ -2047,119 +1917,77 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_4_raw.
 		"QC01": 24,
 		"QD01": 25, "QD02": 26, "QD03": 27, "QD04": 28, "QD05": 29, 
 		"QE01": 30, "QE02": 31, "QE03": 32
-	})
+	}, known_data=ssc_info)
 
 # SRS_Child
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Child
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Child
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Other Sibling Data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Child
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Designated Unaffected Sibling Data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
+		'clinical_diagnosis_raw': lambda x: 'Control'
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Adult
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Father Data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
+		"gender": lambda x: 'Male',
+		'clinical_diagnosis_raw': lambda x: 'Control'
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Adult
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Mother Data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
+		"gender": lambda x: 'Female',
+		'clinical_diagnosis_raw': lambda x: 'Control'
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Adult
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Other Sibling Data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Adult
 convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Designated Unaffected Sibling Data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][39].title(),
-		"race": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][34],
-		"ethnicity": lambda x: None if x[0] not in ssc_demographics else ssc_demographics[x[0]][20],
-		"age": lambda x: None if x[0] not in ssc_demographics or ssc_demographics[x[0]][13] == '' else int(ssc_demographics[x[0]][13]),
-		"interview_date": lambda x: None,
 		"family": lambda x: x[0][:-3],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in ssc_diagnosis else ssc_diagnosis[x[0]]
+		'clinical_diagnosis_raw': lambda x: 'Control'
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # # ***************************************************************************************************************
 # # *
@@ -2172,11 +2000,7 @@ convert_phenotypes("cognoa_adir_dataset.txt", "Cognoa", "ADIR2003",
 	{
 		"identifier": lambda x: x[158],
 		"gender": lambda x: None if x[156] == '' else x[156].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
 		"age": lambda x: None if x[0] == '' else int(x[0]),
-		"interview_date": lambda x: None,
-		"family": lambda x: None,
 		"clinical_diagnosis_raw": lambda x: 'Control'
 	}, 
 	{
@@ -2192,46 +2016,67 @@ convert_phenotypes("cognoa_adir_dataset.txt", "Cognoa", "ADIR2003",
 		"Q91.1": 149, "Q91.2": 150, "Q92.1": 151, "Q92.2": 152, "Q93.1": 153, "Q93.2": 154
 	}, delimiter='\t')
 
-# # ***************************************************************************************************************
-# # *
-# # --------------------------------------------------- SVIP ------------------------------------------------------
-# # *
-# # ***************************************************************************************************************
+# ***************************************************************************************************************
+# *
+# --------------------------------------------------- SVIP ------------------------------------------------------
+# *
+# ***************************************************************************************************************
 
 # Pull diagnosis
-svip_diagnosis = {}
-with open(directory + "/SVIP/SVIP_1q21.1/diagnosis_summary.csv", 'r') as f:
-	reader = csv.reader(f)
-	header = next(reader)[1:]
-	svip_diagnosis.update([(x[0], 'Control' if x[16]=='FALSE' else x[72]) for x in reader])
+svip_info = defaultdict(dict)
 
-with open(directory + "/SVIP/SVIP_16p11.2/diagnosis_summary.csv", 'r') as f:
-	reader = csv.reader(f)
-	header = next(reader)[1:]
-	svip_diagnosis.update([(x[0], 'Control' if x[16]=='FALSE' else x[72]) for x in reader])
+for subd in ['Longitudinal', 'SVIP_1q21.1', 'SVIP_16p11.2']:
+	#print('/SVIP/%s/diagnosis_summary.csv' % subd)
+	with open(directory + "/SVIP/%s/diagnosis_summary.csv" % subd, 'r') as f:
+		reader = csv.reader(f)
+		header = next(reader)[1:]
+		for line in reader:
+			if line[16] == 'false':
+				svip_info[line[0]]['clinical_diagnosis_raw'] = 'Control'
+			elif line[16] == 'true':
+				svip_info[line[0]]['clinical_diagnosis_raw'] = 'Autism' if line[72] == '' else line[72]
 
-svip_demo = {}
-with open(directory + "/SVIP/SVIP_1q21.1/svip_subjects.csv", 'r') as f:
-	reader = csv.reader(f)
-	header = next(reader)[1:]
-	svip_demo.update([(x[0], x) for x in reader])
+for subd in ['SVIP_Phase_2_1q21.1', 'SVIP_Phase_2_16p11.2']:
+	with open(directory + "/SVIP/%s/previous_diagnosis.csv" % subd, 'r') as f:
+		reader = csv.reader(f)
+		header = next(reader)[1:]
+		for line in reader:
+			if 'clinical_diagnosis_raw' not in svip_info[line[0]]:
+				svip_info[line[0]]['clinical_diagnosis_raw'] = line[1]
 
-with open(directory + "/SVIP/SVIP_16p11.2/svip_subjects.csv", 'r') as f:
+#print('SVIP/Longitudinal/longitudinal_time_points_per_instrument.csv')
+with open(directory + "/SVIP/Longitudinal/longitudinal_time_points_per_instrument.csv", 'r') as f:
 	reader = csv.reader(f)
 	header = next(reader)[1:]
-	svip_demo.update([(x[0], x) for x in reader])
+	for line in reader:
+		ind_id = line[1]
+		svip_info[ind_id]['family'] = line[0]
+		svip_info[ind_id]['age'] = int(line[5])
+		svip_info[ind_id]['gender'] = line[6].title()
+		if svip_info[ind_id]['gender'] != 'Male' and svip_info[ind_id]['gender'] != 'Female':
+			print(svip_info[ind_id]['gender'])
+
+for subd in ['Non_familial_controls', 'SVIP_1q21.1', 'SVIP_16p11.2']:
+	#print('/SVIP/%s/svip_summary_variables.csv' % subd)
+	with open(directory + "/SVIP/%s/svip_summary_variables.csv" % subd, 'r') as f:
+		reader = csv.reader(f)
+		header = next(reader)[1:]
+		for line in reader:
+			ind_id = line[0]
+			svip_info[ind_id]['family'] = line[1]
+			if line[6] != '':
+				svip_info[ind_id]['age'] = int(line[6])
+			svip_info[ind_id]['gender'] = line[13].title()
+			if svip_info[ind_id]['gender'] != 'Male' and svip_info[ind_id]['gender'] != 'Female':
+				print(svip_info[ind_id]['gender'])
+
 
 # ADIR2003
 convert_phenotypes("SVIP/Longitudinal/adi_r.csv", "SVIP", "ADIR2003",
 	{
 		"identifier": lambda x: x[3],
-		"gender": lambda x: None if x[3] not in svip_demo else svip_demo[x[3]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: int(x[5]),
-		"interview_date": lambda x: None,
-		"family": lambda x: x[0],
-		"clinical_diagnosis_raw": lambda x: None if x[3] not in svip_diagnosis else svip_diagnosis[x[3]]
+		"age": lambda x: None if x[5] == '' else int(x[5]),
+		'family': lambda x: x[0]
 	}, 
 	{
 		"Q02": (6, 7), "Q04": 8, "Q05": (9, 10), "Q06": (11, 12), "Q07": (13, 14), "Q08": (15, 16), "Q09": (17, 18), "Q10": (19, 20),
@@ -2244,19 +2089,15 @@ convert_phenotypes("SVIP/Longitudinal/adi_r.csv", "SVIP", "ADIR2003",
 		"Q71.1": 126, "Q71.2": 127, "Q72.1": 128, "Q72.2": 129, "Q73.1": 130, "Q73.2": 131, "Q74.1": 132, "Q74.2": 133, "Q75.1": 134, "Q75.2": 135, "Q76.1": 136, "Q76.2": 137, "Q77.1": 138, "Q77.2": 139, "Q78.1": 140, "Q78.2": 141, "Q79.1": 142, "Q79.2": 143, "Q80.1": 144, "Q80.2": 145,
 		"Q81.1": 146, "Q81.2": 147, "Q82.1": 148, "Q82.2": 149, "Q83.1": 150, "Q83.2": 151, "Q84.1": 152, "Q84.2": 153, "Q85.1": 154, "Q85.2": 155, "Q86": 156, "Q87": (157, 158), "Q88.1": 159, "Q88.2": 160, "Q89.1": 161, "Q89.2": 162, "Q90.1": 163, "Q90.2": 164,
 		"Q91.1": 165, "Q91.2": 166, "Q92.1": 167, "Q92.2": 168, "Q93.1": 169, "Q93.2": 170
-	})
+	}, known_data=svip_info)
 
 # ADIR2003
 convert_phenotypes("SVIP/SVIP_1q21.1/adi_r.csv", "SVIP", "ADIR2003",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		"family": lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
+
 	}, 
 	{
 		"Q02": (27, 28), "Q04": 29, "Q05": (30, 31), "Q06": (32, 33), "Q07": (34, 35), "Q08": (36, 37), "Q09": (38, 39), "Q10": (40, 41),
@@ -2269,19 +2110,14 @@ convert_phenotypes("SVIP/SVIP_1q21.1/adi_r.csv", "SVIP", "ADIR2003",
 		"Q71.1": 147, "Q71.2": 148, "Q72.1": 149, "Q72.2": 150, "Q73.1": 151, "Q73.2": 152, "Q74.1": 153, "Q74.2": 154, "Q75.1": 155, "Q75.2": 156, "Q76.1": 157, "Q76.2": 158, "Q77.1": 159, "Q77.2": 160, "Q78.1": 161, "Q78.2": 162, "Q79.1": 163, "Q79.2": 164, "Q80.1": 165, "Q80.2": 166,
 		"Q81.1": 167, "Q81.2": 168, "Q82.1": 169, "Q82.2": 170, "Q83.1": 171, "Q83.2": 172, "Q84.1": 173, "Q84.2": 174, "Q85.1": 175, "Q85.2": 176, "Q86": 177, "Q87": (178, 179), "Q88.1": 180, "Q88.2": 181, "Q89.1": 182, "Q89.2": 183, "Q90.1": 184, "Q90.2": 185,
 		"Q91.1": 186, "Q91.2": 187, "Q92.1": 188, "Q92.2": 189, "Q93.1": 190, "Q93.2": 191
-	})
+	}, known_data=svip_info)
 
 # ADIR2003
 convert_phenotypes("SVIP/SVIP_16p11.2/adi_r.csv", "SVIP", "ADIR2003",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		"family": lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
 	}, 
 	{
 		"Q02": (27, 28), "Q04": 29, "Q05": (30, 31), "Q06": (32, 33), "Q07": (34, 35), "Q08": (36, 37), "Q09": (38, 39), "Q10": (40, 41),
@@ -2294,19 +2130,14 @@ convert_phenotypes("SVIP/SVIP_16p11.2/adi_r.csv", "SVIP", "ADIR2003",
 		"Q71.1": 147, "Q71.2": 148, "Q72.1": 149, "Q72.2": 150, "Q73.1": 151, "Q73.2": 152, "Q74.1": 153, "Q74.2": 154, "Q75.1": 155, "Q75.2": 156, "Q76.1": 157, "Q76.2": 158, "Q77.1": 159, "Q77.2": 160, "Q78.1": 161, "Q78.2": 162, "Q79.1": 163, "Q79.2": 164, "Q80.1": 165, "Q80.2": 166,
 		"Q81.1": 167, "Q81.2": 168, "Q82.1": 169, "Q82.2": 170, "Q83.1": 171, "Q83.2": 172, "Q84.1": 173, "Q84.2": 174, "Q85.1": 175, "Q85.2": 176, "Q86": 177, "Q87": (178, 179), "Q88.1": 180, "Q88.2": 181, "Q89.1": 182, "Q89.2": 183, "Q90.1": 184, "Q90.2": 185,
 		"Q91.1": 186, "Q91.2": 187, "Q92.1": 188, "Q92.2": 189, "Q93.1": 190, "Q93.2": 191
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module1
 convert_phenotypes("SVIP/Longitudinal/ados_1.csv", "SVIP", "ADOS_Module1",
 	{
 		"identifier": lambda x: x[3],
-		"gender": lambda x: None if x[3] not in svip_demo else svip_demo[x[3]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: int(x[5]),
-		"interview_date": lambda x: None,
-		"family": lambda x: x[0],
-		"clinical_diagnosis_raw": lambda x: None if x[3] not in svip_diagnosis else svip_diagnosis[x[3]]
+		'family': lambda x: x[0],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
 	}, 
 	{
 		"QA01": 6, "QA02": 7, "QA03": 8, "QA04": 9, "QA05": 10, "QA06": 11, "QA07": 12, "QA08": 13, 
@@ -2314,19 +2145,14 @@ convert_phenotypes("SVIP/Longitudinal/ados_1.csv", "SVIP", "ADOS_Module1",
 		"QC01": 26, "QC02": 27, 
 		"QD01": 28, "QD02": 29, "QD03": 30, "QD04": 31, 
 		"QE01": 32, "QE02": 33, "QE03": 34
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module1
 convert_phenotypes("SVIP/SVIP_1q21.1/ados_1.csv", "SVIP", "ADOS_Module1",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		"family": lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
 	}, 
 	{
 		"QA01": 6, "QA02": 7, "QA03": 8, "QA04": 9, "QA05": 10, "QA06": 11, "QA07": 12, "QA08": 13, 
@@ -2334,19 +2160,14 @@ convert_phenotypes("SVIP/SVIP_1q21.1/ados_1.csv", "SVIP", "ADOS_Module1",
 		"QC01": 26, "QC02": 27, 
 		"QD01": 28, "QD02": 29, "QD03": 30, "QD04": 31, 
 		"QE01": 32, "QE02": 33, "QE03": 34
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module1
 convert_phenotypes("SVIP/SVIP_16p11.2/ados_1.csv", "SVIP", "ADOS_Module1",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		"family": lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
 	}, 
 	{
 		"QA01": 6, "QA02": 7, "QA03": 8, "QA04": 9, "QA05": 10, "QA06": 11, "QA07": 12, "QA08": 13, 
@@ -2354,19 +2175,14 @@ convert_phenotypes("SVIP/SVIP_16p11.2/ados_1.csv", "SVIP", "ADOS_Module1",
 		"QC01": 26, "QC02": 27, 
 		"QD01": 28, "QD02": 29, "QD03": 30, "QD04": 31, 
 		"QE01": 32, "QE02": 33, "QE03": 34
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module2
 convert_phenotypes("SVIP/Longitudinal/ados_2.csv", "SVIP", "ADOS_Module2",
 	{
-		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		"identifier": lambda x: x[3],
+		'family': lambda x: x[0],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
 	},   
 	{
 		"QA01": 6, "QA02": 7, "QA03": 8, "QA04": 9, "QA05": 10, "QA06": 11, "QA07": 12, "QA08": 13, 
@@ -2374,314 +2190,240 @@ convert_phenotypes("SVIP/Longitudinal/ados_2.csv", "SVIP", "ADOS_Module2",
 		"QC01": 25, "QC02": 26, 
 		"QD01": 27, "QD02": 28, "QD03": 29, "QD04": 30, 
 		"QE01": 31, "QE02": 32, "QE03": 33
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module2
 convert_phenotypes("SVIP/SVIP_1q21.1/ados_2.csv", "SVIP", "ADOS_Module2",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
-	},   
+		'family': lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
+	},  
 	{
 		"QA01": 6, "QA02": 7, "QA03": 8, "QA04": 9, "QA05": 10, "QA06": 11, "QA07": 12, "QA08": 13, 
 		"QB01": 14, "QB02": 15, "QB03": 16, "QB04": 17, "QB05": 18, "QB06": 19, "QB07": 20, "QB08": 21, "QB09": 22, "QB10": 23, "QB11": 24,
 		"QC01": 25, "QC02": 26, 
 		"QD01": 27, "QD02": 28, "QD03": 29, "QD04": 30, 
 		"QE01": 31, "QE02": 32, "QE03": 33
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module2
 convert_phenotypes("SVIP/SVIP_16p11.2/ados_2.csv", "SVIP", "ADOS_Module2",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
-	},   
+		'family': lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
+	},  
 	{
 		"QA01": 6, "QA02": 7, "QA03": 8, "QA04": 9, "QA05": 10, "QA06": 11, "QA07": 12, "QA08": 13, 
 		"QB01": 14, "QB02": 15, "QB03": 16, "QB04": 17, "QB05": 18, "QB06": 19, "QB07": 20, "QB08": 21, "QB09": 22, "QB10": 23, "QB11": 24,
 		"QC01": 25, "QC02": 26, 
 		"QD01": 27, "QD02": 28, "QD03": 29, "QD04": 30, 
 		"QE01": 31, "QE02": 32, "QE03": 33
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module3
 convert_phenotypes("SVIP/Longitudinal/ados_3.csv", "SVIP", "ADOS_Module3",
 	{
-		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
-	},   
+		"identifier": lambda x: x[3],
+		'family': lambda x: x[0],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
+
+	},  
 	{
 		"QA01": 6, "QA02": 7, "QA03": 8, "QA04": 9, "QA05": 10, "QA06": 11, "QA07": 12, "QA08": 13, "QA09": 14, 
 		"QB01": 15, "QB02": 16, "QB03": 17, "QB04": 18, "QB05": 19, "QB06": 20, "QB07": 21, "QB08": 22, "QB09": 23, "QB10": 24,
 		"QC01": 25,
 		"QD01": 26, "QD02": 27, "QD03": 28, "QD04": 29, "QD05": 30, 
 		"QE01": 31, "QE02": 32, "QE03": 33
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module3
 convert_phenotypes("SVIP/SVIP_1q21.1/ados_3.csv", "SVIP", "ADOS_Module3",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
-	},   
+		'family': lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
+
+	},  
 	{
 		"QA01": 6, "QA02": 7, "QA03": 8, "QA04": 9, "QA05": 10, "QA06": 11, "QA07": 12, "QA08": 13, "QA09": 14, 
 		"QB01": 15, "QB02": 16, "QB03": 17, "QB04": 18, "QB05": 19, "QB06": 20, "QB07": 21, "QB08": 22, "QB09": 23, "QB10": 24,
 		"QC01": 25,
 		"QD01": 26, "QD02": 27, "QD03": 28, "QD04": 29, "QD05": 30, 
 		"QE01": 31, "QE02": 32, "QE03": 33
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module3
 convert_phenotypes("SVIP/SVIP_16p11.2/ados_3.csv", "SVIP", "ADOS_Module3",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
-	},   
+		'family': lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
+
+	},  
 	{
 		"QA01": 6, "QA02": 7, "QA03": 8, "QA04": 9, "QA05": 10, "QA06": 11, "QA07": 12, "QA08": 13, "QA09": 14, 
 		"QB01": 15, "QB02": 16, "QB03": 17, "QB04": 18, "QB05": 19, "QB06": 20, "QB07": 21, "QB08": 22, "QB09": 23, "QB10": 24,
 		"QC01": 25,
 		"QD01": 26, "QD02": 27, "QD03": 28, "QD04": 29, "QD05": 30, 
 		"QE01": 31, "QE02": 32, "QE03": 33
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module4
 convert_phenotypes("SVIP/SVIP_1q21.1/ados_4.csv", "SVIP", "ADOS_Module4",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
-	},   
+		'family': lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
+
+	}, 
 	{
 		"QA01": 6, "QA02": 8, "QA03": 9, "QA04": 10, "QA05": 11, "QA06": 12, "QA07": 13, "QA08": 14, "QA09": 15, "QA10": 7, 
 		"QB01": 16, "QB02": 17, "QB03": 18, "QB04": 19, "QB05": 20, "QB06": 21, "QB07": 22, "QB08": 23, "QB09": 24, "QB10": 25, "QB11": 26, "QB12": 27,
 		"QC01": 28,
 		"QD01": 29, "QD02": 30, "QD03": 31, "QD04": 32, "QD05": 33, 
 		"QE01": 34, "QE02": 35, "QE03": 36
-	})
+	}, known_data=svip_info)
 
 # ADOS_Module4
 convert_phenotypes("SVIP/SVIP_16p11.2/ados_4.csv", "SVIP", "ADOS_Module4",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
-	},   
+		'family': lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
+
+	}, 
 	{
 		"QA01": 6, "QA02": 8, "QA03": 9, "QA04": 10, "QA05": 11, "QA06": 12, "QA07": 13, "QA08": 14, "QA09": 15, "QA10": 7, 
 		"QB01": 16, "QB02": 17, "QB03": 18, "QB04": 19, "QB05": 20, "QB06": 21, "QB07": 22, "QB08": 23, "QB09": 24, "QB10": 25, "QB11": 26, "QB12": 27,
 		"QC01": 28,
 		"QD01": 29, "QD02": 30, "QD03": 31, "QD04": 32, "QD05": 33, 
 		"QE01": 34, "QE02": 35, "QE03": 36
-	})
+	}, known_data=svip_info)
 
 # SRS_Child
 convert_phenotypes("SVIP/Longitudinal/srs_parent.csv", "SVIP", "SRS_Child",
 	{
 		"identifier": lambda x: x[3],
-		"gender": lambda x: None if x[3] not in svip_demo else svip_demo[x[3]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
+		'family': lambda x: x[0],
 		"age": lambda x: int(x[5]),
-		"interview_date": lambda x: None,
-		"family": lambda x: x[0],
-		"clinical_diagnosis_raw": lambda x: None if x[3] not in svip_diagnosis else svip_diagnosis[x[3]]
 	}, 
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(25, 90))),
-	value_transform=srs_transform)
+	value_transform=srs_transform, known_data=svip_info)
 
 # SRS_Child
 convert_phenotypes("SVIP/Non_familial_controls/srs_parent.csv", "SVIP", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
+		'family': lambda x: x[1],
 		"age": lambda x: None if x[5] == '' else int(x[5]),
-		"interview_date": lambda x: None,
-		"family": lambda x: x[1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'clinical_diagnosis_raw': lambda x: 'Control'
 	}, 
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(25, 90))),
-	value_transform=srs_transform)
+	value_transform=srs_transform, known_data=svip_info)
 
 # SRS_Adult
 convert_phenotypes("SVIP/Non_familial_controls/srs_adult.csv", "SVIP", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
+		'family': lambda x: x[1],
 		"age": lambda x: None if x[5] == '' else int(x[5]),
-		"interview_date": lambda x: None,
-		"family": lambda x: x[1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'clinical_diagnosis_raw': lambda x: 'Control'
 	}, 
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(14, 79))),
-	value_transform=srs_transform)
+	value_transform=srs_transform, known_data=svip_info)
 
 # SRS_Child
 convert_phenotypes("SVIP/SVIP_1q21.1/srs_parent.csv", "SVIP", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'family': lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
 	}, 
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(25, 90))),
-	value_transform=srs_transform)
+	value_transform=srs_transform, known_data=svip_info)
 
 # SRS_Adult
 convert_phenotypes("SVIP/SVIP_1q21.1/srs_adult.csv", "SVIP", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'family': lambda x: x[1],		
+		"age": lambda x: None if x[5] == '' else int(x[5]),
 	}, 
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(14, 79))),
-	value_transform=srs_transform)
+	value_transform=srs_transform, known_data=svip_info)
 
 # SRS_Child
 convert_phenotypes("SVIP/SVIP_16p11.2/srs_parent.csv", "SVIP", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'family': lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
 	}, 
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(25, 90))),
-	value_transform=srs_transform)
+	value_transform=srs_transform, known_data=svip_info)
 
 # SRS_Adult
 convert_phenotypes("SVIP/SVIP_16p11.2/srs_adult.csv", "SVIP", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: x[10],
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'family': lambda x: x[1],
+		"age": lambda x: None if x[5] == '' else int(x[5]),
 	}, 
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(14, 79))),
-	value_transform=srs_transform)
+	value_transform=srs_transform, known_data=svip_info)
 
 # SRS_Adult
 convert_phenotypes("SVIP/SVIP_Phase_2_1q21.1/srs_adult.csv", "SVIP", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: None,
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'family': lambda x: x[0].split('-')[0],
+		'mother_id': lambda x: None if x[5] != 'iip' and x[5] != 'full-sibling' else x[0].split('-')[0] + '_mother',
+		'father_id': lambda x: None if x[5] != 'iip' and x[5] != 'full-sibling' else x[0].split('-')[0] + '_father',
+
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(81, 146))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(81, 146))), known_data=svip_info)
 
 # SRS_Child
 convert_phenotypes("SVIP/SVIP_Phase_2_1q21.1/srs_sa.csv", "SVIP", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: None,
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'family': lambda x: x[0].split('-')[0],
+		'mother_id': lambda x: None if x[5] != 'iip' and x[5] != 'full-sibling' else x[0].split('-')[0] + '_mother',
+		'father_id': lambda x: None if x[5] != 'iip' and x[5] != 'full-sibling' else x[0].split('-')[0] + '_father',
+		'gender': lambda x: x[76].title(),
+		'age': lambda x: None if x[72] == '' else int(x[72])
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(78, 143))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(78, 143))), known_data=svip_info)
 
 # SRS_Adult
 convert_phenotypes("SVIP/SVIP_Phase_2_16p11.2/srs_adult.csv", "SVIP", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: None,
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'family': lambda x: x[0].split('-')[0],
+		'mother_id': lambda x: None if x[5] != 'iip' and x[5] != 'full-sibling' else x[0].split('-')[0] + '_mother',
+		'father_id': lambda x: None if x[5] != 'iip' and x[5] != 'full-sibling' else x[0].split('-')[0] + '_father',
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(81, 146))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(81, 146))), known_data=svip_info)
 
 # SRS_Child
 convert_phenotypes("SVIP/SVIP_Phase_2_16p11.2/srs_sa.csv", "SVIP", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][7].title(),
-		"race": lambda x: None,
-		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[0] not in svip_demo or svip_demo[x[0]][6] == '' else int(svip_demo[x[0]][6]),
-		"interview_date": lambda x: None,
-		"family": lambda x: None if x[0] not in svip_demo else svip_demo[x[0]][1],
-		"clinical_diagnosis_raw": lambda x: None if x[0] not in svip_diagnosis else svip_diagnosis[x[0]]
+		'family': lambda x: x[0].split('-')[0],
+		'mother_id': lambda x: None if x[5] != 'iip' and x[5] != 'full-sibling' else x[0].split('-')[0] + '_mother',
+		'father_id': lambda x: None if x[5] != 'iip' and x[5] != 'full-sibling' else x[0].split('-')[0] + '_father',
+		'gender': lambda x: x[76].title(),
+		'age': lambda x: None if x[72] == '' else int(x[72])
 	}, 
-	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(78, 143))))
+	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(78, 143))), known_data=svip_info)
 
-# # ***************************************************************************************************************
-# # *
-# # --------------------------------------------------- AGP ------------------------------------------------------
-# # *
-# # ***************************************************************************************************************
+# ***************************************************************************************************************
+# *
+# --------------------------------------------------- AGP ------------------------------------------------------
+# *
+# ***************************************************************************************************************
 
 # Pull demo
 agp_demo = {}
@@ -2907,38 +2649,36 @@ convert_phenotypes("AGP_pheno_all_201112/srs.csv", "AGP", "SRS_Child",
 # # *
 # # ***************************************************************************************************************
 
-mssng_sex = {}
-with open(directory + '/mssng/tanner.csv') as f:
+from datetime import datetime
+
+mssng_info = {}
+with open(directory + '/mssng/mssng.subject.tsv') as f:
+	next(f) # skip header
 	for line in f:
-		pieces = line.strip().split(',')
+		pieces = line.strip().split('\t')
+		mssng_info[pieces[0]] = pieces
 
-		sex = None
-		if pieces[2] == '1':
-			sex = 'Male'
-		elif pieces[2] == '2':
-			sex = 'Female'
-		elif pieces[5] != '':
-			sex = 'Female'
-		elif pieces[10] != '':
-			sex = 'Male'
-
-		if sex is not None:
-			mssng_sex[pieces[0]] = sex
+def age_lambda(x):
+	interview_d = datetime.strptime(x[1], '%Y-%m-%d')
+	if x[0] in mssng_info and len(mssng_info[x[0]]) > 7:
+		dob = datetime.strptime(mssng_info[x[0]][7], '%Y-%m-%d %H:%M:%S')
+		if dob > interview_d:
+			return None
 		else:
-			print('Sex not found', pieces[0])
+			return 12*(interview_d.year - dob.year) + (interview_d.month - dob.month)
 
 # ADIR1995
 # print_codes_for_instrument('ADIR1995')
 convert_phenotypes("mssng/adi1995.csv", "MSSNG", "ADIR1995",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None,
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'Q002': 130, 'Q004': 136, 'Q005': 140, 'Q006': 143, 'Q007': 145, 'Q008': 146, 'Q009': 149, 
@@ -2959,13 +2699,13 @@ convert_phenotypes("mssng/adi1995.csv", "MSSNG", "ADIR1995",
 convert_phenotypes("mssng/adi1995short.csv", "MSSNG", "ADIR1995",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None,
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	adir_short_to_long({
 		'Q02': 13, 'Q04': 15, 'Q05': 17, 'Q06': 20, 'Q07': 22, 'Q07E': 185, 'Q08': 23, 'Q09': 24, 
@@ -2982,13 +2722,13 @@ convert_phenotypes("mssng/adi1995short.csv", "MSSNG", "ADIR1995",
 convert_phenotypes("mssng/adiwps.csv", "MSSNG", "ADIR2003",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None,
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'Q02': 76, 'Q04': 80, 'Q05': 83, 'Q06': 85, 'Q07': 89, 'Q08': 93, 'Q09': 97, 
@@ -3008,13 +2748,13 @@ convert_phenotypes("mssng/adiwps.csv", "MSSNG", "ADIR2003",
 convert_phenotypes("mssng/adosiimod1.csv", "MSSNG", "ADOS2_Module1",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[63] == '' else int(x[63]),
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'QA01': 6, 'QA02': 7, 'QA03': 8, 'QA04': 9, 'QA05': 10, 'QA06': 12, 'QA07': 14, 'QA08': 17, 
@@ -3028,14 +2768,14 @@ convert_phenotypes("mssng/adosiimod1.csv", "MSSNG", "ADOS2_Module1",
 convert_phenotypes("mssng/adosmod1.csv", "MSSNG", "ADOS_Module1",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[39] == '' else int(round(float(x[39]), 0)),
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
-	}, 
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
+	},  
 	{
 	'QA01': 44, 'QA02': 45, 'QA03': 47, 'QA04': 48, 'QA05': 49, 'QA06': 51, 'QA07': 53, 'QA08': 55, 
 	'QB01': 8, 'QB02': 9, 'QB03': 10, 'QB04': 11, 'QB05': 15, 'QB06': 16, 'QB07': 17, 'QB08': 19, 'QB09': 21, 'QB10': 74, 'QB11': 75, 'QB12': 76, 
@@ -3049,13 +2789,13 @@ print_codes_for_instrument('ADOS2_Module2')
 convert_phenotypes("mssng/adosiimod2.csv", "MSSNG", "ADOS2_Module2",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[3] == '' else int(x[3]),
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'QA01': 11, 'QA02': 12, 'QA03': 13, 'QA04': 14, 'QA05': 15, 'QA06': 17, 'QA07': 18, 
@@ -3070,13 +2810,13 @@ convert_phenotypes("mssng/adosiimod2.csv", "MSSNG", "ADOS2_Module2",
 convert_phenotypes("mssng/adosm2g1999.csv", "MSSNG", "ADOS_Module2",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[59] == '' else int(round(float(x[59]), 0)),
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'QA01': 53, 'QA02': 54, 'QA03': 55, 'QA04': 56, 'QA05': 58, 'QA06': 60, 'QA07': 65, 'QA08': 25,
@@ -3091,13 +2831,13 @@ convert_phenotypes("mssng/adosm2g1999.csv", "MSSNG", "ADOS_Module2",
 convert_phenotypes("mssng/adosiimod3.csv", "MSSNG", "ADOS2_Module3",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[22] == '' else int(round(float(x[22]), 0)),
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'QA01': 31, 'QA02': 32, 'QA03': 33, 'QA04': 34, 'QA05': 35, 'QA06': 36, 'QA07': 37, 'QA08': 38, 'QA09': 40, 
@@ -3112,13 +2852,13 @@ convert_phenotypes("mssng/adosiimod3.csv", "MSSNG", "ADOS2_Module3",
 convert_phenotypes("mssng/adosm3.csv", "MSSNG", "ADOS_Module3",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[55] == '' else int(round(float(x[55]), 0)),
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'QA01': 61, 'QA02': 62, 'QA03': 63, 'QA04': 64, 'QA05': 65, 'QA06': 66, 'QA07': 67, 'QA08': 70, 'QA09': 71, 
@@ -3133,13 +2873,13 @@ convert_phenotypes("mssng/adosm3.csv", "MSSNG", "ADOS_Module3",
 convert_phenotypes("mssng/adosiimod4.csv", "MSSNG", "ADOS2_Module4",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[30] == '' else int(round(float(x[30]), 0)),
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'QA01': 41, 'QA02': 42, 'QA03': 43, 'QA04': 44, 'QA05': 45, 'QA06': 47, 'QA07': 48, 'QA08': 49, 'QA09': 51, 'QA10': 37, 
@@ -3153,13 +2893,13 @@ convert_phenotypes("mssng/adosiimod4.csv", "MSSNG", "ADOS2_Module4",
 convert_phenotypes("mssng/adosm4g.csv", "MSSNG", "ADOS_Module4",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[24] == '' else int(round(float(x[24]), 0)),
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'QA01': 42, 'QA02': 43, 'QA03': 44, 'QA04': 45, 'QA05': 46, 'QA06': 48, 'QA07': 50, 'QA08': 52, 'QA09': 53, 'QA10': 38,
@@ -3173,13 +2913,13 @@ convert_phenotypes("mssng/adosm4g.csv", "MSSNG", "ADOS_Module4",
 convert_phenotypes("mssng/adosm4wps20011999.csv", "MSSNG", "ADOS_Module4",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None if x[2] == '' else int(round(float(x[2]), 0)),
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'QA01': 47, 'QA02': 49, 'QA03': 50, 'QA04': 51, 'QA05': 52, 'QA06': 53, 'QA07': 54, 'QA08': 56, 'QA09': 57, 'QA10': 14,
@@ -3196,13 +2936,13 @@ convert_phenotypes("mssng/adosm4wps20011999.csv", "MSSNG", "ADOS_Module4",
 convert_phenotypes("mssng/srsadultresearchform.csv", "MSSNG", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None,
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'Q01': 22, 'Q02': 24, 'Q03': 16, 'Q04': 28, 'Q05': 31, 'Q06': 32, 'Q07': 30, 'Q08': 35, 'Q09': 36, 
@@ -3218,13 +2958,13 @@ convert_phenotypes("mssng/srsadultresearchform.csv", "MSSNG", "SRS_Adult",
 convert_phenotypes("mssng/srsparentreportforchild.csv", "MSSNG", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
-		"gender": lambda x: None if x[0] not in mssng_sex else mssng_sex[x[0]],
+		"gender": lambda x: 'Male' if mssng_info[x[0]][4] == 'M' else 'Female' if mssng_info[x[0]][4] == 'F' else None,
 		"race": lambda x: None,
 		"ethnicity": lambda x: None,
-		"age": lambda x: None,
+		"age": age_lambda,
 		"interview_date": lambda x: x[1],
-		"family": lambda x: None if '-' not in x[0] else x[0][:x[0].rindex('-')],
-		"clinical_diagnosis_raw": lambda x: None
+		"family": lambda x: mssng_info[x[0]][5],
+		"clinical_diagnosis_raw": lambda x: 'Autism' if mssng_info[x[0]][3] == '2' else 'Control' if mssng_info[x[0]][3] == '1' else None
 	}, 
 	{
 	'Q01': 122, 'Q02': 124, 'Q03': 126, 'Q04': 128, 'Q05': 131, 'Q06': 134, 'Q07': 137, 'Q08': 139, 'Q09': 141, 

@@ -50,19 +50,21 @@ with open(filename + '.csv', 'r') as infile:
 	reader = csv.reader(infile)
 	header = next(reader)
 
-	label_cols = [
-		header.index('identifier'), header.index('diagnosis'), header.index('gender'),
-		header.index('ADIR2003:diagnosis'), header.index('ADIR2003:diagnosis_num_nulls'),
-		header.index('ADOS_Module1:diagnosis'), header.index('ADOS_Module1:diagnosis_num_nulls'), 
-		header.index('ADOS_Module2:diagnosis'), header.index('ADOS_Module2:diagnosis_num_nulls'), 
-		header.index('ADOS_Module3:diagnosis'), header.index('ADOS_Module3:diagnosis_num_nulls'), 
-		header.index('ADOS_Module4:diagnosis'), header.index('ADOS_Module4:diagnosis_num_nulls'), 
-		header.index('ADOS2_Module1:diagnosis'), header.index('ADOS2_Module1:diagnosis_num_nulls'), 
-		header.index('ADOS2_Module2:diagnosis'), header.index('ADOS2_Module2:diagnosis_num_nulls'), 
-		header.index('ADOS2_Module3:diagnosis'), header.index('ADOS2_Module3:diagnosis_num_nulls'), 
-		header.index('ADOS2_Module4:diagnosis'), header.index('ADOS2_Module4:diagnosis_num_nulls'), 
-		header.index('SRS_Child:diagnosis'), header.index('SRS_Child:diagnosis_num_nulls')
+	label_cols = ['identifier', 'clinical_diagnosis', 'gender', 'dataset', 'age', 'race', 'ethnicity', 
+		'family', 'mother_id', 'father_id',
+		'ADIR2003:diagnosis', 'ADIR2003:diagnosis_num_nulls',
+		'ADOS_Module1:diagnosis', 'ADOS_Module1:diagnosis_num_nulls', 
+		'ADOS_Module2:diagnosis', 'ADOS_Module2:diagnosis_num_nulls', 
+		'ADOS_Module3:diagnosis', 'ADOS_Module3:diagnosis_num_nulls', 
+		'ADOS_Module4:diagnosis', 'ADOS_Module4:diagnosis_num_nulls', 
+		'ADOS2_Module1:diagnosis', 'ADOS2_Module1:diagnosis_num_nulls', 
+		'ADOS2_Module2:diagnosis', 'ADOS2_Module2:diagnosis_num_nulls', 
+		'ADOS2_Module3:diagnosis', 'ADOS2_Module3:diagnosis_num_nulls', 
+		'ADOS2_Module4:diagnosis', 'ADOS2_Module4:diagnosis_num_nulls', 
+		'SRS_Child:diagnosis', 'SRS_Child:diagnosis_num_nulls'
 	]
+	label_cols = [x for x in label_cols if x in header]
+	label_indices = [header.index(x) for x in label_cols]
 
 	keep_cols = [header.index('identifier')]
 
@@ -79,11 +81,11 @@ with open(filename + '.csv', 'r') as infile:
 			label_writer = csv.writer(label_outfile)
 			writer = csv.writer(outfile)
 
-			label_writer.writerow([header[i] for i in label_cols])
+			label_writer.writerow(label_cols)
 			writer.writerow([header[i] for i in keep_cols])
 			for i, row in enumerate(reader):
 				#if row_null_counts[i] <= 1: #.6:
-				label_writer.writerow([("None" if row[i] == '' else row[i]) for i in label_cols])
+				label_writer.writerow([("None" if row[i] == '' else row[i]) for i in label_indices])
 				writer.writerow([("None" if row[i] == '' else row[i]) for i in keep_cols])
 
 

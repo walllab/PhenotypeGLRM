@@ -14,7 +14,7 @@ for i, sample in enumerate(samples):
 		if isinstance(value, dict):
 			# this is an instrument
 			nonnull_items = len([v for k, v in value.items() if v is not None and k.startswith('Q') and not k.endswith('a')])
-			if nonnull_items == 0:
+			if nonnull_items < 5:
 				to_be_removed[key].append(i)
 
 # Remove empty instruments

@@ -423,13 +423,13 @@ def assign_clinical_diagnosis(sample):
 		cd = sample['clinical_diagnosis_raw'].lower()
 		if cd == '':
 			sample['clinical_diagnosis'] = None
-		elif 'aut' in cd or '299' in cd or cd in ['proband', 'broadspectrum', 'asd', 'affected sibling', 'ad', 'affected']:
+		elif 'aut' in cd or '299' in cd or 'asd' in cd or cd in ['proband', 'broadspectrum', 'asd', 'affected sibling', 'ad', 'affected']:
 			sample['clinical_diagnosis'] = 'Autism'
-		elif 'asperger' in cd:
+		elif 'asperger' in cd or 'nqa' in cd:
 			sample['clinical_diagnosis'] =  'Asperger'
-		elif cd in ['nqa', 'not met', 'unaffected', 'typical', 'unaffected sibling'] or 'control' in cd:
+		elif cd in ['not met', 'unaffected', 'typical', 'unaffected sibling', 'primary caregiver 1', 'primary caregiver 2'] or 'control' in cd:
 			sample['clinical_diagnosis'] =  'Control'
-		elif 'pdd' in cd or 'nos' in cd or 'pervasive developmental disorder' in cd:
+		elif 'pdd' in cd or 'nos' in cd or 'pervasive developmental disorder' in cd or cd == 'pervasive development disorder - not otherwise specified':
 			sample['clinical_diagnosis'] = 'PDD-NOS'
 		elif cd in ['not defined', 'fragile x']:
 			sample['clinical_diagnosis'] = None
@@ -451,11 +451,11 @@ def assign_all_diagnoses(sample):
 
 	assign_srs_diagnosis(sample)
 
-	#assign_cpea_diagnosis(sample)
-	#assign_cpea_adjusted_diagnosis(sample)
+	assign_cpea_diagnosis(sample)
+	assign_cpea_adjusted_diagnosis(sample)
 
 	assign_clinical_diagnosis(sample)
-	assign_diagnosis(sample)
+	# assign_diagnosis(sample)
 
 from collections import Counter
 if __name__ == '__main__':
@@ -477,8 +477,7 @@ if __name__ == '__main__':
 			#jsonschema.validate(sample, pheno_schema)
 
 		# Print counts
-		diag_keys = ['clinical_diagnosis', 'diagnosis',
-		'cpea_diagnosis', 'cpea_adjusted_diagnosis']
+		diag_keys = ['clinical_diagnosis', 'cpea_diagnosis', 'cpea_adjusted_diagnosis']
 
 		for key in diag_keys:
 			print(key)

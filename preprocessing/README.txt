@@ -22,7 +22,7 @@ This package is structured as a multi-stage pipeline.
 6. filter_ordinal_features.py - Pulls columns of interet for analysis. Discards age of onset questions, special codes, and individual ADOS modules (in favor of the aggregated ADOS data).
 
 Here's an example run:
-python3 aggregate_phenotype.py /Users/kelley/Projects/iHART/Phenotype
+python3 aggregate_phenotype.py ../Phenotype
 python3 remove_empty.py ../data/all_samples_stage1.json ../data/all_samples_stage2.json
 python3 assign_diagnosis.py ../data/all_samples_stage2.json ../data/all_samples.json
 python3 json-to-csv.py ../data/all_samples.json ../data/all_samples.csv
