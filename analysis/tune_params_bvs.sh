@@ -12,4 +12,5 @@
 # Print this sub-job's task ID
 echo "My SLURM_ARRAY_TASK_ID is " $SLURM_ARRAY_TASK_ID
 
-/scratch/PI/dpwall/DATA/iHART/kpaskov/julia-d386e40c17/bin/julia analysis/tune_params_bvs.jl data $1 $SLURM_ARRAY_TASK_ID
+module load julia/0.6.4
+julia analysis/tune_params_bvs.jl data $1 $SLURM_ARRAY_TASK_ID
