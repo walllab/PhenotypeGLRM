@@ -1,4 +1,3 @@
-using DataFrames
 using LowRankModels
 
 # Pull command line arguments
@@ -9,12 +8,12 @@ nfolds = parse(Int64, ARGS[3])
 
 for fold=0:nfolds
 	# Read in training data
-	df = readtable(string(data_directory, "/all_samples_ordinal_cv_train$(fold).csv"), header=false)
-	#df = readtable(string(data_directory, "/all_samples_ordinal_test_train.csv"), header=false)[1:100, :]
-	m, n = size(df)
+	all_data = readcsv(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"), Int, header=false)
+	#all_data = readcsv(string(data_directory, "/all_samples_ordinal_test_train.csv"), Int, header=false)[1:100, :]
+	m, n = size(all_data)
 
 	# Form sparse array
-	all_data = sparse(Array(df))
+	all_data = sparse(Array(all_data))
 	dropzeros!(all_data)
 	p = size(nonzeros(all_data), 1)
 
