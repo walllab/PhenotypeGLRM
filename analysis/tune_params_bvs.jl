@@ -9,8 +9,8 @@ nfolds = parse(Int64, ARGS[3])
 
 for fold=0:nfolds
 	# Read in training data
-	#df = readtable(string(data_directory, "/all_samples_ordinal_cv_train$(fold).csv"), header=false)
-	df = readtable(string(data_directory, "/all_samples_ordinal_test_train.csv"), header=false)[1:100, :]
+	df = readtable(string(data_directory, "/all_samples_ordinal_cv_train$(fold).csv"), header=false)
+	#df = readtable(string(data_directory, "/all_samples_ordinal_test_train.csv"), header=false)[1:100, :]
 	m, n = size(df)
 
 	# Form sparse array

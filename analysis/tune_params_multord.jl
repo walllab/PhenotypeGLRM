@@ -10,8 +10,8 @@ nfolds = parse(Int64, ARGS[3])
 
 for fold=0:nfolds
 	# Read in training data
-	#df = readtable(string(data_directory, "/all_samples_ordinal_cv_train$(fold).csv"), header=false)
-	df = readtable(string(data_directory, "/all_samples_ordinal_test_train.csv"), header=false)[1:100, :]
+	df = readtable(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"), header=false)
+	#df = readtable(string(data_directory, "/all_samples_ordinal_test_train.csv"), header=false)[1:100, :]
 	m, n = size(df)
 
 	# Form sparse array
@@ -25,7 +25,7 @@ for fold=0:nfolds
 	@show maximum(all_data), minimum(all_data), size(obs, 1)
 
 	# construct the model
-	rx, ry = QuadReg(0.01), QuadReg(0.01)
+	rx, ry = QuadReg(0.01), OrdinalReg(QuadReg(0.01))
 
 	# construct the BVSLoss
 	losses = Array{Loss}(n)

@@ -10,8 +10,8 @@ nfolds = parse(Int64, ARGS[3])
 
 for fold=0:nfolds
 	# Read in training data
-	#df = readtable(string(data_directory, "/all_samples_ordinal_cv_train$(fold).csv"), header=false)
-	df = readtable(string(data_directory, "/all_samples_ordinal_test_train.csv"), header=false)[1:100, :]
+	df = readtable(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"), header=false)
+	#df = readtable(string(data_directory, "/all_samples_ordinal_test_train.csv"), header=false)[1:100, :]
 	m, n = size(df)
 
 	# Form sparse array
@@ -32,9 +32,9 @@ for fold=0:nfolds
 	D = 0
 	for i=1:n
 	    options = unique(all_data[:, i])
-		num_options = maximum(options)
+		num_options = max(maximum(options), 3)
 	    losses[i] = OvALoss(num_options)
-	    D += (num_options-1)
+	    D += num_options
 	end
 	@show m, n, D
 
