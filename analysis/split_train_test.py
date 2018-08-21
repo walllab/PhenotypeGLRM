@@ -2,33 +2,39 @@ import numpy as np
 import json
 import csv
 import random
+import sys
 
+input_stem = sys.argv[1] # ../data/all_samples_ordinal
+label_file = sys.argv[2] # ../data/all_samples_ordinal_labels.csv
+output_stem = sys.argv[3] # ../data/all_samples_ordinal_test
 
 # Read data
-all_data = np.genfromtxt('../data/all_samples_ordinal.csv', delimiter=',', skip_header=True, missing_values=['None', ''], dtype=int)
+all_data = np.genfromtxt(input_stem + '.csv', delimiter=',', skip_header=True, 
+	missing_values=['None', ''], dtype=int)
 m, n = all_data.shape
+print(m, n)
 
 # Grab header
-with open('../data/all_samples_ordinal.csv', 'r') as f:
+with open(input_stem + '.csv', 'r') as f:
     reader = csv.reader(f)
     header = next(reader)[1:]
 
 # Grab labels
-with open('../data/all_samples_ordinal_labels.csv', 'r') as f:
+with open(label_file, 'r') as f:
     reader = csv.reader(f)
     label_header = next(reader)
     labels = list(reader)
 
 # pull individuals with autism and known sex
-diag_index = label_header.index('diagnosis')
-sex_index = label_header.index('gender')
-
-filtered_indices = []
-for i, sample_labels in enumerate(labels):
-	if sample_labels[diag_index] == 'Autism' and sample_labels[sex_index] != 'None':
-		filtered_indices.append(i)
-all_data = all_data[filtered_indices, :]
-labels = [labels[i] for i in filtered_indices]
+# diag_index = label_header.index('clinical_diagnosis')
+# sex_index = label_header.index('gender')
+#
+# filtered_indices = []
+# for i, sample_labels in enumerate(labels):
+#	if sample_labels[diag_index] == 'Autism' and sample_labels[sex_index] != 'None':
+#		filtered_indices.append(i)
+#all_data = all_data[filtered_indices, :]
+#labels = [labels[i] for i in filtered_indices]
 
 # Remove sample_identifiers
 sample_identifiers = all_data[:, 0]
@@ -38,18 +44,11 @@ all_data = all_data[:, 1:]
 all_data += 1
 all_data[np.isnan(all_data)] = 0
 
-# pull certain instruments
-item_indices = []
-for i, h in enumerate(header):
-	if h.startswith('ADIR') or h.startswith('ADOS_Module') or h.startswith('SRS_Adult') or h.startswith('SRS_Child'):
-		item_indices.append(i)
-all_data = all_data[:, item_indices]
-
 # Add sex columns
-print(len(labels), all_data.shape)
-all_data = np.insert(all_data, 0, [1 if x[sex_index] == 'Male' else 0 for x in labels], axis=1)
-all_data = np.insert(all_data, 0, [1 if x[sex_index] == 'Female' else 0 for x in labels], axis=1)
-labels = ['Male', 'Female'] + labels
+# print(len(labels), all_data.shape)
+# all_data = np.insert(all_data, 0, [1 if x[sex_index] == 'Male' else 0 for x in labels], axis=1)
+# all_data = np.insert(all_data, 0, [1 if x[sex_index] == 'Female' else 0 for x in labels], axis=1)
+# labels = ['Male', 'Female'] + labels
 
 # Recode each feature to skip missing categories
 m, n = all_data.shape
@@ -64,8 +63,13 @@ print('Responses', list(zip(*np.unique(all_data.astype(int), return_counts=True)
 
 train_data = all_data.copy()
 
-# ---------------------------- Mask whole instruments ----------------------------
-instruments = ['ADIR', 'ADOS_Module1', 'ADOS_Module2', 'ADOS_Module3', 'ADOS_Module4', 'SRS']
+# ---------------------------- Mask whole instruments for Test ----------------------------
+instruments = [
+'ADIR2003', 
+'ADOS_Module1', 'ADOS_Module2', 'ADOS_Module3', 'ADOS_Module4', 
+#'ADOS2_Module1', 'ADOS2_Module2', 'ADOS2_Module3', 'ADOS2_Module4',
+'SRS_Child'
+]
 
 # Pull instrument features and samples that have each instrument
 features = []
@@ -91,20 +95,21 @@ for i, instrument in enumerate(instruments):
 	instrument_test_data[np.ix_(masked[i], features[i])] = train_data[np.ix_(masked[i], features[i])]
 	train_data[np.ix_(masked[i], features[i])] = 0
 
-	np.savetxt('../data/all_samples_ordinal_test_instrument_%s.csv', instrument_test_data.astype(int), delimiter=',', fmt='%d')
+	np.savetxt(output_stem + '_instrument_%s.csv' % instrument, instrument_test_data.astype(int), delimiter=',', fmt='%d')
 
-# ---------------------------- Mask entries ----------------------------
+# ---------------------------- Mask entries for Test ----------------------------
 x, y = np.where(train_data != 0)
 num_entries_masked = int(round(0.1*x.shape[0]))
 entry_mask = random.sample(range(x.shape[0]), num_entries_masked)
-
-print('Entries masked', len(entry_mask))
-print('Train (should be all 0s)', train_data[x[entry_mask], y[entry_mask]])
-print('Test (should have data)', entry_test_data[x[entry_mask], y[entry_mask]])
 
 entry_test_data = np.zeros((m, n), dtype=int)
 entry_test_data[x[entry_mask], y[entry_mask]] = train_data[x[entry_mask], y[entry_mask]]
 train_data[x[entry_mask], y[entry_mask]] = 0
 
-np.savetxt('../data/all_samples_ordinal_test_entry.csv', entry_test_data.astype(int), delimiter=',', fmt='%d')
-np.savetxt('../data/all_samples_ordinal_train.csv', train_data.astype(int), delimiter=',', fmt='%d')
+print('Entries masked', len(entry_mask))
+print('Train (should be all 0s)', train_data[x[entry_mask], y[entry_mask]])
+print('Test (should have data)', entry_test_data[x[entry_mask], y[entry_mask]])
+
+np.savetxt(output_stem + '_entry.csv', entry_test_data.astype(int), delimiter=',', fmt='%d')
+np.savetxt(output_stem + '_train.csv', train_data.astype(int), delimiter=',', fmt='%d')
+
