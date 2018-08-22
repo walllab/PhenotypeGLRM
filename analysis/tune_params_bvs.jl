@@ -6,7 +6,7 @@ flush(STDOUT)
 data_directory = ARGS[1]
 k = parse(Int64, ARGS[2])
 fold = parse(Int64, ARGS[3])
-@show data_directory, k, nfolds
+@show data_directory, k, fold
 println("Command line arguments loaded")
 flush(STDOUT)
 
