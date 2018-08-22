@@ -1,15 +1,19 @@
 using LowRankModels
+println("LowRankModels loaded")
+flush(STDOUT)
 
 # Pull command line arguments
 data_directory = ARGS[1]
 k = parse(Int64, ARGS[2])
-nfolds = parse(Int64, ARGS[3])
+fold = parse(Int64, ARGS[3])
 @show data_directory, k, nfolds
+println("Command line arguments loaded")
+flush(STDOUT)
 
 function read_data(filename)
 	# Read in training data
-	#all_data = readcsv(filename, Int, header=false)
-	all_data = readcsv(string(data_directory, "/all_samples_ordinal_test_train.csv"), Int, header=false)[1:100, :]
+	all_data = readcsv(filename, Int, header=false)
+	#all_data = readcsv(filename, Int, header=false)[1:100, :]
 
 	# Form sparse array
 	all_data = sparse(Array(all_data))
@@ -19,6 +23,8 @@ function read_data(filename)
 	i, j, v = findnz(all_data)
 	obs = collect(zip(i, j))
 	@show maximum(all_data), minimum(all_data), size(obs, 1)
+	println("Data loaded")
+	flush(STDOUT)
 	return all_data, obs
 end
 
@@ -45,6 +51,8 @@ function build_model(all_data, obs, k)
 	    prox!(ry, view(Yord,:,yidxs[i]), 1)
 	end
 
+	println("Model built")
+    flush(STDOUT)
 	return GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=true, X=Xinit, Y=Yord)
 end
 
@@ -55,9 +63,12 @@ function run_model(fold, k)
 
 	# Fit model
     X,Y,ch = @time LowRankModels.fit!(glrm, params=ProxGradParams(max_iter=500), verbose=true);
+    println("Model trained")
+    flush(STDOUT)
+
 	@time writecsv(string(data_directory, "/impute_bvs_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+	println("Model saved")
+    flush(STDOUT)
 end
 
-for fold=0:nfolds
-	run_model(fold, k)
-end
+run_model(fold, k)
