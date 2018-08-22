@@ -6,23 +6,24 @@ k = parse(Int64, ARGS[2])
 nfolds = parse(Int64, ARGS[3])
 @show data_directory, k, nfolds
 
-for fold=0:nfolds
+function read_data(filename)
 	# Read in training data
-	all_data = readcsv(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"), Int, header=false)
-	#all_data = readcsv(string(data_directory, "/all_samples_ordinal_test_train.csv"), Int, header=false)[1:100, :]
-	m, n = size(all_data)
+	#all_data = readcsv(filename, Int, header=false)
+	all_data = readcsv(string(data_directory, "/all_samples_ordinal_test_train.csv"), Int, header=false)[1:100, :]
 
 	# Form sparse array
 	all_data = sparse(Array(all_data))
 	dropzeros!(all_data)
-	p = size(nonzeros(all_data), 1)
 
 	# Pull observed (nonzero) entries
 	i, j, v = findnz(all_data)
 	obs = collect(zip(i, j))
 	@show maximum(all_data), minimum(all_data), size(obs, 1)
+	return all_data, obs
+end
 
-	# construct the model
+function build_model(all_data, obs, k)
+	m, n = size(all_data)
 	rx, ry = QuadReg(0.01), QuadReg(0.01)
 
 	# construct the BVSLoss
@@ -44,9 +45,19 @@ for fold=0:nfolds
 	    prox!(ry, view(Yord,:,yidxs[i]), 1)
 	end
 
-	glrm = GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=true, X=Xinit, Y=Yord);
+	return GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=true, X=Xinit, Y=Yord)
+end
+
+function run_model(fold, k)
+	all_data, obs = @time read_data(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"))
+
+	glrm = @time build_model(all_data, obs, k)
 
 	# Fit model
-    X,Y,ch = LowRankModels.fit!(glrm, params=ProxGradParams(max_iter=500), verbose=true);
-	writecsv(string(data_directory, "/impute_bvs_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+    X,Y,ch = @time LowRankModels.fit!(glrm, params=ProxGradParams(max_iter=500), verbose=true);
+	@time writecsv(string(data_directory, "/impute_bvs_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+end
+
+for fold=0:nfolds
+	run_model(fold, k)
 end
