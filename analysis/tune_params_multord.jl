@@ -13,8 +13,8 @@ flush(STDOUT)
 function read_data(filename, map_filename)
 	println("Read in data ", filename)
 	# Read in training data
-	#all_data = readcsv(filename, Int, header=false)
-	all_data = readcsv(filename, Int, header=false)[1:100, :]
+	all_data = readcsv(filename, Int, header=false)
+	#all_data = readcsv(filename, Int, header=false)[1:100, :]
 
 	# Form sparse array
 	all_data = sparse(Array(all_data))
