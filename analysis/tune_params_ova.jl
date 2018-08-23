@@ -1,53 +1,84 @@
 using LowRankModels
-
+println("LowRankModels loaded")
+flush(STDOUT)
 
 # Pull command line arguments
 data_directory = ARGS[1]
 k = parse(Int64, ARGS[2])
-nfolds = parse(Int64, ARGS[3])
-@show data_directory, k, nfolds
+fold = parse(Int64, ARGS[3])
+@show data_directory, k, fold
+println("Command line arguments loaded")
+flush(STDOUT)
 
-for fold=0:nfolds
+function read_data(filename, map_filename)
+	println("Read in data ", filename)
 	# Read in training data
-	all_data = readcsv(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"), Int, header=false)
-	#all_data = readcsv(string(data_directory, "/all_samples_ordinal_test_train.csv"), Int, header=false)[1:100, :]
-	m, n = size(df)
+	#all_data = readcsv(filename, Int, header=false)
+	all_data = readcsv(filename, Int, header=false)[1:100, :]
 
 	# Form sparse array
-	all_data = sparse(Array(df))
+	all_data = sparse(Array(all_data))
 	dropzeros!(all_data)
-	p = size(nonzeros(all_data), 1)
 
 	# Pull observed (nonzero) entries
 	i, j, v = findnz(all_data)
 	obs = collect(zip(i, j))
 	@show maximum(all_data), minimum(all_data), size(obs, 1)
 
-	# construct the model
-	rx, ry = QuadReg(0.01), QuadReg(0.01)
+	num_options = readdlm(map_filename, '\t', header=false)[(size(all_data, 2)+1):(2*(size(all_data, 2)))]
+
+	println("Data loaded")
+	flush(STDOUT)
+	return all_data, obs, num_options
+end
+
+function build_model(all_data, obs, k, num_options)
+	m, n = size(all_data)
+	#rx, ry = QuadReg(0.01), QuadReg(0.01)
+	rx, ry = QuadReg(.01), QuadReg(.01)
 
 	# construct the BVSLoss
 	losses = Array{Loss}(n)
 	D = 0
 	for i=1:n
-	    options = unique(all_data[:, i])
-		num_options = max(maximum(options), 3)
-	    losses[i] = OvALoss(num_options)
-	    D += num_options
+		if num_options[i] == 2
+			losses[i] = LogisticLoss()
+			D += 1
+		else
+	    	losses[i] = OvALoss(num_options[i])
+	    	D += num_options[i]
+	    end
 	end
 	@show m, n, D
 
 	# Initialize X and Y
 	Xinit = randn(k, m)
-	Yord = randn(k, D)
+	Yinit = randn(k, D)
 	yidxs = get_yidxs(losses)
 	for i=1:n
-	    prox!(ry, view(Yord,:,yidxs[i]), 1)
+	    prox!(ry, view(Yinit,:,yidxs[i]), 1)
 	end
 
-	glrm = GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=true, X=Xinit, Y=Yord);
+	println("Model built")
+    flush(STDOUT)
+	return GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=true, X=Xinit, Y=Yinit)
+end
+
+function run_model(fold, k)
+	all_data, obs, num_options = @time read_data(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"),
+									string(data_directory, "/all_samples_ordinal_cleaned_map.txt"))
+
+	glrm = @time build_model(all_data, obs, k, num_options)
 
 	# Fit model
-    X,Y,ch = LowRankModels.fit!(glrm, params=ProxGradParams(max_iter=500), verbose=true);
-	writecsv(string(data_directory, "/impute_ova_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+    X,Y,ch = @time LowRankModels.fit!(glrm, params=ProxGradParams(max_iter=500), verbose=true);
+    println("Model trained")
+    flush(STDOUT)
+
+	@time writecsv(string(data_directory, "/impute_ova_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+	println("Model saved")
+    flush(STDOUT)
 end
+
+run_model(fold, k)
+
