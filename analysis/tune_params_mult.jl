@@ -65,7 +65,7 @@ function build_model(all_data, obs, k, num_options)
 end
 
 function run_model(fold, k)
-	all_data, obs, num_options = @time read_data(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"),
+	all_data, obs, num_options = @time read_data(string(data_directory, "/all_samples_ordinal_gender_cv$(fold)_train.csv"),
 									string(data_directory, "/all_samples_ordinal_cleaned_map.txt"))
 
 	glrm = @time build_model(all_data, obs, k, num_options)
