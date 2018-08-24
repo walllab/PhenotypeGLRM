@@ -34,7 +34,7 @@ end
 
 function build_model(all_data, obs, k, num_options)
 	m, n = size(all_data)
-	rx, ry = lastentry1(QuadReg(.01)), MNLOrdinalReg(QuadReg(.01))
+	rx, ry = QuadReg(.01), QuadReg(.01)
 
 	# construct the BVSLoss
 	losses = Array{Loss}(n)
@@ -60,7 +60,7 @@ function build_model(all_data, obs, k, num_options)
 
 	println("Model built")
     flush(STDOUT)
-	return GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=false, X=Xinit, Y=Yinit)
+	return GLRM(all_data, losses, rx, ry, k, obs=obs, scale=false, offset=true, X=Xinit, Y=Yinit)
 end
 
 function run_model(fold, k)
