@@ -14,7 +14,7 @@ function read_data(filename, map_filename)
 	println("Read in data ", filename)
 	# Read in training data
 	all_data = readcsv(filename, Int, header=false)
-	#all_data = readcsv(filename, Int, header=false)[1:100, :]
+	all_data = vcat(all_data[1:100, :], all_data[end-100:end, :])
 
 	# Form sparse array
 	all_data = sparse(Array(all_data))
@@ -76,6 +76,9 @@ function run_model(fold, k)
     flush(STDOUT)
 
 	@time writecsv(string(data_directory, "/impute_ova_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+	@time writecsv(string(data_directory, "/impute_ova_X_cv_k$(k)_fold$(fold).csv"), X)
+	@time writecsv(string(data_directory, "/impute_ova_Y_cv_k$(k)_fold$(fold).csv"), Y)
+
 	println("Model saved")
     flush(STDOUT)
 end

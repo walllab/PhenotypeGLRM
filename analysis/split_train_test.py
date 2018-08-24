@@ -55,7 +55,8 @@ for i, instrument in enumerate(instruments):
 	instrument_test_data[np.ix_(masked[i], features[i])] = train_data[np.ix_(masked[i], features[i])]
 	train_data[np.ix_(masked[i], features[i])] = 0
 
-	np.savetxt(output_stem + '_instrument_%s.csv' % instrument, instrument_test_data.astype(int), delimiter=',', fmt='%d')
+	np.save(output_stem + '_instrument_%s' % instrument, instrument_test_data.astype(int))
+	#np.savetxt(output_stem + '_instrument_%s.csv' % instrument, instrument_test_data.astype(int), delimiter=',', fmt='%d')
 
 for ms, instrument in zip(masked, instruments):
 	for i in ms:
@@ -80,6 +81,9 @@ print('Entries masked', len(entry_mask))
 print('Train (should be all 0s)', train_data[x[entry_mask], y[entry_mask]])
 print('Test (should have data)', entry_test_data[x[entry_mask], y[entry_mask]])
 
-np.savetxt(output_stem + '_entry.csv', entry_test_data.astype(int), delimiter=',', fmt='%d')
+np.save(output_stem + '_entry', entry_test_data.astype(int))
+np.save(output_stem + '_train', train_data.astype(int))
+
+#np.savetxt(output_stem + '_entry.csv', entry_test_data.astype(int), delimiter=',', fmt='%d')
 np.savetxt(output_stem + '_train.csv', train_data.astype(int), delimiter=',', fmt='%d')
 

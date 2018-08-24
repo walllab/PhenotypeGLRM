@@ -28,7 +28,7 @@ python3 assign_diagnosis.py ../data/all_samples_stage2.json ../data/all_samples.
 python3 json-to-csv.py ../data/all_samples.json ../data/all_samples.csv
 python3 filter_ordinal_features.py ../data/all_samples
 python3 clean_ordinals.py ../data/all_samples_ordinal.csv ../data/all_samples_ordinal_cleaned.csv
-#python3 filter_autism_known_sex.py ../data/all_samples_ordinal
+python prepare_gender_analysis.py ../data/all_samples_ordinal_cleaned.csv ../data/all_samples_ordinal_labels.csv ../data/all_samples_ordinal_cleaned_gender
 
 # Splitting training/testing
 python split_train_test.py ../data/all_samples_ordinal_cleaned.csv ../data/all_samples_ordinal_labels.csv ../data/all_samples_ordinal_cleaned_map.txt ../data/all_samples_ordinal_test

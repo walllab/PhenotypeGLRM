@@ -6,7 +6,6 @@ import numpy as np
 # This script column filters all_samples.csv
 # We are discarding the following features for analysis:
 # "Medical History" related features
-# ADOS Modules (we keep the aggregated ADOS instrument instead)
 # Categorical features - these features correspond to the 9** codes in ADIR and ADOS - they generally mean "unknown" and are not useful for our analysis
 
 # This code requires an all_samples.csv file to filter.

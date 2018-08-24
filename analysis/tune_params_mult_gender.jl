@@ -10,11 +10,15 @@ fold = parse(Int64, ARGS[3])
 println("Command line arguments loaded")
 flush(STDOUT)
 
-function read_data(filename, map_filename)
+function read_data(filename, gendiag_filename, map_filename)
 	println("Read in data ", filename)
 	# Read in training data
 	all_data = readcsv(filename, Int, header=false)
-	#all_data = readcsv(filename, Int, header=false)[1:100, :]
+	#all_data = vcat(all_data[1:100, :], all_data[end-100:end, :])
+
+	# read in gender and diagnosis data
+	gendiag = readcsv(gendiag_filename, header=false)
+	#gendiag = vcat(gendiag[1:100, :], gendiag[end-100:end, :])
 
 	# Form sparse array
 	all_data = sparse(Array(all_data))
@@ -29,15 +33,25 @@ function read_data(filename, map_filename)
 
 	println("Data loaded")
 	flush(STDOUT)
-	return all_data, obs, num_options
+	return all_data, obs, num_options, gendiag
 end
 
-function build_model(all_data, obs, k, num_options)
+function build_model(all_data, obs, k, num_options, gendiag)
 	m, n = size(all_data)
-	#rx, ry = QuadReg(0.01), QuadReg(0.01)
-	rx, ry = QuadReg(.01), QuadReg(.01)
+	rx = Array{Regularizer}(m)
+	ry = QuadReg(.01)
+	
 
-	# construct the BVSLoss
+	# Latent features
+	last_diag = findlast(gendiag[:, 2])
+	for i=1:last_diag
+		rx[i] = fixed_latent_features(QuadReg(0.01), gendiag[i, :])
+	end
+	for i=(last_diag+1):m
+		rx[i] = fixed_latent_features(QuadReg(0.01), gendiag[i, 1:1], 1)
+	end
+
+	# construct the Loss
 	losses = Array{Loss}(n)
 	D = 0
 	for i=1:n
@@ -65,19 +79,20 @@ function build_model(all_data, obs, k, num_options)
 end
 
 function run_model(fold, k)
-	all_data, obs, num_options = @time read_data(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"),
+	all_data, obs, num_options, gendiag = @time read_data(string(data_directory, "/all_samples_ordinal_gender_cv$(fold)_train.csv"),
+									string(data_directory, "/all_samples_ordinal_cleaned_gender_gendiag.csv"),
 									string(data_directory, "/all_samples_ordinal_cleaned_map.txt"))
 
-	glrm = @time build_model(all_data, obs, k, num_options)
+	glrm = @time build_model(all_data, obs, k, num_options, gendiag)
 
 	# Fit model
     X,Y,ch = @time LowRankModels.fit!(glrm, params=ProxGradParams(max_iter=500), verbose=true);
     println("Model trained")
     flush(STDOUT)
 
-	@time writecsv(string(data_directory, "/impute_mult_cv_k$(k)_fold$(fold).csv"), impute(glrm))
-	@time writecsv(string(data_directory, "/impute_mult_X_cv_k$(k)_fold$(fold).csv"), X)
-	@time writecsv(string(data_directory, "/impute_mult_Y_cv_k$(k)_fold$(fold).csv"), Y)
+	@time writecsv(string(data_directory, "/impute_mult_gender_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+	@time writecsv(string(data_directory, "/impute_mult_gender_X_cv_k$(k)_fold$(fold).csv"), X)
+	@time writecsv(string(data_directory, "/impute_mult_gender_Y_cv_k$(k)_fold$(fold).csv"), Y)
 
 	println("Model saved")
     flush(STDOUT)
