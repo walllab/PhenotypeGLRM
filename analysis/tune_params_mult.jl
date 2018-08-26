@@ -14,7 +14,7 @@ function read_data(filename, map_filename)
 	println("Read in data ", filename)
 	# Read in training data
 	all_data = readcsv(filename, Int, header=false)
-	all_data = vcat(all_data[1:100, :], all_data[end-100:end, :])
+	#all_data = vcat(all_data[1:100, :], all_data[end-100:end, :])
 
 	# Form sparse array
 	all_data = sparse(Array(all_data))
@@ -37,7 +37,7 @@ function build_model(all_data, obs, k, num_options)
 	#rx, ry = QuadReg(0.01), QuadReg(0.01)
 	rx, ry = QuadReg(.01), QuadReg(.01)
 
-	# construct the BVSLoss
+	# construct the Loss
 	losses = Array{Loss}(n)
 	D = 0
 	for i=1:n

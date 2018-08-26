@@ -14,7 +14,7 @@ function read_data(filename, map_filename)
 	println("Read in data ", filename)
 	# Read in training data
 	all_data = readcsv(filename, Int, header=false)
-	all_data = vcat(all_data[1:100, :], all_data[end-100:end, :])
+	#all_data = vcat(all_data[1:100, :], all_data[end-100:end, :])
 
 	# Form sparse array
 	all_data = sparse(Array(all_data))
@@ -40,7 +40,7 @@ function build_model(all_data, obs, k, num_options)
 	losses = Array{Loss}(n)
 	D = 0
 	for i=1:n
-		scale = sum(all_data[:, i]!=0)/n
+		scale = n/sum(all_data[:, i]!=0)
 		if num_options[i] == 2
 			losses[i] = LogisticLoss(scale)
 			D += 1
