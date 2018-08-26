@@ -14,7 +14,7 @@ function read_data(filename, map_filename)
 	println("Read in data ", filename)
 	# Read in training data
 	all_data = readcsv(filename, Int, header=false)
-	#all_data = readcsv(filename, Int, header=false)[1:100, :]
+	all_data = vcat(all_data[1:100, :], all_data[end-100:end, :])
 
 	# Form sparse array
 	all_data = sparse(Array(all_data))
@@ -41,11 +41,12 @@ function build_model(all_data, obs, k, num_options)
 	losses = Array{Loss}(n)
 	D = 0
 	for i=1:n
+		scale = n/sum(all_data[:, i]!=0)
 		if num_options[i] == 2
-			losses[i] = LogisticLoss()
+			losses[i] = LogisticLoss(scale)
 			D += 1
 		else
-	    	losses[i] = MultinomialLoss(num_options[i])
+	    	losses[i] = MultinomialLoss(num_options[i], scale)
 	    	D += num_options[i]
 	    end
 	end
@@ -65,7 +66,7 @@ function build_model(all_data, obs, k, num_options)
 end
 
 function run_model(fold, k)
-	all_data, obs, num_options = @time read_data(string(data_directory, "/all_samples_ordinal_gender_cv$(fold)_train.csv"),
+	all_data, obs, num_options = @time read_data(string(data_directory, "/all_samples_ordinal_cv$(fold)_train.csv"),
 									string(data_directory, "/all_samples_ordinal_cleaned_map.txt"))
 
 	glrm = @time build_model(all_data, obs, k, num_options)
@@ -75,9 +76,9 @@ function run_model(fold, k)
     println("Model trained")
     flush(STDOUT)
 
-	@time writecsv(string(data_directory, "/impute_mult_cv_k$(k)_fold$(fold).csv"), impute(glrm))
-	@time writecsv(string(data_directory, "/impute_mult_X_cv_k$(k)_fold$(fold).csv"), X)
-	@time writecsv(string(data_directory, "/impute_mult_Y_cv_k$(k)_fold$(fold).csv"), Y)
+	@time writecsv(string(data_directory, "/impute_mult_scale_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+	@time writecsv(string(data_directory, "/impute_mult_scale_X_cv_k$(k)_fold$(fold).csv"), X)
+	@time writecsv(string(data_directory, "/impute_mult_scale_Y_cv_k$(k)_fold$(fold).csv"), Y)
 
 	println("Model saved")
     flush(STDOUT)

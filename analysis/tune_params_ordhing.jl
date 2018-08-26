@@ -39,10 +39,11 @@ function build_model(all_data, obs, k, num_options)
 	# construct the OrdinalHingeLoss
 	losses = Array{Loss}(n)
 	for i=1:n
+		scale = n/sum(all_data[:, i]!=0)
 		if num_options[i] == 2
-			losses[i] = LogisticLoss()
+			losses[i] = LogisticLoss(scale)
 		else
-	    	losses[i] = OrdinalHingeLoss(num_options[i])
+	    	losses[i] = OrdinalHingeLoss(num_options[i], scale)
 	    end
 	end
 	@show m, n
@@ -63,7 +64,10 @@ function run_model(fold, k)
     println("Model trained")
     flush(STDOUT)
 
-	@time writecsv(string(data_directory, "/impute_ordhing_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+	@time writecsv(string(data_directory, "/impute_ordhing_scale_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+	@time writecsv(string(data_directory, "/impute_ordhing_scale_X_cv_k$(k)_fold$(fold).csv"), X)
+	@time writecsv(string(data_directory, "/impute_ordhing_scale_Y_cv_k$(k)_fold$(fold).csv"), Y)
+
 	println("Model saved")
     flush(STDOUT)
 end
