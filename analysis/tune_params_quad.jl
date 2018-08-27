@@ -37,8 +37,7 @@ function build_model(all_data, obs, k)
 	# construct the Loss
 	losses = Array{Loss}(n)
 	for i=1:n
-		scale = n/sum(all_data[:, i]!=0)
-		losses[i] = QuadLoss(scale)
+		losses[i] = QuadLoss()
 	end
 
 	println("Model built")
@@ -57,9 +56,9 @@ function run_model(fold, k)
     println("Model trained")
     flush(STDOUT)
 
-	@time writecsv(string(data_directory, "/impute_quad_scale_cv_k$(k)_fold$(fold).csv"), impute(glrm))
-	@time writecsv(string(data_directory, "/impute_quad_scale_X_cv_k$(k)_fold$(fold).csv"), X)
-	@time writecsv(string(data_directory, "/impute_quad_scale_Y_cv_k$(k)_fold$(fold).csv"), Y)
+	@time writecsv(string(data_directory, "/impute_quad_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+	@time writecsv(string(data_directory, "/impute_quad_X_cv_k$(k)_fold$(fold).csv"), X)
+	@time writecsv(string(data_directory, "/impute_quad_Y_cv_k$(k)_fold$(fold).csv"), Y)
 	
 	println("Model saved")
     flush(STDOUT)

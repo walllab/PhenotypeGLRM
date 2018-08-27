@@ -41,12 +41,11 @@ function build_model(all_data, obs, k, num_options)
 	losses = Array{Loss}(n)
 	D = 0
 	for i=1:n
-		scale = n/sum(all_data[:, i]!=0)
 		if num_options[i] == 2
-			losses[i] = LogisticLoss(scale)
+			losses[i] = LogisticLoss()
 			D += 1
 		else
-	    	losses[i] = BvSLoss(num_options[i], scale)
+	    	losses[i] = BvSLoss(num_options[i])
 	    	D += (num_options[i]-1)
 	    end
 	end
@@ -76,9 +75,9 @@ function run_model(fold, k)
     println("Model trained")
     flush(STDOUT)
 
-	@time writecsv(string(data_directory, "/impute_bvs_scale_cv_k$(k)_fold$(fold).csv"), impute(glrm))
-	@time writecsv(string(data_directory, "/impute_bvs_scale_X_cv_k$(k)_fold$(fold).csv"), X)
-	@time writecsv(string(data_directory, "/impute_bvs_scale_Y_cv_k$(k)_fold$(fold).csv"), Y)
+	@time writecsv(string(data_directory, "/impute_bvs_cv_k$(k)_fold$(fold).csv"), impute(glrm))
+	@time writecsv(string(data_directory, "/impute_bvs_X_cv_k$(k)_fold$(fold).csv"), X)
+	@time writecsv(string(data_directory, "/impute_bvs_Y_cv_k$(k)_fold$(fold).csv"), Y)
 	
 	println("Model saved")
     flush(STDOUT)

@@ -4,7 +4,7 @@
 #SBATCH --job-name=quad
 #SBATCH --output=quad%A_%a.out
 #SBATCH --error=quad%A_%a.err
-#SBATCH --array=0-4
+#SBATCH --array=5-9
 #SBATCH -p dpwall
 #SBATCH -D /scratch/PI/dpwall/DATA/iHART/kpaskov/PhenotypeGLRM
 #SBATCH -t 20:00:00

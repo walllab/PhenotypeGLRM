@@ -4,7 +4,7 @@
 #SBATCH --job-name=ova
 #SBATCH --output=ova%A_%a.out
 #SBATCH --error=ova%A_%a.err
-#SBATCH --array=0-4
+#SBATCH --array=5-9
 #SBATCH -p dpwall
 #SBATCH -D /scratch/PI/dpwall/DATA/iHART/kpaskov/PhenotypeGLRM
 #SBATCH -t 20:00:00
