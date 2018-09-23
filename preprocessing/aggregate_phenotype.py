@@ -553,8 +553,8 @@ with open(directory + '/160826.ped', 'r') as f:
 		if ped_diag_map[line[5]] is not None:
 			agre_info[ind_id]['clinical_diagnosis_raw'] = ped_diag_map[line[5]]
 		agre_info[ind_id]['family'] = line[0]
-		agre_info[ind_id]['mother_id'] = x[3]
-		agre_info[ind_id]['father_id'] = x[2]
+		agre_info[ind_id]['mother_id'] = line[3]
+		agre_info[ind_id]['father_id'] = line[2]
 		if gender_map[line[4]] is not None:
 			agre_info[ind_id]['gender'] = gender_map[line[4]]
 

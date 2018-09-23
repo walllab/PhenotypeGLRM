@@ -1,0 +1,14 @@
+adi1995short	ADIR1995_Short
+adi1995		ADIR1995_Long
+adiwps		ADIR2003
+adosiimod1	ADOS2_Module1
+adosiimod2	ADOS2_Module2
+adosiimod3	ADOS2_Module3
+adosiimod4	ADOS2_Module4
+adosm2g1999	ADOS_Module2
+adosm3		ADOS_Module3
+adosm4g		ADOS_Module4
+adosm4wps20011999	ADOS_Module4 with some reordering
+adosmod1	ADOS_Module1
+adosmod2wps2001	ADOS_Module2 with some reordering
+adospremod	ADOS2_Module_Toddler

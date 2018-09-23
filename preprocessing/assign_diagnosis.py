@@ -423,9 +423,11 @@ def assign_clinical_diagnosis(sample):
 		cd = sample['clinical_diagnosis_raw'].lower()
 		if cd == '':
 			sample['clinical_diagnosis'] = None
-		elif 'aut' in cd or '299' in cd or 'asd' in cd or cd in ['proband', 'broadspectrum', 'asd', 'affected sibling', 'ad', 'affected']:
+		elif 'aut' in cd or '299' in cd or 'asd' in cd or cd in ['proband', 'asd', 'affected sibling', 'ad', 'affected']:
 			sample['clinical_diagnosis'] = 'Autism'
-		elif 'asperger' in cd or 'nqa' in cd:
+		elif 'nqa' in cd or cd == 'broadspectrum':
+			sample['clinical_diagnosis'] = 'NQA'
+		elif 'asperger' in cd:
 			sample['clinical_diagnosis'] =  'Asperger'
 		elif cd in ['not met', 'unaffected', 'typical', 'unaffected sibling', 'primary caregiver 1', 'primary caregiver 2'] or 'control' in cd:
 			sample['clinical_diagnosis'] =  'Control'

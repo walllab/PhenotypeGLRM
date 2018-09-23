@@ -6,7 +6,8 @@ flush(STDOUT)
 data_directory = ARGS[1]
 k = parse(Int64, ARGS[2])
 fold = parse(Int64, ARGS[3])
-@show data_directory, k, fold
+instrument = ARGS[4]
+@show data_directory, k, fold, instrument
 println("Command line arguments loaded")
 flush(STDOUT)
 
@@ -14,7 +15,18 @@ function read_data(filename, map_filename)
 	println("Read in data ", filename)
 	# Read in training data
 	all_data = readcsv(filename, Int, header=false)
-	#all_data = readcsv(filename, Int, header=false)[1:100, :]
+	all_data = all_data[1:100, :]
+
+	# Pull number of options for each item
+	num_options = readdlm(map_filename, '\t', header=false)[(size(all_data, 2)+1):(2*(size(all_data, 2)))]
+
+	if instrument != "all"
+		from_inst = Array([startswith(x, instrument) for x in readdlm(map_filename, '\t', header=false)[1:size(all_data, 2)]])
+		print(from_inst)
+		println(size(from_inst), size(all_data))
+		all_data = [:, from_inst]
+		num_options = num_options[from_inst]
+	end
 
 	# Form sparse array
 	all_data = sparse(Array(all_data))
@@ -23,9 +35,8 @@ function read_data(filename, map_filename)
 	# Pull observed (nonzero) entries
 	i, j, v = findnz(all_data)
 	obs = collect(zip(i, j))
+	@show size(all_data)
 	@show maximum(all_data), minimum(all_data), size(obs, 1)
-
-	num_options = readdlm(map_filename, '\t', header=false)[(size(all_data, 2)+1):(2*(size(all_data, 2)))]
 
 	println("Data loaded")
 	flush(STDOUT)

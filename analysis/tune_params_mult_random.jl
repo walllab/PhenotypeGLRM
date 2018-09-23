@@ -6,6 +6,7 @@ flush(STDOUT)
 data_directory = ARGS[1]
 k = parse(Int64, ARGS[2])
 fold = parse(Int64, ARGS[3])
+run = parse(Int64, ARGS[4])
 @show data_directory, k, fold
 println("Command line arguments loaded")
 flush(STDOUT)
@@ -18,8 +19,9 @@ function read_data(filename, gendiag_filename, map_filename)
 
 	# read in gender and diagnosis data
 	gendiag = readcsv(gendiag_filename, header=false)
+	gendiag[:, 1] = rand([-1,1],(size(gendiag, 1)))
 	gendiag = vcat(gendiag[1:100, :], gendiag[end-100:end, :])
-
+	
 	# Form sparse array
 	all_data = sparse(Array(all_data))
 	dropzeros!(all_data)
