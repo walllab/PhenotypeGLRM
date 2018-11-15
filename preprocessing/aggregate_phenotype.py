@@ -665,7 +665,7 @@ convert_phenotypes("AGRE_2015/ADOS Mod1/ADOS2_combined.csv", "AGRE", "ADOS2_Modu
 	known_data=agre_info)
 
 # ADOS_Module1 (This is the old version)
-convert_phenotypes("AGRE_2010/ADOS Module 1/ADOS11.csv", "AGRE", "ADOS_Module1",
+convert_phenotypes("AGRE_2010/ADOS.Module.1/ADOS11.csv", "AGRE", "ADOS_Module1",
 	{
 		"identifier": lambda x: x[6],
 		"age": lambda x: int(round(12*float(x[12]), 0)),
@@ -716,7 +716,7 @@ convert_phenotypes("AGRE_2015/ADOS Mod2/ADOS2_combined.csv", "AGRE", "ADOS2_Modu
 	known_data=agre_info)
 
 # ADOS_Module2
-convert_phenotypes("AGRE_2010/ADOS Module 2/ADOS21.csv", "AGRE", "ADOS_Module2",
+convert_phenotypes("AGRE_2010/ADOS.Module.2/ADOS21.csv", "AGRE", "ADOS_Module2",
 	{
 		"identifier": lambda x: x[6],
 		"age": lambda x: int(round(12*float(x[12]), 0)),
@@ -767,7 +767,7 @@ convert_phenotypes("AGRE_2015/ADOS Mod3/ADOS2_combined.csv", "AGRE", "ADOS2_Modu
 	known_data=agre_info)
 
 # ADOS_Module3
-convert_phenotypes("AGRE_2010/ADOS Module 3/ADOS31.csv", "AGRE", "ADOS_Module3",
+convert_phenotypes("AGRE_2010/ADOS.Module.3/ADOS31.csv", "AGRE", "ADOS_Module3",
 	{
 		"identifier": lambda x: x[6],
 		"age": lambda x: int(round(12*float(x[12]), 0)),
@@ -801,7 +801,7 @@ convert_phenotypes("AGRE_2015/ADOS Mod4/ADOS41.csv", "AGRE", "ADOS_Module4",
  	known_data=agre_info)
 
 # ADOS_Module4
-convert_phenotypes("AGRE_2010/ADOS Module 4/ADOS41.csv", "AGRE", "ADOS_Module4",
+convert_phenotypes("AGRE_2010/ADOS.Module.4/ADOS41.csv", "AGRE", "ADOS_Module4",
 	{
 		"identifier": lambda x: x[6],
 		"age": lambda x: int(round(12*float(x[12]), 0)),
@@ -1744,8 +1744,8 @@ for filename in os.listdir("%s/%s" % (directory, path)):
 # pull diagnosis
 ssc_info = defaultdict(dict)
 
-for subd in ['Proband Data', 'MZ Twin Data', 'Mother Data', 'Father Data', 'Other Sibling Data', 'Designated Unaffected Sibling Data']:
-	with open(directory + "/SSC Version 15 Phenotype Data Set 2/%s/ssc_core_descriptive.csv" % subd, 'r') as f:
+for subd in ['proband.data', 'mz.twin.data', 'mother.data', 'father.data', 'other.sibling.data', 'designated.unaffected.sibling.data']:
+	with open(directory + "/SSC.v15.phenotype.dataset.2/%s/ssc_core_descriptive.csv" % subd, 'r') as f:
 		reader = csv.reader(f)
 		header = next(reader)[1:]
 		for line in reader:
@@ -1755,14 +1755,14 @@ for subd in ['Proband Data', 'MZ Twin Data', 'Mother Data', 'Father Data', 'Othe
 			ssc_info[ind_id]['gender'] = gender_map[line[40]]
 			ssc_info[ind_id]['family'] = ind_id[:-3]
 
-for subd in ['Proband Data', 'MZ Twin Data']:
-	with open(directory + "/SSC Version 15 Phenotype Data Set 2/%s/ssc_diagnosis.csv" % subd, 'r') as f:
+for subd in ['proband.data', 'mz.twin.data']:
+	with open(directory + "/SSC.v15.phenotype.dataset.2/%s/ssc_diagnosis.csv" % subd, 'r') as f:
 		reader = csv.reader(f)
 		header = next(reader)[1:]
 		for line in reader:
 			ssc_info[line[0]]['clinical_diagnosis_raw'] = line[15]
 
-with open(directory + '/SSC Version 15 Phenotype Data Set 2/ssc.ped', 'r') as f:
+with open(directory + '/SSC.v15.phenotype.dataset.2/ssc.ped', 'r') as f:
 	reader = csv.reader(f, delimiter='\t')
 	for line in reader:
 		ind_id = line[1]
@@ -1771,7 +1771,7 @@ with open(directory + '/SSC Version 15 Phenotype Data Set 2/ssc.ped', 'r') as f:
 		ssc_info[ind_id]['clinical_diagnosis_raw'] = ped_diag_map[line[5]]
 
 # ADIR2003
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/adi_r.csv", "Simons Simplex Collection", "ADIR2003", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/proband.data/adi_r.csv", "Simons Simplex Collection", "ADIR2003", 
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1790,7 +1790,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/adi_r.csv",
 	}, known_data=ssc_info)
 
 # ADIR2003
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/adi_r.csv", "Simons Simplex Collection", "ADIR2003", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/mz.twin.data/adi_r.csv", "Simons Simplex Collection", "ADIR2003", 
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1809,7 +1809,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/adi_r.csv",
 	}, known_data=ssc_info)
 
 # ADOS_Module1
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_1_raw.csv", "Simons Simplex Collection", "ADOS_Module1", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/proband.data/ados_1_raw.csv", "Simons Simplex Collection", "ADOS_Module1", 
 	{"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
 	}, 
@@ -1822,7 +1822,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_1_raw.
 	}, known_data=ssc_info)
 
 # ADOS_Module1
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_1_raw.csv", "Simons Simplex Collection", "ADOS_Module1", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/mz.twin.data/ados_1_raw.csv", "Simons Simplex Collection", "ADOS_Module1", 
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1836,7 +1836,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_1_raw.
 	}, known_data=ssc_info)
 
 # ADOS_Module2
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_2_raw.csv", "Simons Simplex Collection", "ADOS_Module2", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/proband.data/ados_2_raw.csv", "Simons Simplex Collection", "ADOS_Module2", 
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1850,7 +1850,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_2_raw.
 	}, known_data=ssc_info)
 
 # ADOS_Module2
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_2_raw.csv", "Simons Simplex Collection", "ADOS_Module2", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/mz.twin.data/ados_2_raw.csv", "Simons Simplex Collection", "ADOS_Module2", 
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1864,7 +1864,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_2_raw.
 	}, known_data=ssc_info)
 
 # ADOS_Module3
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_3_raw.csv", "Simons Simplex Collection", "ADOS_Module3", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/proband.data/ados_3_raw.csv", "Simons Simplex Collection", "ADOS_Module3", 
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1878,7 +1878,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_3_raw.
  	}, known_data=ssc_info)
 
 # ADOS_Module3
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_3_raw.csv", "Simons Simplex Collection", "ADOS_Module3", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/mz.twin.data/ados_3_raw.csv", "Simons Simplex Collection", "ADOS_Module3", 
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1892,7 +1892,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_3_raw.
 	}, known_data=ssc_info)
 
 # ADOS_Module4	
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_4_raw.csv", "Simons Simplex Collection", "ADOS_Module4", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/proband.data/ados_4_raw.csv", "Simons Simplex Collection", "ADOS_Module4", 
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1906,7 +1906,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/ados_4_raw.
 	}, known_data=ssc_info)
 
 # ADOS_Module4
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_4_raw.csv", "Simons Simplex Collection", "ADOS_Module4", 
+convert_phenotypes("SSC.v15.phenotype.dataset.2/mz.twin.data/ados_4_raw.csv", "Simons Simplex Collection", "ADOS_Module4", 
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1920,7 +1920,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/ados_4_raw.
 	}, known_data=ssc_info)
 
 # SRS_Child
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
+convert_phenotypes("SSC.v15.phenotype.dataset.2/proband.data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1928,7 +1928,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Proband Data/srs_parent_
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Child
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
+convert_phenotypes("SSC.v15.phenotype.dataset.2/mz.twin.data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1936,7 +1936,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/MZ Twin Data/srs_parent_
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Child
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Other Sibling Data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
+convert_phenotypes("SSC.v15.phenotype.dataset.2/other.sibling.data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1944,7 +1944,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Other Sibling Data/srs_p
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Child
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Designated Unaffected Sibling Data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
+convert_phenotypes("SSC.v15.phenotype.dataset.2/designated.unaffected.sibling.data/srs_parent_recode.csv", "Simons Simplex Collection", "SRS_Child",
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1953,7 +1953,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Designated Unaffected Si
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Adult
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Father Data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
+convert_phenotypes("SSC.v15.phenotype.dataset.2/father.data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1963,7 +1963,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Father Data/srs_adult_re
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Adult
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Mother Data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
+convert_phenotypes("SSC.v15.phenotype.dataset.2/mother.data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1973,7 +1973,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Mother Data/srs_adult_re
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Adult
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Other Sibling Data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
+convert_phenotypes("SSC.v15.phenotype.dataset.2/other.sibling.data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
@@ -1981,7 +1981,7 @@ convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Other Sibling Data/srs_a
 	dict(zip(['Q' + str(i).zfill(2) for i in range(1, 66)], range(3, 68))), known_data=ssc_info)
 
 # SRS_Adult
-convert_phenotypes("SSC Version 15 Phenotype Data Set 2/Designated Unaffected Sibling Data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
+convert_phenotypes("SSC.v15.phenotype.dataset.2/designated.unaffected.sibling.data/srs_adult_recode.csv", "Simons Simplex Collection", "SRS_Adult",
 	{
 		"identifier": lambda x: x[0],
 		"family": lambda x: x[0][:-3],
